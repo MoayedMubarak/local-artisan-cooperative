@@ -1,2 +1,2 @@
 # local-artisan-cooperative
-A Spring Boot and MySQL web application for a Local Artisan Cooperative.
+A Spring Boot and PostgreSQL web application for a Local Artisan Cooperative.
