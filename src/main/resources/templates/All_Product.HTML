@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .product-card {
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .auction-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e0d8;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c17c5f;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            background: #a5664d;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c17c5f;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-moz-range-thumb:hover {
+            background: #a5664d;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox:checked {
+            background-color: #c17c5f;
+            border-color: #c17c5f;
+        }
+
+        .custom-radio:checked {
+            border-color: #c17c5f;
+        }
+
+        .custom-radio:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #c17c5f;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Center Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="#" class="text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Artisan Dashboard</a>
+            </div>
+
+            <!-- Cart Icon -->
+            <div class="relative">
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">
+        <!-- Left Sidebar -->
+        <aside class="w-[250px] flex-shrink-0 hidden lg:block">
+            <div class="bg-white rounded-xl p-6 card-shadow sticky top-24">
+                <!-- Search Input -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Search Products</h3>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Search..." 
+                            class="w-full px-4 py-2 pl-10 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
+                        />
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#b8a99a]"></i>
+                    </div>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Categories</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="custom-radio sr-only" checked>
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">All</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Ceramics</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Jewelry</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Paintings</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Textiles</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Woodwork</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Price Range Slider -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Price Range</h3>
+                    <div class="px-2">
+                        <input type="range" min="0" max="1000" value="500" class="w-full" id="priceRange">
+                        <div class="flex justify-between mt-2 text-sm text-[#8b7355]">
+                            <span>0 BD</span>
+                            <span class="font-semibold text-[#c17c5f]" id="priceValue">500 BD</span>
+                            <span>1000 BD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Show Auctions Only Checkbox -->
+                <div>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" class="custom-checkbox sr-only">
+                        <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded mr-3 flex items-center justify-center group-hover:border-[#c17c5f] transition-colors">
+                            <i class="fas fa-check text-white text-xs opacity-0 checkbox-icon"></i>
+                        </div>
+                        <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Show Auctions Only</span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Top Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <p class="text-[#8b7355]">
+                    <span class="font-semibold text-[#5c4a3d]">12</span> items found
+                </p>
+                <div class="flex items-center gap-3">
+                    <label class="text-[#5c4a3d] font-medium">Sort by:</label>
+                    <select class="px-4 py-2 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                        <option value="name">Name: A-Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Product Card 1 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=300&fit=crop" alt="Handmade Ceramic Vase" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Handmade Ceramic Vase</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Elena Rodriguez</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$85.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 (Auction) -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=300&fit=crop" alt="Silver Moonstone Necklace" class="w-full h-56 object-cover">
+                        <div class="absolute top-3 right-3 auction-badge bg-[#c17c5f] text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            <i class="fas fa-gavel mr-1"></i> Auction
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Silver Moonstone Necklace</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Marcus Chen</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xl font-bold text-[#c17c5f]">$120.00</span>
+                            </div>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&h=300&fit=crop" alt="Abstract Oil Painting" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Abstract Oil Painting</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Sarah Mitchell</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$350.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 4 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=400&h=300&fit=crop" alt="Woven Wool Blanket" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Woven Wool Blanket</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Anna Kowalski</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$195.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 5 (Auction) -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=300&fit=crop" alt="Oak Wood Cutting Board" class="w-full h-56 object-cover">
+                        <div class="absolute top-3 right-3 auction-badge bg-[#c17c5f] text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            <i class="fas fa-gavel mr-1"></i> Auction
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Oak Wood Cutting Board</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by James Thompson</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xl font-bold text-[#c17c5f]">$65.00</span>
+                            </div>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 6 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400&h=300&fit=crop" alt="Artisan Coffee Mug Set" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Artisan Coffee Mug Set</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Elena Rodriguez</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$48.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 7 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop" alt="Gold Leaf Earrings" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Gold Leaf Earrings</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Maria Santos</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$95.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 8 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1582560475093-d092229f0350?w=400&h=300&fit=crop" alt="Landscape Watercolor" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Landscape Watercolor</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by David Park</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$220.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 9 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=300&fit=crop" alt="Handwoven Scarf" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Handwoven Scarf</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Lisa Anderson</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$78.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 10 (Auction) -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1605333190470-7626071e7cd0?w=400&h=300&fit=crop" alt="Carved Wooden Bowl" class="w-full h-56 object-cover">
+                        <div class="absolute top-3 right-3 auction-badge bg-[#c17c5f] text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            <i class="fas fa-gavel mr-1"></i> Auction
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Carved Wooden Bowl</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Robert Hayes</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xl font-bold text-[#c17c5f]">$145.00</span>
+                            </div>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 11 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1565193566173-034e49e89015?w=400&h=300&fit=crop" alt="Ceramic Planter Set" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Ceramic Planter Set</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Emma Wilson</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$62.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 12 -->
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1576016770956-debb63d92086?w=400&h=300&fit=crop" alt="Embroidered Wall Hanging" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Embroidered Wall Hanging</h3>
+                        <p class="text-[#8b7355] text-sm mb-3">by Sophie Turner</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-bold text-[#c17c5f]">$135.00</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = this.value + ' BD';
+        });
+
+        // Custom checkbox functionality
+        const checkboxes = document.querySelectorAll('.custom-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const icon = this.parentElement.querySelector('.checkbox-icon');
+                if (this.checked) {
+                    icon.style.opacity = '1';
+                    this.parentElement.querySelector('div').classList.add('bg-[#c17c5f]', 'border-[#c17c5f]');
+                } else {
+                    icon.style.opacity = '0';
+                    this.parentElement.querySelector('div').classList.remove('bg-[#c17c5f]', 'border-[#c17c5f]');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
