@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta {
+            color: #c17c5f;
+        }
+        
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+        
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+        
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+        
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+        
+        .text-earth {
+            color: #8b7355;
+        }
+        
+        .bg-earth {
+            background-color: #8b7355;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+        
+        .success-green {
+            color: #10b981;
+        }
+        
+        .bg-success-green {
+            background-color: #10b981;
+        }
+        
+        .bg-success-light {
+            background-color: #ecfdf5;
+        }
+        
+        .border-success-green {
+            border-color: #10b981;
+        }
+        
+        .text-success-dark {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
+            </div>
+            
+            <!-- Center Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="products.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="auctions.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Auctions</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- User Menu -->
+                <a href="my-profile.HTML" class="group flex items-center gap-2 transition-colors">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <!-- Profile Icon Container with Badge -->
+                        <div class="relative">
+                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                            <!-- This is the badge, like your cart icon has -->
+                        </div>
+                        
+                        <div class="text-sm">
+                            <!-- Name changes color on hover because of group-hover -->
+                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Notifications Bell Icon -->
+                <a href="notifications.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                </a>
+                
+                <!-- Cart Icon -->
+                <a href="ShoppingCart&Checkout.HTML">
+                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+        <!-- Main Content: Order Confirmation -->
+        <main class="flex-1">
+            <div class="max-w-2xl mx-auto">
+                <!-- Success Icon and Header -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-success-light rounded-full mb-6">
+                        <i class="fas fa-check-circle text-6xl success-green"></i>
+                    </div>
+                    <h1 class="text-4xl font-bold text-[#5c4a3d] mb-3">Order Confirmed!</h1>
+                    <p class="text-lg text-[#8b7355]">Thank you for your purchase. A confirmation email has been sent to your address.</p>
+                </div>
+
+                <!-- Order Summary Card -->
+                <div class="bg-white rounded-xl p-8 card-shadow mb-8">
+                    <h2 class="text-2xl font-bold text-[#5c4a3d] mb-6 flex items-center">
+                        <i class="fas fa-receipt terracotta mr-3"></i>Order Summary
+                    </h2>
+                    
+                    <!-- Order Info -->
+                    <div class="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-[#e5e0d8]">
+                        <div>
+                            <p class="text-sm text-[#8b7355] mb-1">Order ID</p>
+                            <p class="font-semibold text-[#5c4a3d]">#AC-2024-78542</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-[#8b7355] mb-1">Order Date</p>
+                            <p class="font-semibold text-[#5c4a3d]">January 15, 2024</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Items Purchased -->
+                    <div class="mb-6 pb-6 border-b border-[#e5e0d8]">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-4">Items Purchased</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=60&h=60&fit=crop" alt="Handmade Ceramic Vase" class="w-14 h-14 object-cover rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-[#5c4a3d]">Handmade Ceramic Vase</p>
+                                        <p class="text-sm text-[#8b7355]">Qty: 1</p>
+                                    </div>
+                                </div>
+                                <p class="font-semibold text-[#5c4a3d]">85.00 BD</p>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://images.unsplash.com/photo-1733046889345-25938f38c8e7?q=80&w=1180&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Artisan Coffee Mug Set" class="w-14 h-14 object-cover rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-[#5c4a3d]">Artisan Coffee Mug Set</p>
+                                        <p class="text-sm text-[#8b7355]">Qty: 2</p>
+                                    </div>
+                                </div>
+                                <p class="font-semibold text-[#5c4a3d]">96.00 BD</p>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://images.unsplash.com/photo-1609803384069-19f3e5a70e75?q=80&w=1035&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Handwoven Scarf" class="w-14 h-14 object-cover rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-[#5c4a3d]">Handwoven Scarf</p>
+                                        <p class="text-sm text-[#8b7355]">Qty: 1</p>
+                                    </div>
+                                </div>
+                                <p class="font-semibold text-[#5c4a3d]">78.00 BD</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Address -->
+                    <div class="mb-6 pb-6 border-b border-[#e5e0d8]">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3 flex items-center">
+                            <i class="fas fa-map-marker-alt terracotta mr-2"></i>Shipping Address
+                        </h3>
+                        <p class="text-[#5c4a3d]">John Doe</p>
+                        <p class="text-[#5c4a3d]">123 Main Street, Apt 4B</p>
+                        <p class="text-[#5c4a3d]">New York, NY 10001</p>
+                        <p class="text-[#8b7355] mt-1">United States</p>
+                    </div>
+                    
+                    <div class="pb-6 border-b border-[#e5e0d8] mb-6">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3 flex items-center">
+                        <span class="fas fa-truck terracotta mr-2"></span> Delivery Method
+                        </h3>
+                        <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-[#ecfdf5] text-[#059669] text-[11px] font-bold px-2 py-1 rounded-full border border-[#6ee7b7]">Shipping</span>
+                            <div>
+                            <p class="text-[#5c4a3d]">Home Delivery</p>
+                            <p class="text-xs text-[#8b7355]">Estimated delivery: Jan 20 – Jan 24, 2024</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold text-[#5c4a3d]">2.00 BD</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Method -->
+                    <div class="mb-6 pb-6 border-b border-[#e5e0d8]">
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3 flex items-center">
+                            <i class="fas fa-credit-card terracotta mr-2"></i>Payment Method
+                        </h3>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-cc-visa text-3xl text-[#1a1f71]"></i>
+                            <div>
+                                <p class="font-medium text-[#5c4a3d]">Visa ending in 4242</p>
+                                <p class="text-sm text-[#8b7355]">Credit Card</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Totals -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm text-[#8b7355]">
+                            <span>Subtotal</span>
+                            <span>259.00 BD</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-[#8b7355]">
+                            <span>Shipping</span>
+                            <span>2.00 BD</span>
+                        </div>
+                            <hr class="border-[#e5e0d8] my-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[17px] font-semibold">Total Paid</span>
+                            <span class="text-3xl font-bold text-[#10b981]">261.00 BD</span>
+                        </div>
+                    </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                    <button class="flex-1 bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center">
+                        <i class="fas fa-truck mr-3"></i>Track My Order
+                    </button>
+                    <a href="products.html" class="flex-1 bg-white hover:bg-[#faf9f6] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-4 rounded-xl font-bold text-lg transition-colors flex items-center justify-center">
+                        <i class="fas fa-arrow-left mr-3"></i>Continue Shopping
+                    </a>
+                </div>
+        </main>
+    </div>
+
+    <script>
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = this.value + ' BD';
+        });
+    </script>
+</body>
+</html>

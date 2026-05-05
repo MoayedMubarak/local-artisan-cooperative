@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta {
+            color: #c17c5f;
+        }
+        
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+        
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+        
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+        
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+        
+        .text-earth {
+            color: #8b7355;
+        }
+        
+        .bg-earth {
+            background-color: #8b7355;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status-shipped {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .status-delivered {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .filter-pill {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-pill.active {
+            background-color: #c17c5f;
+            color: white;
+            border-color: #c17c5f;
+        }
+        
+        .filter-pill:not(.active) {
+            background-color: white;
+            color: #8b7355;
+            border-color: #e5e0d8;
+        }
+        
+        .filter-pill:not(.active):hover {
+            border-color: #c17c5f;
+            color: #c17c5f;
+        }
+        
+        .order-row {
+            transition: all 0.2s ease;
+        }
+        
+        .order-row:hover {
+            background-color: #faf9f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- User Menu -->
+                <a href="my-profile.HTML" class="group flex items-center gap-2 transition-colors">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <!-- Profile Icon Container with Badge -->
+                        <div class="relative">
+                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                            <!-- This is the badge, like your cart icon has -->
+                        </div>
+                        
+                        <div class="text-sm">
+                            <!-- Name changes color on hover because of group-hover -->
+                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Notifications Bell Icon -->
+                <a href="notifications.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                </a>
+                
+                <!-- Cart Icon -->
+                <a href="ShoppingCart&Checkout.HTML">
+                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">        
+        <!-- Main Content: My Orders -->
+        <main class="flex-1">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">My Orders</h1>
+                <p class="text-[#8b7355]">Track and manage your purchases.</p>
+            </div>
+
+            <!-- Customer Account Navigation -->
+            <div class="bg-white rounded-xl p-4 card-shadow mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <a href="my-orders.html" class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium transition-colors">
+                        <i class="fas fa-receipt mr-2"></i>My Orders
+                    </a>
+                    <a href="my-wishlist.html" class="px-4 py-2 bg-[#faf9f6] text-[#8b7355] hover:text-[#c17c5f] rounded-lg font-medium transition-colors">
+                        <i class="fas fa-heart mr-2"></i>My Wishlist
+                    </a>
+                    <a href="my-profile.html" class="px-4 py-2 bg-[#faf9f6] text-[#8b7355] hover:text-[#c17c5f] rounded-lg font-medium transition-colors">
+                        <i class="fas fa-user mr-2"></i>My Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status Filter Pills -->
+            <div class="bg-white rounded-xl p-4 card-shadow mb-6">
+                <div class="flex flex-wrap gap-3">
+                    <button class="filter-pill active px-5 py-2 rounded-full border-2 font-medium" onclick="filterOrders('all', this)">
+                        All Orders
+                    </button>
+                    <button class="filter-pill px-5 py-2 rounded-full border-2 font-medium" onclick="filterOrders('pending', this)">
+                        <i class="fas fa-clock mr-2"></i>Pending
+                    </button>
+                    <button class="filter-pill px-5 py-2 rounded-full border-2 font-medium" onclick="filterOrders('shipped', this)">
+                        <i class="fas fa-truck mr-2"></i>Shipped
+                    </button>
+                    <button class="filter-pill px-5 py-2 rounded-full border-2 font-medium" onclick="filterOrders('delivered', this)">
+                        <i class="fas fa-check-circle mr-2"></i>Delivered
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-[#faf9f6] border-b border-[#e5e0d8]">
+                            <tr>
+                                <th class="text-left py-4 px-6 text-sm font-semibold text-[#5c4a3d]">Order ID</th>
+                                <th class="text-left py-4 px-6 text-sm font-semibold text-[#5c4a3d]">Date</th>
+                                <th class="text-left py-4 px-6 text-sm font-semibold text-[#5c4a3d]">Products</th>
+                                <th class="text-left py-4 px-6 text-sm font-semibold text-[#5c4a3d]">Total</th>
+                                <th class="text-left py-4 px-6 text-sm font-semibold text-[#5c4a3d]">Status</th>
+                                <th class="text-left py-4 px-6 text-sm font-semibold text-[#5c4a3d]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Order 1 - Delivered -->
+                            <tr class="order-row border-b border-[#e5e0d8] order-item" data-status="delivered">
+                                <td class="py-4 px-6">
+                                    <span class="font-semibold text-[#5c4a3d]">#AC-2024-78542</span>
+                                </td>
+                                <td class="py-4 px-6 text-[#8b7355]">Jan 15, 2024</td>
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=50&h=50&fit=crop" alt="Ceramic Vase" class="w-12 h-12 object-cover rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-[#5c4a3d]">Handmade Ceramic Vase</p>
+                                            <p class="text-sm text-[#8b7355]">+ 2 more items</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="font-bold text-[#5c4a3d]">$259.00</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="status-delivered px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                                        <i class="fas fa-check-circle mr-1"></i>Delivered
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium transition-colors">
+                                        View Details <i class="fas fa-arrow-right ml-1"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 2 - Shipped -->
+                            <tr class="order-row border-b border-[#e5e0d8] order-item" data-status="shipped">
+                                <td class="py-4 px-6">
+                                    <span class="font-semibold text-[#5c4a3d]">#AC-2024-78123</span>
+                                </td>
+                                <td class="py-4 px-6 text-[#8b7355]">Jan 10, 2024</td>
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=50&h=50&fit=crop" alt="Coffee Mug Set" class="w-12 h-12 object-cover rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-[#5c4a3d]">Artisan Coffee Mug Set</p>
+                                            <p class="text-sm text-[#8b7355]">Qty: 2</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="font-bold text-[#5c4a3d]">$96.00</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="status-shipped px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                                        <i class="fas fa-truck mr-1"></i>Shipped
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium transition-colors">
+                                        View Details <i class="fas fa-arrow-right ml-1"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 3 - Pending -->
+                            <tr class="order-row border-b border-[#e5e0d8] order-item" data-status="pending">
+                                <td class="py-4 px-6">
+                                    <span class="font-semibold text-[#5c4a3d]">#AC-2024-79001</span>
+                                </td>
+                                <td class="py-4 px-6 text-[#8b7355]">Jan 18, 2024</td>
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=50&h=50&fit=crop" alt="Handwoven Scarf" class="w-12 h-12 object-cover rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-[#5c4a3d]">Handwoven Scarf</p>
+                                            <p class="text-sm text-[#8b7355]">Qty: 1</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="font-bold text-[#5c4a3d]">$78.00</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="status-pending px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                                        <i class="fas fa-clock mr-1"></i>Pending
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium transition-colors">
+                                        View Details <i class="fas fa-arrow-right ml-1"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 4 - Delivered -->
+                            <tr class="order-row border-b border-[#e5e0d8] order-item" data-status="delivered">
+                                <td class="py-4 px-6">
+                                    <span class="font-semibold text-[#5c4a3d]">#AC-2024-76890</span>
+                                </td>
+                                <td class="py-4 px-6 text-[#8b7355]">Dec 28, 2023</td>
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=50&h=50&fit=crop" alt="Wooden Bowl" class="w-12 h-12 object-cover rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-[#5c4a3d]">Handcrafted Wooden Bowl</p>
+                                            <p class="text-sm text-[#8b7355]">Qty: 1</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="font-bold text-[#5c4a3d]">$125.00</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="status-delivered px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                                        <i class="fas fa-check-circle mr-1"></i>Delivered
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium transition-colors">
+                                        View Details <i class="fas fa-arrow-right ml-1"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 5 - Shipped -->
+                            <tr class="order-row border-b border-[#e5e0d8] order-item" data-status="shipped">
+                                <td class="py-4 px-6">
+                                    <span class="font-semibold text-[#5c4a3d]">#AC-2024-77456</span>
+                                </td>
+                                <td class="py-4 px-6 text-[#8b7355]">Jan 5, 2024</td>
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=50&h=50&fit=crop" alt="Gold Necklace" class="w-12 h-12 object-cover rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-[#5c4a3d]">Artisan Gold Necklace</p>
+                                            <p class="text-sm text-[#8b7355]">Qty: 1</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="font-bold text-[#5c4a3d]">$340.00</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="status-shipped px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                                        <i class="fas fa-truck mr-1"></i>Shipped
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium transition-colors">
+                                        View Details <i class="fas fa-arrow-right ml-1"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = this.value + ' BD';
+        });
+
+        // Filter orders by status
+        function filterOrders(status, button) {
+            // Update active pill
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            button.classList.add('active');
+
+            // Filter table rows
+            const rows = document.querySelectorAll('.order-item');
+            rows.forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

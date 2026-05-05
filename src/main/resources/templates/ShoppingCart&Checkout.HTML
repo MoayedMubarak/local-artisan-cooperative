@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart & Checkout - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta { color: #c17c5f; }
+        .bg-terracotta { background-color: #c17c5f; }
+        .bg-terracotta-dark { background-color: #a5664d; }
+        .hover\:bg-terracotta-dark:hover { background-color: #a5664d; }
+        .border-terracotta { border-color: #c17c5f; }
+        .text-earth { color: #8b7355; }
+        .bg-earth { background-color: #8b7355; }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139,115,85,0.1), 0 2px 4px -1px rgba(139,115,85,0.06);
+        }
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139,115,85,0.15), 0 4px 6px -2px rgba(139,115,85,0.1);
+        }
+        
+        .payment-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid #e5e0d8;
+        }
+        .payment-card:hover { border-color: #c17c5f; background-color: #faf9f6; }
+        .payment-card.selected { border-color: #c17c5f; background-color: #fdf8f5; }
+        
+        .delivery-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid #e5e0d8;
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+        .delivery-card:hover { border-color: #c17c5f; background-color: #faf9f6; }
+        .delivery-card.selected { border-color: #c17c5f; background-color: #fdf8f5; }
+
+        .quantity-btn { transition: all 0.2s ease; }
+        .quantity-btn:hover { background-color: #f5ebe0; color: #c17c5f; }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #e5e0d8;
+            margin-bottom: 0.75rem;
+            background: #fff;
+        }
+        .cart-item:hover { background-color: #fdf8f5; }
+
+        /* Cart item image — wider square */
+        .cart-item-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%; height: 6px;
+            background: #e5e0d8; border-radius: 3px; outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #c17c5f; cursor: pointer; transition: background 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { background: #a5664d; }
+        input[type=range]::-moz-range-thumb {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #c17c5f; cursor: pointer; border: none; transition: background 0.2s;
+        }
+        input[type=range]::-moz-range-thumb:hover { background: #a5664d; }
+
+        /* BenefitPay brand color */
+        .benefitpay-color { color: #e63b2d; }
+
+        #shipping-cost-row { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="products.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="auctions.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Auctions</a>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- User Menu -->
+                <a href="my-profile.HTML" class="group flex items-center gap-2 transition-colors">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <!-- Profile Icon Container with Badge -->
+                        <div class="relative">
+                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                            <!-- This is the badge, like your cart icon has -->
+                        </div>
+                        
+                        <div class="text-sm">
+                            <!-- Name changes color on hover because of group-hover -->
+                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Notifications Bell Icon -->
+                <a href="notifications.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                </a>
+                
+                <!-- Cart Icon -->
+                <a href="ShoppingCart&Checkout.HTML">
+                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">
+
+        <!-- Main Content: Cart & Checkout -->
+        <main class="flex-1">
+            <h1 class="text-3xl font-bold text-[#5c4a3d] mb-8">Checkout</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- LEFT PANEL: ITEMS (Extra Wide) -->
+                <div class="bg-white rounded-xl p-8 card-shadow">
+                    <h2 class="text-2xl font-bold text-[#5c4a3d] mb-8 flex items-center">
+                        <i class="fas fa-shopping-bag terracotta mr-3"></i>Review Your Order
+                    </h2>
+
+                    <!-- Cart Item 1 -->
+                    <div class="cart-item flex items-center gap-4">
+                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=180&h=180&fit=crop"
+                            alt="Handmade Ceramic Vase" class="cart-item-img">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-[#5c4a3d] truncate">Handmade Ceramic Vase</h3>
+                            <p class="text-sm text-[#8b7355]">by Elena Rodriguez</p>
+                            <p class="text-[#c17c5f] font-bold mt-1">85.00 BD</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                            <div class="flex items-center border border-[#e5e0d8] rounded-lg">
+                                <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <span class="px-3 py-1 text-[#5c4a3d] font-medium quantity-value">1</span>
+                                <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <p class="font-bold text-[#5c4a3d] item-subtotal">85.00 BD</p>
+                                <button class="text-[#8b7355] hover:text-red-500 transition-colors" onclick="removeItem(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Item 2 -->
+                    <div class="cart-item flex items-center gap-4">
+                        <img src="https://images.unsplash.com/photo-1733046889345-25938f38c8e7?q=80&w=180&h=180&fit=crop"
+                            alt="Artisan Coffee Mug Set" class="cart-item-img">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-[#5c4a3d] truncate">Artisan Coffee Mug Set</h3>
+                            <p class="text-sm text-[#8b7355]">by Elena Rodriguez</p>
+                            <p class="text-[#c17c5f] font-bold mt-1">48.00 BD</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                            <div class="flex items-center border border-[#e5e0d8] rounded-lg">
+                                <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <span class="px-3 py-1 text-[#5c4a3d] font-medium quantity-value">2</span>
+                                <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <p class="font-bold text-[#5c4a3d] item-subtotal">96.00 BD</p>
+                                <button class="text-[#8b7355] hover:text-red-500 transition-colors" onclick="removeItem(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Item 3 -->
+                    <div class="cart-item flex items-center gap-4">
+                        <img src="https://images.unsplash.com/photo-1609803384069-19f3e5a70e75?q=80&w=180&h=180&fit=crop"
+                            alt="Handwoven Scarf" class="cart-item-img">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-[#5c4a3d] truncate">Handwoven Scarf</h3>
+                            <p class="text-sm text-[#8b7355]">by Lisa Anderson</p>
+                            <p class="text-[#c17c5f] font-bold mt-1">78.00 BD</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                            <div class="flex items-center border border-[#e5e0d8] rounded-lg">
+                                <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <span class="px-3 py-1 text-[#5c4a3d] font-medium quantity-value">1</span>
+                                <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <p class="font-bold text-[#5c4a3d] item-subtotal">78.00 BD</p>
+                                <button class="text-[#8b7355] hover:text-red-500 transition-colors" onclick="removeItem(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="mt-4 pt-4 border-t-2 border-[#e5e0d8] space-y-2">
+                        <div class="flex justify-between text-[#8b7355]">
+                            <span>Subtotal</span>
+                            <span id="items-subtotal">259.00 BD</span>
+                        </div>
+                        <div class="flex justify-between text-[#8b7355]" id="shipping-cost-row">
+                            <span id="shipping-label">Shipping</span>
+                            <span id="shipping-cost-display">2.00 BD</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-[#e5e0d8]">
+                            <span class="text-lg font-semibold text-[#5c4a3d]">Total</span>
+                            <span class="text-2xl font-bold text-[#c17c5f]" id="cart-total">261.00 BD</span>
+                        </div>
+                        <a href="products.html" class="inline-flex items-center text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium mt-2">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Shopping
+                        </a>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: Delivery + Shipping + Payment -->
+                <div class="space-y-6">
+
+                    <!-- ── DELIVERY METHOD ── -->
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h2 class="text-xl font-bold text-[#5c4a3d] mb-4 flex items-center">
+                            <i class="fas fa-box-open terracotta mr-3"></i>Delivery Method
+                        </h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Ship to me -->
+                            <div class="delivery-card selected" id="card-ship" onclick="selectDelivery('ship')">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-5 h-5 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full flex-shrink-0 flex items-center justify-center mt-0.5" id="radio-ship">
+                                        <i class="fas fa-check text-white" style="font-size:9px;"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-[#5c4a3d] flex items-center gap-2">
+                                            <i class="fas fa-truck text-[#c17c5f]"></i> Ship to Me
+                                        </p>
+                                        <p class="text-xs text-[#8b7355] mt-1">Delivered to your address</p>
+                                        <p class="text-sm font-bold text-[#c17c5f] mt-2">+ 2.00 BD</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pick up -->
+                            <div class="delivery-card" id="card-pickup" onclick="selectDelivery('pickup')">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded-full flex-shrink-0 mt-0.5" id="radio-pickup"></div>
+                                    <div>
+                                        <p class="font-semibold text-[#5c4a3d] flex items-center gap-2">
+                                            <i class="fas fa-store text-[#8b7355]"></i> Pick Up
+                                        </p>
+                                        <p class="text-xs text-[#8b7355] mt-1">Collect from our store</p>
+                                        <p class="text-sm font-bold text-green-600 mt-2">Free</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Store info shown only when pickup selected -->
+                        <div id="pickup-info" class="hidden mt-4 bg-[#fdf8f5] border border-[#e5e0d8] rounded-lg p-4 text-sm text-[#5c4a3d]">
+                            <p class="font-semibold mb-1"><i class="fas fa-map-marker-alt terracotta mr-2"></i>ArtsyVibe Store</p>
+                            <p class="text-[#8b7355]">Building 12, Road 45, Adliya, Manama, Bahrain</p>
+                            <p class="text-[#8b7355] mt-1"><i class="far fa-clock mr-1"></i> Sun–Thu: 9am – 8pm &nbsp;|&nbsp; Fri–Sat: 10am – 10pm</p>
+                        </div>
+                    </div>
+
+                    <!-- ── SHIPPING INFORMATION (hidden when pickup) ── -->
+                    <div class="bg-white rounded-xl p-6 card-shadow" id="shipping-form-section">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold text-[#5c4a3d] flex items-center">
+                                <i class="fas fa-truck terracotta mr-3"></i>Select Delivery Address
+                            </h2>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            
+                            <label class="relative cursor-pointer group">
+                                <input type="radio" name="selected_address" value="home" class="peer sr-only" checked>
+                                <div class="h-full p-4 rounded-xl border-2 border-[#f8f5f0] bg-[#fcfaf7] transition-all 
+                                            peer-checked:border-[#c17c5f] peer-checked:bg-white hover:border-[#e5e0d8]">
+                                    
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-map-marker-alt text-[#c17c5f] mr-2"></i>
+                                            <span class="font-bold text-[#5c4a3d]">Home</span>
+                                            <span class="ml-2 px-2 py-0.5 text-[10px] bg-green-100 text-green-700 rounded-full uppercase font-bold">Default</span>
+                                        </div>
+                                        <div class="flex space-x-2 text-gray-400">
+                                            <button type="button" class="hover:text-[#c17c5f]"><i class="far fa-edit"></i></button>
+                                            <button type="button" class="hover:text-red-500"><i class="far fa-trash-alt"></i></button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-sm text-[#8a7a6d] leading-relaxed">
+                                        Block 123, 123 Main Street<br>
+                                        Manama<br>
+                                        Bahrain
+                                    </div>
+                                </div>
+                            </label>
+
+                            <button type="button" class="group flex flex-col items-center justify-center p-6 rounded-xl border-2 border-dashed border-[#e5e0d8] hover:border-[#c17c5f] hover:bg-[#fcfaf7] transition-all min-h-[140px]">
+                                <div class="w-10 h-10 mb-2 rounded-full bg-[#f8f5f0] group-hover:bg-[#c17c5f] group-hover:text-white flex items-center justify-center text-[#c17c5f] transition-colors">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <span class="text-sm font-medium text-[#5c4a3d]">Add New Address</span>
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <!-- ── PAYMENT METHOD ── -->
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h2 class="text-xl font-bold text-[#5c4a3d] mb-6 flex items-center">
+                            <i class="fas fa-credit-card terracotta mr-3"></i>Payment Method
+                        </h2>
+
+                        <div class="space-y-3">
+                            <!-- Credit Card -->
+                            <label class="payment-card selected block rounded-xl p-4 cursor-pointer" onclick="selectPayment(this)">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment" class="sr-only" checked>
+                                    <div class="w-6 h-6 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full mr-4 flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <i class="fas fa-credit-card text-2xl text-[#c17c5f] mr-3"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-[#5c4a3d]">Credit Card</p>
+                                        <p class="text-sm text-[#8b7355]">Visa, Mastercard, American Express</p>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- PayPal -->
+                            <label class="payment-card block rounded-xl p-4 cursor-pointer" onclick="selectPayment(this)">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment" class="sr-only">
+                                    <div class="w-6 h-6 border-2 border-[#e5e0d8] rounded-full mr-4"></div>
+                                    <i class="fab fa-paypal text-2xl text-[#0070ba] mr-3"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-[#5c4a3d]">PayPal</p>
+                                        <p class="text-sm text-[#8b7355]">Pay securely with your PayPal account</p>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- BenefitPay -->
+                            <label class="payment-card block rounded-xl p-4 cursor-pointer" onclick="selectPayment(this)">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment" class="sr-only">
+                                    <div class="w-6 h-6 border-2 border-[#e5e0d8] rounded-full mr-4"></div>
+                                    <!-- BenefitPay logo using a styled badge since no FA icon exists -->
+                                    <div class="w-8 h-8 rounded-md bg-[#fffff] flex items-center justify-center mr-3 flex-shrink-0">
+                                        <img src="../static/Benifitpay.png" alt="ArtsyVibe Logo" class="h-10 w-auto object-contain">
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-[#5c4a3d]">BenefitPay</p>
+                                        <p class="text-sm text-[#8b7355]">Pay instantly via the Benefit app</p>
+                                    </div>
+                                    <span class="text-xs bg-[#fdecea] text-[#e63b2d] font-semibold px-2 py-0.5 rounded-full ml-2">Bahrain</span>
+                                </div>
+                            </label>
+
+                            <!-- Cash on Delivery -->
+                            <label class="payment-card block rounded-xl p-4 cursor-pointer" onclick="selectPayment(this)">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment" class="sr-only">
+                                    <div class="w-6 h-6 border-2 border-[#e5e0d8] rounded-full mr-4"></div>
+                                    <i class="fas fa-money-bill-wave text-2xl text-green-600 mr-3"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-[#5c4a3d]">Cash on Delivery</p>
+                                        <p class="text-sm text-[#8b7355]">Pay when you receive your order</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Button -->
+                    <button id="confirm-btn"
+                        class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center">
+                        <i class="fas fa-check-circle mr-3"></i>Confirm Order (261.00 BD)
+                    </button>
+
+                    <p class="text-center text-sm text-[#8b7355]">
+                        <i class="fas fa-lock mr-2"></i>Your payment information is secure and encrypted
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ── STATE ──
+        const SHIPPING_COST = 2.00;
+        let isShipping = true; // true = ship, false = pickup
+
+        // ── DELIVERY SELECTION ──
+        function selectDelivery(mode) {
+            isShipping = (mode === 'ship');
+
+            // Card styles
+            ['ship', 'pickup'].forEach(m => {
+                const card = document.getElementById('card-' + m);
+                const radio = document.getElementById('radio-' + m);
+                if (m === mode) {
+                    card.classList.add('selected');
+                    radio.className = 'w-5 h-5 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full flex-shrink-0 flex items-center justify-center mt-0.5';
+                    radio.innerHTML = '<i class="fas fa-check text-white" style="font-size:9px;"></i>';
+                } else {
+                    card.classList.remove('selected');
+                    radio.className = 'w-5 h-5 border-2 border-[#e5e0d8] rounded-full flex-shrink-0 mt-0.5';
+                    radio.innerHTML = '';
+                }
+            });
+
+            // Toggle shipping form & pickup info
+            const shippingForm = document.getElementById('shipping-form-section');
+            const pickupInfo   = document.getElementById('pickup-info');
+            const shippingRow  = document.getElementById('shipping-cost-row');
+            const shippingLabel = document.getElementById('shipping-label');
+            const shippingDisplay = document.getElementById('shipping-cost-display');
+
+            if (isShipping) {
+                shippingForm.style.display = '';
+                pickupInfo.classList.add('hidden');
+                shippingLabel.textContent = 'Shipping';
+                shippingDisplay.textContent = SHIPPING_COST.toFixed(2) + ' BD';
+                shippingRow.style.display = '';
+            } else {
+                shippingForm.style.display = 'none';
+                pickupInfo.classList.remove('hidden');
+                shippingLabel.textContent = 'Pickup';
+                shippingDisplay.textContent = 'Free';
+                shippingRow.style.display = '';
+            }
+
+            updateCartTotal();
+        }
+
+        // ── QUANTITY ──
+        function updateQuantity(button, change) {
+            const cartItem = button.closest('.cart-item');
+            const quantitySpan = cartItem.querySelector('.quantity-value');
+            const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent.replace(' BD', '').trim();
+            const price = parseFloat(priceText);
+            const subtotalEl = cartItem.querySelector('.item-subtotal');
+
+            let qty = parseInt(quantitySpan.textContent) + change;
+            if (qty < 1) return;
+
+            quantitySpan.textContent = qty;
+            subtotalEl.textContent = (price * qty).toFixed(2) + ' BD';
+            updateCartTotal();
+        }
+
+        // ── REMOVE ──
+        function removeItem(button) {
+            const cartItem = button.closest('.cart-item');
+            cartItem.style.opacity = '0';
+            cartItem.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                cartItem.remove();
+                updateCartTotal();
+                if (!document.querySelectorAll('.cart-item').length) {
+                    alert('Your cart is empty!');
+                }
+            }, 300);
+        }
+
+        // ── TOTAL ──
+        function updateCartTotal() {
+            let itemsTotal = 0;
+            document.querySelectorAll('.item-subtotal').forEach(el => {
+                itemsTotal += parseFloat(el.textContent.replace(' BD', ''));
+            });
+
+            const shipping = isShipping ? SHIPPING_COST : 0;
+            const grandTotal = itemsTotal + shipping;
+
+            document.getElementById('items-subtotal').textContent = itemsTotal.toFixed(2) + ' BD';
+            document.getElementById('cart-total').textContent = grandTotal.toFixed(2) + ' BD';
+            document.getElementById('confirm-btn').innerHTML =
+                `<i class="fas fa-check-circle mr-3"></i>Confirm Order (${grandTotal.toFixed(2)} BD)`;
+        }
+
+        // ── PAYMENT SELECTION ──
+        function selectPayment(card) {
+            document.querySelectorAll('.payment-card').forEach(c => {
+                c.classList.remove('selected');
+                const radio = c.querySelector('input[type="radio"]');
+                const indicator = c.querySelector('.w-6.h-6');
+                if (indicator) {
+                    indicator.className = 'w-6 h-6 border-2 border-[#e5e0d8] rounded-full mr-4';
+                    indicator.innerHTML = '';
+                }
+                if (radio) radio.checked = false;
+            });
+
+            card.classList.add('selected');
+            const radio = card.querySelector('input[type="radio"]');
+            const indicator = card.querySelector('.w-6.h-6');
+            if (indicator) {
+                indicator.className = 'w-6 h-6 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full mr-4 flex items-center justify-center';
+                indicator.innerHTML = '<i class="fas fa-check text-white text-xs"></i>';
+            }
+            if (radio) radio.checked = true;
+        }
+
+        // ── PRICE SLIDER ──
+        document.getElementById('priceRange').addEventListener('input', function() {
+            document.getElementById('priceValue').textContent = this.value + ' BD';
+        });
+    </script>
+</body>
+</html>
