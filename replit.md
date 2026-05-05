@@ -1,56 +1,58 @@
 # Local Artisan Cooperative
 
-A Spring Boot web application for a local artisan cooperative.
+A Spring Boot web application for an artisan marketplace called "ArtsyVibe" — lets users browse handcrafted products, view auctions, manage a shopping cart, and access their profile.
 
-## Architecture
+## Run & Operate
+
+- **Run**: `./gradlew bootRun` (via "Start application" workflow, port 5000)
+- **Build**: `./gradlew build -x test`
+- **Deploy run**: `java -jar build/libs/demo-0.0.1-SNAPSHOT.jar --server.port=5000`
+- **Required env vars**: `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` (provided automatically by Replit PostgreSQL)
+
+## Stack
 
 - **Framework**: Spring Boot 3.3.5
-- **Language**: Java 19
-- **Build System**: Gradle (with Gradle Wrapper)
-- **Template Engine**: Thymeleaf (server-side rendering)
-- **Database**: PostgreSQL (Replit built-in)
-- **ORM**: Spring Data JPA / Hibernate
+- **Language**: Java 19 (GraalVM CE 22.3.1)
+- **Build**: Gradle 9.4.1 (wrapper)
+- **Template Engine**: Thymeleaf (server-side rendering, `.html` suffix)
+- **Database**: PostgreSQL via Replit built-in integration
+- **ORM**: Spring Data JPA / Hibernate (ddl-auto=update)
 
-## Project Structure
+## Where things live
 
-```
-src/
-  main/
-    java/com/example/demo/
-      DemoApplication.java       # Spring Boot entry point
-    resources/
-      application.properties     # App configuration
-      templates/                 # Thymeleaf HTML templates (to be added)
-      static/                    # Static assets (to be added)
-  test/
-    java/com/example/demo/
-      DemoApplicationTests.java  # Integration tests
-build.gradle                     # Gradle build config
-settings.gradle                  # Project name
-```
+- `src/main/java/com/example/demo/` — Java source (controllers, entities)
+- `src/main/resources/templates/` — Thymeleaf HTML templates
+- `src/main/resources/static/` — Static assets (Logo.png, Benifitpay.png, etc.)
+- `src/main/resources/application.properties` — Server port, DB config, JPA settings
+- `build.gradle` — Dependencies and build config
 
-## Running the Application
+## Architecture decisions
 
-The app runs via the "Start application" workflow using:
-```
-./gradlew bootRun
-```
+- Thymeleaf suffix set to lowercase `.html` to match actual template filenames
+- `gradlew` CRLF line endings were converted to LF for Linux compatibility
+- `MainController` maps `/` to the `index` template (homepage)
+- JPA `ddl-auto=update` auto-creates/updates tables from entity classes — no manual migrations needed
+- Port 5000 mapped to external port 80 in `.replit`
 
-The server starts on **port 5000**.
+## Product
 
-## Database
+- Homepage with product search and category browsing
+- Products listing page
+- Auctions page with bidding UI
+- Shopping cart and checkout flow
+- User profile, orders, wishlist, notifications pages
+- Login and forgot-password pages
 
-Uses Replit's built-in PostgreSQL database. Connection is configured via the `DATABASE_URL` environment variable (automatically set by Replit).
+## User preferences
 
-The `spring.jpa.hibernate.ddl-auto=update` setting auto-creates/updates tables based on JPA entity classes.
+_Populate as you build_
 
-## Deployment
+## Gotchas
 
-Configured for autoscale deployment:
-- **Build**: `./gradlew build -x test`
-- **Run**: `java -jar build/libs/demo-0.0.1-SNAPSHOT.jar --server.port=5000`
+- Template filenames are mixed-case (e.g., `Login.html`, `Forget-Password.html`) — Thymeleaf suffix must remain lowercase `.html`
+- The Gradle wrapper (`gradlew`) must have LF line endings — re-run `sed -i 's/\r//' gradlew` if it gets reset to CRLF
 
-## Key Configuration
+## Pointers
 
-- `src/main/resources/application.properties` — server port, database connection, JPA settings
-- `build.gradle` — dependencies and build configuration
+- [Spring Boot docs](https://docs.spring.io/spring-boot/docs/3.3.5/reference/html/)
+- [Thymeleaf docs](https://www.thymeleaf.org/documentation.html)
