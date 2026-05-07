@@ -1,0 +1,382 @@
+// ============================================================
+// my-profile.js — ArtsyVibe My Profile Page
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ----------------------------------------------------------
+    // 1. Role — toggle artisan section
+    // ----------------------------------------------------------
+    setRole('customer'); // change to 'artisan' to show shop section
+
+    // ----------------------------------------------------------
+    // 2. Custom checkboxes (modals)
+    // ----------------------------------------------------------
+    document.querySelectorAll('input[type="checkbox"].sr-only, #edit-address-default')
+        .forEach(cb => cb.addEventListener('change', () => toggleCheckboxVisual(cb)));
+
+    // ----------------------------------------------------------
+    // 3. Profile picture upload
+    // ----------------------------------------------------------
+    const cameraBtn = document.querySelector('label .fa-camera')?.closest('label');
+    cameraBtn?.querySelector('input[type="file"]')?.addEventListener('change', function () {
+        if (!this.files.length) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.querySelector('.w-40.h-40.rounded-full');
+            if (img) img.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    // ----------------------------------------------------------
+    // 4. File upload areas in artisan section
+    // ----------------------------------------------------------
+    document.querySelectorAll('.border-dashed').forEach(area => {
+        area.addEventListener('click', (e) => {
+            if (e.target.closest('.fa-plus')) return;
+            area.querySelector('input[type="file"]')?.click();
+        });
+
+        const fileInput = area.querySelector('input[type="file"]');
+        fileInput?.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                const p = area.querySelector('p');
+                if (p) p.textContent = `Selected: ${fileInput.files[0].name}`;
+            }
+        });
+    });
+
+    // ----------------------------------------------------------
+    // 5. Close modals when clicking backdrop
+    // ----------------------------------------------------------
+    ['add-address-modal', 'edit-address-modal'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById(id)) {
+                id === 'add-address-modal' ? closeAddAddressModal() : closeEditAddressModal();
+            }
+        });
+    });
+
+    // ----------------------------------------------------------
+    // 6. Keyboard: close modals on Escape
+    // ----------------------------------------------------------
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        closeAddAddressModal();
+        closeEditAddressModal();
+    });
+});
+
+// ============================================================
+// Role management
+// ============================================================
+
+window.setRole = function (role) {
+    const artisanSection = document.getElementById('artisan-section');
+    const roleBadge      = document.getElementById('role-badge');
+    if (role === 'artisan') {
+        artisanSection?.classList.remove('hidden');
+        if (roleBadge) roleBadge.textContent = 'Artisan';
+    } else {
+        artisanSection?.classList.add('hidden');
+        if (roleBadge) roleBadge.textContent = 'Customer';
+    }
+};
+
+// ============================================================
+// Personal Information
+// ============================================================
+
+window.savePersonalInfo = function () {
+    const section = document.querySelector('section:first-of-type');
+    const inputs  = section?.querySelectorAll('input');
+    let   valid   = true;
+
+    inputs?.forEach(input => {
+        if (!input.value.trim()) { valid = false; }
+    });
+
+    if (!valid) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
+    }
+
+    showToast('Personal information saved successfully!', 'success');
+};
+
+// ============================================================
+// Password update
+// ============================================================
+
+window.updatePassword = function () {
+    const security = document.querySelectorAll('section')[1];
+    const pwds     = security?.querySelectorAll('input[type="password"]');
+    if (!pwds || pwds.length < 3) return;
+
+    const [current, newPwd, confirm] = pwds;
+
+    if (!current.value) {
+        showToast('Please enter your current password.', 'error');
+        current.focus();
+        return;
+    }
+    if (newPwd.value.length < 8) {
+        showToast('New password must be at least 8 characters.', 'error');
+        newPwd.focus();
+        return;
+    }
+    if (newPwd.value !== confirm.value) {
+        showToast('New passwords do not match.', 'error');
+        confirm.focus();
+        return;
+    }
+
+    showToast('Password updated successfully!', 'success');
+    [current, newPwd, confirm].forEach(i => i.value = '');
+};
+
+// ============================================================
+// Shop Information
+// ============================================================
+
+window.saveShopInfo = function () {
+    showToast('Shop information saved successfully!', 'success');
+};
+
+// ============================================================
+// Delete Account
+// ============================================================
+
+window.deleteAccount = function () {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        showToast('Account deletion initiated. You will be logged out shortly.', 'info');
+        setTimeout(() => window.location.href = 'login.html', 2500);
+    }
+};
+
+// ============================================================
+// Address Management
+// ============================================================
+
+window.openAddAddressModal = function () {
+    const modal = document.getElementById('add-address-modal');
+    modal?.classList.remove('hidden');
+    modal?.classList.add('flex');
+};
+
+window.closeAddAddressModal = function () {
+    const modal = document.getElementById('add-address-modal');
+    modal?.classList.add('hidden');
+    modal?.classList.remove('flex');
+    document.getElementById('add-address-form')?.reset();
+    resetCheckboxVisuals(document.getElementById('add-address-modal'));
+};
+
+window.saveNewAddress = function (event) {
+    event.preventDefault();
+    const form    = event.target;
+    const inputs  = form.querySelectorAll('input[type="text"]');
+    const select  = form.querySelector('select');
+    const cbInput = form.querySelector('input[type="checkbox"]');
+
+    const label   = inputs[0]?.value.trim();
+    const street  = inputs[1]?.value.trim();
+    const city    = inputs[2]?.value.trim();
+    const zip     = inputs[3]?.value.trim();
+    const country = select?.options[select.selectedIndex]?.text ?? '';
+    const isDefault = cbInput?.checked ?? false;
+
+    if (!label || !street || !city || !zip || !country || country.startsWith('Select')) {
+        showToast('Please fill in all address fields.', 'error');
+        return;
+    }
+
+    const grid     = document.getElementById('addresses-grid');
+    const addCard  = grid?.querySelector('.fa-plus')?.closest('.address-card');
+    const defBadge = isDefault ? '<span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Default</span>' : '';
+
+    if (isDefault) removeAllDefaultBadges();
+
+    const html = `
+        <div class="address-card bg-[#faf9f6] rounded-xl p-5 border border-[#e5e0d8] relative">
+            <div class="absolute top-4 right-4 flex gap-2">
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors text-sm font-medium" onclick="editAddress(this)">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-[#8b7355] hover:text-red-500 transition-colors text-sm font-medium" onclick="deleteAddress(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="flex items-start gap-3 mb-3">
+                <i class="fas fa-map-marker-alt text-[#c17c5f] text-lg mt-0.5"></i>
+                <div>
+                    <span class="font-semibold text-[#5c4a3d]">${escapeHtml(label)}</span>${defBadge}
+                </div>
+            </div>
+            <p class="text-[#8b7355] text-sm leading-relaxed">${escapeHtml(street)}<br>${escapeHtml(city)}, ${escapeHtml(zip)}<br>${escapeHtml(country)}</p>
+        </div>
+    `;
+    addCard?.insertAdjacentHTML('beforebegin', html);
+    closeAddAddressModal();
+    showToast('Address added successfully!', 'success');
+};
+
+window.editAddress = function (button) {
+    const card      = button.closest('.address-card');
+    const label     = card.querySelector('.font-semibold')?.textContent.trim() ?? '';
+    const addrLines = card.querySelector('p')?.innerHTML.split('<br>') ?? [];
+    const street    = addrLines[0]?.trim() ?? '';
+    const cityZip   = addrLines[1]?.trim() ?? '';
+    const country   = addrLines[2]?.trim() ?? '';
+    const isDefault = card.querySelector('.bg-green-100') !== null;
+
+    let city = cityZip, zip = '';
+    if (cityZip.includes(',')) {
+        [city, zip] = cityZip.split(',').map(s => s.trim());
+    }
+
+    document.getElementById('edit-address-label').value   = label;
+    document.getElementById('edit-address-street').value  = street;
+    document.getElementById('edit-address-city').value    = city;
+    document.getElementById('edit-address-zip').value     = zip;
+    document.getElementById('edit-address-country').value = getCountryCode(country);
+
+    const cb     = document.getElementById('edit-address-default');
+    const icon   = cb?.parentElement.querySelector('.checkbox-icon');
+    const visual = cb?.parentElement.querySelector('div');
+    if (cb) cb.checked = isDefault;
+    if (isDefault) {
+        if (icon) icon.style.opacity = '1';
+        visual?.classList.add('bg-[#c17c5f]', 'border-[#c17c5f]');
+    } else {
+        if (icon) icon.style.opacity = '0';
+        visual?.classList.remove('bg-[#c17c5f]', 'border-[#c17c5f]');
+    }
+
+    window.currentEditCard = card;
+
+    const modal = document.getElementById('edit-address-modal');
+    modal?.classList.remove('hidden');
+    modal?.classList.add('flex');
+};
+
+window.closeEditAddressModal = function () {
+    const modal = document.getElementById('edit-address-modal');
+    modal?.classList.add('hidden');
+    modal?.classList.remove('flex');
+    window.currentEditCard = null;
+};
+
+window.saveEditedAddress = function (event) {
+    event.preventDefault();
+    const label     = document.getElementById('edit-address-label').value.trim();
+    const street    = document.getElementById('edit-address-street').value.trim();
+    const city      = document.getElementById('edit-address-city').value.trim();
+    const zip       = document.getElementById('edit-address-zip').value.trim();
+    const sel       = document.getElementById('edit-address-country');
+    const country   = sel?.options[sel.selectedIndex]?.text ?? '';
+    const isDefault = document.getElementById('edit-address-default')?.checked ?? false;
+
+    if (!label || !street || !city || !zip || !country || country.startsWith('Select')) {
+        showToast('Please fill in all address fields.', 'error');
+        return;
+    }
+
+    if (isDefault) removeAllDefaultBadges();
+    const defBadge = isDefault ? '<span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Default</span>' : '';
+
+    if (window.currentEditCard) {
+        window.currentEditCard.innerHTML = `
+            <div class="absolute top-4 right-4 flex gap-2">
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors text-sm font-medium" onclick="editAddress(this)">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-[#8b7355] hover:text-red-500 transition-colors text-sm font-medium" onclick="deleteAddress(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="flex items-start gap-3 mb-3">
+                <i class="fas fa-map-marker-alt text-[#c17c5f] text-lg mt-0.5"></i>
+                <div>
+                    <span class="font-semibold text-[#5c4a3d]">${escapeHtml(label)}</span>${defBadge}
+                </div>
+            </div>
+            <p class="text-[#8b7355] text-sm leading-relaxed">${escapeHtml(street)}<br>${escapeHtml(city)}, ${escapeHtml(zip)}<br>${escapeHtml(country)}</p>
+        `;
+    }
+
+    closeEditAddressModal();
+    showToast('Address updated successfully!', 'success');
+};
+
+window.deleteAddress = function (button) {
+    if (confirm('Are you sure you want to delete this address?')) {
+        button.closest('.address-card').remove();
+        showToast('Address deleted.', 'info');
+    }
+};
+
+// ============================================================
+// Helpers
+// ============================================================
+
+function removeAllDefaultBadges() {
+    document.querySelectorAll('#addresses-grid .bg-green-100').forEach(b => b.remove());
+}
+
+function toggleCheckboxVisual(checkbox) {
+    const icon   = checkbox.parentElement.querySelector('.checkbox-icon');
+    const visual = checkbox.parentElement.querySelector('div');
+    if (checkbox.checked) {
+        if (icon) icon.style.opacity = '1';
+        visual?.classList.add('bg-[#c17c5f]', 'border-[#c17c5f]');
+    } else {
+        if (icon) icon.style.opacity = '0';
+        visual?.classList.remove('bg-[#c17c5f]', 'border-[#c17c5f]');
+    }
+}
+
+function resetCheckboxVisuals(container) {
+    container?.querySelectorAll('input[type="checkbox"].sr-only').forEach(cb => {
+        cb.checked = false;
+        const icon   = cb.parentElement.querySelector('.checkbox-icon');
+        const visual = cb.parentElement.querySelector('div');
+        if (icon) icon.style.opacity = '0';
+        visual?.classList.remove('bg-[#c17c5f]', 'border-[#c17c5f]');
+    });
+}
+
+function getCountryCode(countryName) {
+    const map = {
+        'Saudi Arabia / المملكة العربية السعودية': 'SA',
+        'United Arab Emirates / الإمارات العربية المتحدة': 'AE',
+        'Egypt / مصر': 'EG',
+        'Qatar / قطر': 'QA',
+        'Kuwait / الكويت': 'KW',
+        'Oman / سلطنة عمان': 'OM',
+        'Bahrain / البحرين': 'BH',
+        'Jordan / الأردن': 'JO',
+        'Morocco / المغرب': 'MA',
+        'Algeria / الجزائر': 'DZ',
+        'Iraq / العراق': 'IQ',
+        'Lebanon / لبنان': 'LB',
+    };
+    return map[countryName] ?? '';
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showToast(message, type = 'info') {
+    document.getElementById('av-toast')?.remove();
+    const colours = { success: 'bg-green-600', error: 'bg-red-500', info: 'bg-[#c17c5f]' };
+    const toast = document.createElement('div');
+    toast.id        = 'av-toast';
+    toast.className = `fixed bottom-6 right-6 z-50 px-6 py-3 rounded-xl text-white font-medium shadow-lg ${colours[type]}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
