@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta {
+            color: #c17c5f;
+        }
+        
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+        
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+        
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+        
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background-color: #c17c5f;
+            color: white;
+        }
+        
+        .tab-btn:not(.active) {
+            background-color: transparent;
+            color: #8b7355;
+        }
+        
+        .tab-btn:not(.active):hover {
+            color: #c17c5f;
+        }
+        
+        .type-pill {
+            transition: all 0.3s ease;
+        }
+        
+        .type-pill.active {
+            background-color: #c17c5f;
+            color: white;
+            border-color: #c17c5f;
+        }
+        
+        .type-pill:not(.active) {
+            background-color: white;
+            color: #8b7355;
+            border-color: #e5e0d8;
+        }
+        
+        .type-pill:not(.active):hover {
+            border-color: #c17c5f;
+            color: #c17c5f;
+        }
+        
+        .form-input {
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #c17c5f;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(193, 124, 95, 0.1);
+        }
+
+        
+        /* Custom Checkbox */
+        .Remember-checkbox:checked {
+            background-color: #c17c5f;
+            border-color: #c17c5f;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
+            </div>
+            
+            <!-- Center Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="products.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="auctions.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Auctions</a>
+            </div>
+            
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">
+        <!-- Main Content: Login/Register -->
+        <main class="flex-1 flex items-center justify-center">
+            <div class="w-full max-w-2xl">
+                <!-- Logo at Top -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-[#f5ebe0] rounded-full mb-4">
+                        <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    </div>
+                    <h1 class="text-4xl font-bold text-[#5c4a3d] mb-2" style="font-family: 'Playfair Display', serif;">Welcome to ArtsyVibe</h1>
+                    <p class="text-[#8b7355] text-lg">Join our community of artisans and customers</p>
+                </div>
+
+                <!-- Main Card -->
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+                    <!-- Tabs -->
+                    <div class="flex border-b border-[#e5e0d8]">
+                        <button class="tab-btn active flex-1 py-5 text-lg font-semibold" onclick="switchTab('login')">
+                            Login
+                        </button>
+                        <button class="tab-btn flex-1 py-5 text-lg font-semibold" onclick="switchTab('register')">
+                            Register
+                        </button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="login-form" class="p-10">
+                        <form onsubmit="handleLogin(event)">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        placeholder="your@email.com"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Password</label>
+                                    <input 
+                                        type="password" 
+                                        placeholder="Enter your password"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="flex items-center cursor-pointer group">
+                                            <input type="checkbox" class="Remember-checkbox sr-only">
+                                            <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded mr-3 flex items-center justify-center group-hover:border-[#c17c5f] transition-colors">
+                                                <i class="fas fa-check text-white text-xs opacity-0 checkbox-icon"></i>
+                                            </div>
+                                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Remember me</span>
+                                        </label>
+                                    </div>
+                                    <a href="Forget_Password.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-lg">Forgot Password?</a>
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white py-4 rounded-xl font-bold text-lg transition-colors shadow-lg">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div id="register-form" class="p-10 hidden">
+                        <!-- Customer/Artisan Toggle -->
+                        <div class="flex bg-[#faf9f6] rounded-xl p-1 mb-8">
+                            <button class="type-pill active flex-1 py-3 rounded-lg font-semibold text-lg" onclick="switchType('customer')">
+                                Customer
+                            </button>
+                            <button class="type-pill flex-1 py-3 rounded-lg font-semibold text-lg" onclick="switchType('artisan')">
+                                Artisan
+                            </button>
+                        </div>
+
+                        <!-- Customer Form -->
+                        <form id="customer-form" onsubmit="handleRegister(event)">
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Full Name</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="John Doe"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        placeholder="your@email.com"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Phone Number</label>
+                                    <input 
+                                        type="tel" 
+                                        placeholder="your phone number"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Password</label>
+                                    <input 
+                                        type="password" 
+                                        placeholder="Create a password"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Confirm Password</label>
+                                    <input 
+                                        type="password" 
+                                        placeholder="Confirm your password"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white py-4 rounded-xl font-bold text-lg transition-colors shadow-lg">
+                                    Create Account
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Artisan Form -->
+                        <form id="artisan-form" class="hidden" onsubmit="handleRegister(event)">
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Full Name</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="John Doe"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        placeholder="your@email.com"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Phone Number</label>
+                                    <input 
+                                        type="tel" 
+                                        placeholder="your phone number"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Password</label>
+                                    <input 
+                                        type="password" 
+                                        placeholder="Create a password"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Shop Name</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Your Shop Name"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Biography</label>
+                                    <textarea 
+                                        placeholder="Tell us about yourself and your craft..."
+                                        rows="4"
+                                        class="form-input w-full px-5 py-4 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] text-lg resize-none"
+                                        required
+                                    ></textarea>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">Profile Picture</label>
+                                    <div class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-6 text-center hover:border-[#c17c5f] transition-colors cursor-pointer">
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-[#b8a99a] mb-3"></i>
+                                        <p class="text-[#8b7355] text-lg">Click to upload or drag and drop</p>
+                                        <p class="text-[#b8a99a] text-sm mt-1">PNG, JPG up to 5MB</p>
+                                        <input type="file" class="hidden" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[#5c4a3d] font-semibold mb-2 text-lg">ID Card / Passport</label>
+                                    <div class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-6 text-center hover:border-[#c17c5f] transition-colors cursor-pointer">
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-[#b8a99a] mb-3"></i>
+                                        <p class="text-[#8b7355] text-lg">Click to upload or drag and drop</p>
+                                        <p class="text-[#b8a99a] text-sm mt-1">PNG, JPG up to 5MB</p>
+                                        <input type="file" class="hidden" accept="image/*">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white py-4 rounded-xl font-bold text-lg transition-colors shadow-lg">
+                                   Send Request to Create Artisan Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Remember checkbox functionality
+        const checkboxes = document.querySelectorAll('.Remember-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const icon = this.parentElement.querySelector('.checkbox-icon');
+                if (this.checked) {
+                    icon.style.opacity = '1';
+                    this.parentElement.querySelector('div').classList.add('bg-[#c17c5f]', 'border-[#c17c5f]');
+                } else {
+                    icon.style.opacity = '0';
+                    this.parentElement.querySelector('div').classList.remove('bg-[#c17c5f]', 'border-[#c17c5f]');
+                }
+            });
+        });
+
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = this.value + ' BD';
+        });
+
+        // Switch between Login and Register tabs
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                tabBtns[0].classList.add('active');
+                tabBtns[1].classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                tabBtns[0].classList.remove('active');
+                tabBtns[1].classList.add('active');
+            }
+        }
+
+        // Switch between Customer and Artisan registration
+        function switchType(type) {
+            const customerForm = document.getElementById('customer-form');
+            const artisanForm = document.getElementById('artisan-form');
+            const typePills = document.querySelectorAll('.type-pill');
+            
+            if (type === 'customer') {
+                customerForm.classList.remove('hidden');
+                artisanForm.classList.add('hidden');
+                typePills[0].classList.add('active');
+                typePills[1].classList.remove('active');
+            } else {
+                customerForm.classList.add('hidden');
+                artisanForm.classList.remove('hidden');
+                typePills[0].classList.remove('active');
+                typePills[1].classList.add('active');
+            }
+        }
+
+        // Handle login submission
+        function handleLogin(event) {
+            event.preventDefault();
+            alert('Login functionality would be implemented here!');
+        }
+
+        // Handle register submission
+        function handleRegister(event) {
+            event.preventDefault();
+            alert('Registration functionality would be implemented here!');
+        }
+
+        // File upload click handler
+        document.querySelector('.border-dashed').addEventListener('click', function() {
+            this.querySelector('input[type="file"]').click();
+        });
+    </script>
+</body>
+</html>

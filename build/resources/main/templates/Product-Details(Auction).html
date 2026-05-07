@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silver Moonstone Necklace - Auction - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta {
+            color: #c17c5f;
+        }
+        
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+        
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+        
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+        
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+        
+        .text-earth {
+            color: #8b7355;
+        }
+        
+        .bg-earth {
+            background-color: #8b7355;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+        
+        .thumbnail {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        .thumbnail:hover, .thumbnail.active {
+            opacity: 1;
+            transform: scale(1.05);
+            border-color: #c17c5f;
+        }
+        
+        .star-filled {
+            color: #fbbf24;
+        }
+        
+        .star-empty {
+            color: #e5e0d8;
+        }
+        
+        .auction-badge-large {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.02);
+            }
+        }
+        
+        .countdown-digit {
+            background: linear-gradient(135deg, #c17c5f 0%, #a5664d 100%);
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e0d8;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c17c5f;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            background: #a5664d;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c17c5f;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-moz-range-thumb:hover {
+            background: #a5664d;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox:checked {
+            background-color: #c17c5f;
+            border-color: #c17c5f;
+        }
+
+        .custom-radio:checked {
+            border-color: #c17c5f;
+        }
+
+        .custom-radio:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #c17c5f;
+        }
+
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
+            </div>
+            
+            <!-- Center Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="products.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="auctions.html" class="text-[#c17c5f] font-semibold">Auctions</a>
+            </div>
+            
+           <div class="flex items-center space-x-4">
+                <!-- User Menu -->
+                <a href="my-profile.html" class="group flex items-center gap-2 transition-colors">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <!-- Profile Icon Container with Badge -->
+                        <div class="relative">
+                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                            <!-- This is the badge, like your cart icon has -->
+                        </div>
+                        
+                        <div class="text-sm">
+                            <!-- Name changes color on hover because of group-hover -->
+                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Notifications Bell Icon -->
+                <a href="notifications.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                </a>
+                
+                <!-- Cart Icon -->
+                <a href="ShoppingCart&Checkout.html">
+                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">
+        <!-- Left Sidebar (Reused from products.html) -->
+        <aside class="w-[250px] flex-shrink-0 hidden lg:block">
+            <div class="bg-white rounded-xl p-6 card-shadow sticky top-24">
+                <!-- Search Input -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Search Products</h3>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Search..." 
+                            class="w-full px-4 py-2 pl-10 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
+                        />
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#b8a99a]"></i>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Categories</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">All</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Ceramics</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only" checked>
+                                <div class="w-4 h-4 border-2 border-[#c17c5f] rounded-full mr-3"></div>
+                            </div>
+                            <span class="text-[#c17c5f] font-medium">Jewelry</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Paintings</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Textiles</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Woodwork</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Price Range Slider -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Price Range</h3>
+                    <div class="px-2">
+                        <input type="range" min="0" max="1000" value="500" class="w-full" id="priceRange">
+                        <div class="flex justify-between mt-2 text-sm text-[#8b7355]">
+                            <span>0 BD</span>
+                            <span class="font-semibold text-[#c17c5f]" id="priceValue">500 BD</span>
+                            <span>1000 BD</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Show Auctions Only Checkbox -->
+                <div>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" class="sr-only" checked>
+                        <div class="w-5 h-5 border-2 border-[#c17c5f] bg-[#c17c5f] rounded mr-3 flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <span class="text-[#c17c5f] font-medium">Show Auctions Only</span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Breadcrumb -->
+            <nav class="mb-6 text-sm">
+                <ol class="flex items-center space-x-2 text-[#8b7355]">
+                    <li><a href="index.html" class="hover:text-[#c17c5f] transition-colors">Home</a></li>
+                    <li><span>/</span></li>
+                    <li><a href="products.html" class="hover:text-[#c17c5f] transition-colors">Products</a></li>
+                    <li><span>/</span></li>
+                    <li><a href="products.html" class="hover:text-[#c17c5f] transition-colors">Jewelry</a></li>
+                    <li><span>/</span></li>
+                    <li class="text-[#5c4a3d] font-medium">Silver Moonstone Necklace</li>
+                </ol>
+            </nav>
+
+            <!-- Product Detail Section -->
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow mb-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left: Product Images -->
+                    <div>
+                        <!-- Main Image with Auction Badge -->
+                        <div class="mb-4 relative">
+                            <img id="mainImage" src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=500&fit=crop" alt="Silver Moonstone Necklace" class="w-full h-96 object-cover rounded-xl">
+                            <div class="absolute top-4 left-4 auction-badge-large bg-[#c17c5f] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                                <i class="fas fa-gavel mr-2"></i>Live Auction
+                            </div>
+                        </div>
+                        
+                        <!-- Thumbnails -->
+                        <div class="flex gap-3">
+                            <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=150&h=150&fit=crop" alt="Thumbnail 1" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8] active" onclick="changeImage(this)">
+                            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=150&h=150&fit=crop" alt="Thumbnail 2" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8]" onclick="changeImage(this)">
+                            <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=150&h=150&fit=crop" alt="Thumbnail 3" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8]" onclick="changeImage(this)">
+                            <img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=150&h=150&fit=crop" alt="Thumbnail 4" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8]" onclick="changeImage(this)">
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Product Info & Bid Panel -->
+                    <div>
+                        <!-- Category Badge -->
+                        <span class="inline-block bg-[#f5ebe0] text-[#c17c5f] px-3 py-1 rounded-full text-sm font-medium mb-4">
+                            Jewelry
+                        </span>
+                        
+                        <!-- Product Name -->
+                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2">Silver Moonstone Necklace</h1>
+                        
+                        <!-- Artisan Name -->
+                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block">
+                            by Marcus Chen
+                        </a>
+                        
+                        <!-- Star Rating -->
+                        <div class="flex items-center mb-6">
+                            <div class="flex mr-3">
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                            </div>
+                            <span class="text-[#5c4a3d] font-medium">5.0</span>
+                            <span class="text-[#8b7355] ml-2">(18 reviews)</span>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-[#5c4a3d] mb-2">Description</h3>
+                            <p class="text-[#8b7355] leading-relaxed">
+                                Exquisite handcrafted silver necklace featuring a luminous moonstone pendant. This unique piece showcases masterful silversmithing with intricate detailing around the natural moonstone cabochon. The chain is made from sterling silver with a secure lobster clasp.
+                            </p>
+                            <p class="text-[#8b7355] leading-relaxed mt-3">
+                                Chain length: 18 inches. Pendant size: 1.2" × 0.8". Comes with a certificate of authenticity and elegant gift box.
+                            </p>
+                        </div>
+                        
+                        <!-- Place a Bid Panel -->
+                        <div class="bg-gradient-to-br from-[#f5ebe0] to-[#ede3d5] rounded-xl p-6 border-2 border-[#c17c5f]">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-gavel text-2xl text-[#c17c5f] mr-3"></i>
+                                <h3 class="text-xl font-bold text-[#5c4a3d]">Place a Bid</h3>
+                            </div>
+                            
+                            <!-- Current Bid Info -->
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-white rounded-lg p-4">
+                                    <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Current Bid</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] whitespace-nowrap">120.00 BD</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-4">
+                                    <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Highest Bidder</p>
+                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate">Jennifer M.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Countdown Timer -->
+                            <div class="bg-white rounded-lg p-4 mb-6">
+                                <p class="text-sm text-[#8b7355] mb-3">Auction Ends In</p>
+                                <div class="flex gap-3" id="countdown">
+                                    <div class="countdown-digit text-white rounded-lg p-3 text-center flex-1">
+                                        <span class="text-2xl font-bold" id="hours">02</span>
+                                        <span class="text-xs block">Hours</span>
+                                    </div>
+                                    <div class="countdown-digit text-white rounded-lg p-3 text-center flex-1">
+                                        <span class="text-2xl font-bold" id="minutes">45</span>
+                                        <span class="text-xs block">Minutes</span>
+                                    </div>
+                                    <div class="countdown-digit text-white rounded-lg p-3 text-center flex-1">
+                                        <span class="text-2xl font-bold" id="seconds">32</span>
+                                        <span class="text-xs block">Seconds</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-[#8b7355] mt-2 text-center">Ends: March 25, 2024 at 8:00 PM EST</p>
+                            </div>
+                            
+                            <!-- Bid Form -->
+                            <form class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-[#5c4a3d] mb-2">Your Bid (BD)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></span>
+                                        <input 
+                                            type="number" 
+                                            min="121" 
+                                            step="1" 
+                                            placeholder="121.00" 
+                                            class="w-full pl-4 pr-12 py-3 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] font-semibold"
+                                            id="bidAmount"
+                                        />
+                                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] font-medium pointer-events-none">BD</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-[#5c4a3d] mb-2">Your Name</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Enter your name" 
+                                        class="w-full px-4 py-3 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                                        id="bidderName"
+                                    />
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg flex items-center justify-center">
+                                    <i class="fas fa-gavel mr-2"></i>Place Bid
+                                </button>
+                                
+                                <p class="text-xs text-[#8b7355] text-center">
+                                    <i class="fas fa-info-circle mr-1"></i>Bids must be higher than the current bid (120.00 BD) to be valid.
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Reviews Section -->
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow">
+                <h2 class="text-2xl font-bold text-[#5c4a3d] mb-6">Customer Reviews</h2>
+                
+                <!-- Review 1 -->
+                <div class="border-b border-[#e5e0d8] pb-6 mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
+                                <span class="text-[#c17c5f] font-semibold">LW</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d]">Lisa Wong</h4>
+                                <div class="flex text-sm">
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#8b7355] text-sm">February 20, 2024</span>
+                    </div>
+                    <p class="text-[#8b7355] leading-relaxed">
+                        I won this necklace in a previous auction and it's absolutely breathtaking! The craftsmanship is incredible and the moonstone has such a beautiful glow. Marcus is a true artist. Don't miss out on this auction!
+                    </p>
+                </div>
+                
+                <!-- Review 2 -->
+                <div class="border-b border-[#e5e0d8] pb-6 mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
+                                <span class="text-[#c17c5f] font-semibold">RP</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d]">Robert Peterson</h4>
+                                <div class="flex text-sm">
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#8b7355] text-sm">January 15, 2024</span>
+                    </div>
+                    <p class="text-[#8b7355] leading-relaxed">
+                        Bought this as an anniversary gift for my wife. She absolutely loves it! The quality is outstanding and it arrived beautifully packaged. Worth every penny. Marcus's work is exceptional.
+                    </p>
+                </div>
+                
+                <!-- Review 3 -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
+                                <span class="text-[#c17c5f] font-semibold">EK</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d]">Emma Kowalski</h4>
+                                <div class="flex text-sm">
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="far fa-star star-empty"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#8b7355] text-sm">December 8, 2023</span>
+                    </div>
+                    <p class="text-[#8b7355] leading-relaxed">
+                        Beautiful necklace with great attention to detail. The moonstone is genuine and has lovely iridescence. Only giving 4 stars because the chain is a bit shorter than I prefer, but overall a stunning piece.
+                    </p>
+                </div>
+                
+                <!-- Write Review Button -->
+                <div class="mt-8 text-center">
+                    <button class="bg-white hover:bg-[#f5ebe0] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-2 rounded-lg font-medium transition-colors">
+                        Write a Review
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Change main image when clicking thumbnail
+        function changeImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = thumbnail.src.replace('w=150&h=150', 'w=600&h=500');
+            
+            // Update active state
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+        
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = this.value + ' BD';
+        });
+        
+        // Countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const endDate = new Date();
+            endDate.setHours(20, 0, 0, 0); // 8:00 PM today
+            
+            if (now > endDate) {
+                endDate.setDate(endDate.getDate() + 1); // Set to tomorrow if already past
+            }
+            
+            const diff = endDate - now;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // Bid form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const bidAmount = parseFloat(document.getElementById('bidAmount').value);
+            const bidderName = document.getElementById('bidderName').value.trim();
+            const currentBid = 120.00;
+            
+            if (!bidAmount || bidAmount <= currentBid) {
+                alert('Your bid must be higher than the current bid of $120.00');
+                return;
+            }
+            
+            if (!bidderName) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            alert(`Thank you, ${bidderName}! Your bid of $${bidAmount.toFixed(2)} has been placed.`);
+            this.reset();
+        });
+    </script>
+</body>
+</html>

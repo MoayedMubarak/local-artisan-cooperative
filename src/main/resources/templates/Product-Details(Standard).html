@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handmade Ceramic Vase - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta {
+            color: #c17c5f;
+        }
+        
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+        
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+        
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+        
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+        
+        .text-earth {
+            color: #8b7355;
+        }
+        
+        .bg-earth {
+            background-color: #8b7355;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+        
+        .thumbnail {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        .thumbnail:hover, .thumbnail.active {
+            opacity: 1;
+            transform: scale(1.05);
+            border-color: #c17c5f;
+        }
+        
+        .star-filled {
+            color: #fbbf24;
+        }
+        
+        .star-empty {
+            color: #e5e0d8;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e0d8;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c17c5f;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            background: #a5664d;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c17c5f;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-moz-range-thumb:hover {
+            background: #a5664d;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox:checked {
+            background-color: #c17c5f;
+            border-color: #c17c5f;
+        }
+
+        .custom-radio:checked {
+            border-color: #c17c5f;
+        }
+
+        .custom-radio:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #c17c5f;
+        }
+
+        
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="../static/Logo.png" 
+                        class="h-10 w-auto object-contain" 
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- User Menu -->
+                <a href="my-profile.html" class="group flex items-center gap-2 transition-colors">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <!-- Profile Icon Container with Badge -->
+                        <div class="relative">
+                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                            <!-- This is the badge, like your cart icon has -->
+
+                        </div>
+                        
+                        <div class="text-sm">
+                            <!-- Name changes color on hover because of group-hover -->
+                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Notifications Bell Icon -->
+                <a href="notifications.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                </a>
+                
+                <!-- Cart Icon -->
+                <a href="ShoppingCart&Checkout.html">
+                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">
+        <!-- Left Sidebar (Reused from products.html) -->
+        <aside class="w-[250px] flex-shrink-0 hidden lg:block">
+            <div class="bg-white rounded-xl p-6 card-shadow sticky top-24">
+                <!-- Search Input -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Search Products</h3>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Search..." 
+                            class="w-full px-4 py-2 pl-10 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
+                        />
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#b8a99a]"></i>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Categories</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">All</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only" checked>
+                                <div class="w-4 h-4 border-2 border-[#c17c5f] rounded-full mr-3"></div>
+                            </div>
+                            <span class="text-[#c17c5f] font-medium">Ceramics</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Jewelry</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Paintings</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Textiles</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Woodwork</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Price Range Slider -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Price Range</h3>
+                    <div class="px-2">
+                        <input type="range" min="0" max="1000" value="500" class="w-full" id="priceRange">
+                        <div class="flex justify-between mt-2 text-sm text-[#8b7355]">
+                            <span>0 BD</span>
+                            <span class="font-semibold text-[#c17c5f]" id="priceValue">500 BD</span>
+                            <span>1000 BD</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Show Auctions Only Checkbox -->
+                <div>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" class="sr-only">
+                        <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded mr-3 flex items-center justify-center group-hover:border-[#c17c5f] transition-colors">
+                            <i class="fas fa-check text-white text-xs opacity-0"></i>
+                        </div>
+                        <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Show Auctions Only</span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Breadcrumb -->
+            <nav class="mb-6 text-sm">
+                <ol class="flex items-center space-x-2 text-[#8b7355]">
+                    <li><a href="index.html" class="hover:text-[#c17c5f] transition-colors">Home</a></li>
+                    <li><span>/</span></li>
+                    <li><a href="products.html" class="hover:text-[#c17c5f] transition-colors">Products</a></li>
+                    <li><span>/</span></li>
+                    <li><a href="products.html" class="hover:text-[#c17c5f] transition-colors">Ceramics</a></li>
+                    <li><span>/</span></li>
+                    <li class="text-[#5c4a3d] font-medium">Handmade Ceramic Vase</li>
+                </ol>
+            </nav>
+
+            <!-- Product Detail Section -->
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow mb-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left: Product Images -->
+                    <div>
+                        <!-- Main Image -->
+                        <div class="mb-4">
+                            <img id="mainImage" src="https://images.unsplash.com/photo-1631125914037-b5657e20fa82?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dp" alt="Handmade Ceramic Vase" class="w-full h-96 object-cover rounded-xl">
+                        </div>
+                        
+                        <!-- Thumbnails -->
+                        <div class="flex gap-3">
+                            <img src="https://images.unsplash.com/photo-1769118440996-801e493974be?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Thumbnail 1" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8] active" onclick="changeImage(this)">
+                            <img src="https://images.unsplash.com/photo-1631125914037-b5657e20fa82?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dp" alt="Thumbnail 2" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8]" onclick="changeImage(this)">
+                            <img src="https://images.unsplash.com/photo-1738858363258-c8e7f833133d?q=80&w=1006&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Thumbnail 3" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8]" onclick="changeImage(this)">
+                            <img src="https://images.unsplash.com/photo-1631125914087-d249da84932c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Thumbnail 4" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8]" onclick="changeImage(this)">
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Product Info -->
+                    <div>
+                        <!-- Category Badge -->
+                        <span class="inline-block bg-[#f5ebe0] text-[#c17c5f] px-3 py-1 rounded-full text-sm font-medium mb-4">
+                            Ceramics
+                        </span>
+                        
+                        <!-- Product Name -->
+                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2">Handmade Ceramic Vase</h1>
+                        
+                        <!-- Artisan Name -->
+                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block">
+                            by Elena Rodriguez
+                        </a>
+                        
+                        <!-- Price -->
+                        <div class="text-3xl font-bold text-[#c17c5f] mb-3">85.00 BD</div>
+                        
+                        <!-- Stock Count -->
+                        <p class="text-green-600 mb-6">
+                            <i class="fas fa-check-circle mr-2"></i>12 in stock
+                        </p>
+                        
+                        <!-- Star Rating -->
+                        <div class="flex items-center mb-6">
+                            <div class="flex mr-3">
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star star-filled"></i>
+                                <i class="fas fa-star-half-alt star-filled"></i>
+                            </div>
+                            <span class="text-[#5c4a3d] font-medium">4.5</span>
+                            <span class="text-[#8b7355] ml-2">(24 reviews)</span>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-[#5c4a3d] mb-2">Description</h3>
+                            <p class="text-[#8b7355] leading-relaxed">
+                                This beautiful handmade ceramic vase is crafted with care by skilled artisan Elena Rodriguez. Each piece is unique, featuring a smooth glazed finish in warm earth tones that complement any home decor. Perfect for displaying fresh or dried flowers, this vase adds a touch of organic elegance to your living space.
+                            </p>
+                            <p class="text-[#8b7355] leading-relaxed mt-3">
+                                Dimensions: 12" height × 5" diameter. Made from high-quality stoneware clay and fired at high temperatures for durability. Food-safe glaze. Hand wash recommended.
+                            </p>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button class="flex-1 bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg flex items-center justify-center">
+                                <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                            </button>
+                            <button class="flex-1 bg-white hover:bg-[#f5ebe0] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
+                                <i class="far fa-heart mr-2"></i>Add to Wishlist
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Reviews Section -->
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow">
+                <h2 class="text-2xl font-bold text-[#5c4a3d] mb-6">Customer Reviews</h2>
+                
+                <!-- Review 1 -->
+                <div class="border-b border-[#e5e0d8] pb-6 mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
+                                <span class="text-[#c17c5f] font-semibold">SM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d]">Sarah Mitchell</h4>
+                                <div class="flex text-sm">
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#8b7355] text-sm">March 15, 2024</span>
+                    </div>
+                    <p class="text-[#8b7355] leading-relaxed">
+                        Absolutely stunning vase! The craftsmanship is exceptional and it looks even better in person. The earthy tones match my decor perfectly. Elena's attention to detail really shows in this piece. Highly recommend!
+                    </p>
+                </div>
+                
+                <!-- Review 2 -->
+                <div class="border-b border-[#e5e0d8] pb-6 mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
+                                <span class="text-[#c17c5f] font-semibold">JC</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d]">James Chen</h4>
+                                <div class="flex text-sm">
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="far fa-star star-empty"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#8b7355] text-sm">February 28, 2024</span>
+                    </div>
+                    <p class="text-[#8b7355] leading-relaxed">
+                        Beautiful vase with great quality. Shipping was fast and it was packaged very securely. The only reason I'm giving 4 stars instead of 5 is that it's slightly smaller than I expected, but still a lovely piece.
+                    </p>
+                </div>
+                
+                <!-- Review 3 -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
+                                <span class="text-[#c17c5f] font-semibold">AK</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d]">Anna Kowalski</h4>
+                                <div class="flex text-sm">
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                    <i class="fas fa-star star-filled"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#8b7355] text-sm">January 10, 2024</span>
+                    </div>
+                    <p class="text-[#8b7355] leading-relaxed">
+                        This is my third purchase from Elena and I'm never disappointed. Her work is consistently beautiful and well-made. This vase is now the centerpiece of my dining table. Worth every penny!
+                    </p>
+                </div>
+                
+                <!-- Write Review Button -->
+                <div class="mt-8 text-center">
+                    <button class="bg-white hover:bg-[#f5ebe0] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-2 rounded-lg font-medium transition-colors">
+                        Write a Review
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Change main image when clicking thumbnail
+        function changeImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = thumbnail.src.replace('w=150&h=150', 'w=600&h=500');
+            
+            // Update active state
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+        
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = this.value + ' BD';
+        });
+    </script>
+</body>
+</html>
