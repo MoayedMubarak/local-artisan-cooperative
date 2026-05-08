@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // In a real app this would use a product ID from data attributes.
             // For now we navigate to a generic product detail page.
             console.log('View details for:', productName);
-            window.location.href = 'product-detail.html';
+            window.location.href = 'Product-Details(Standard).html';
         });
     });
 
