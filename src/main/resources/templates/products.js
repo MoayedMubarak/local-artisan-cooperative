@@ -3,9 +3,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceRange = document.getElementById('priceRange');
     const priceValue = document.getElementById('priceValue');
 
-    if (priceRange && priceValue) {
+    function updatePriceDisplay() {
+        if (priceRange && priceValue) {
+            priceValue.textContent = priceRange.value + ' BD';
+        }
+    }
+
+    if (priceRange) {
         priceRange.addEventListener('input', function() {
-            priceValue.textContent = this.value + ' BD';
+            updatePriceDisplay();
+            applyFilters(); // Apply filters when price changes
         });
     }
 
@@ -40,15 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchTerm = searchInput?.value.trim().toLowerCase() || '';
         const selectedCategory = getSelectedCategoryValue();
         const showAuctionsOnly = auctionCheckbox?.checked || false;
+        const maxPrice = priceRange ? parseFloat(priceRange.value) : Infinity;
 
         productCards.forEach(card => {
             const cardText = card.textContent.toLowerCase();
             const cardCategory = card.dataset.category?.trim().toLowerCase() || '';
+            const cardPrice = card.dataset.price ? parseFloat(card.dataset.price) : 0;
+            
             const matchesSearch = !searchTerm || cardText.includes(searchTerm);
             const matchesCategory = selectedCategory === 'all' || cardCategory === selectedCategory || cardText.includes(selectedCategory);
             const matchesAuction = !showAuctionsOnly || card.dataset.auctionCard === 'true';
+            const matchesPrice = cardPrice <= maxPrice;
 
-            card.style.display = (matchesSearch && matchesCategory && matchesAuction) ? 'block' : 'none';
+            card.style.display = (matchesSearch && matchesCategory && matchesAuction && matchesPrice) ? 'block' : 'none';
         });
 
         updateItemCount();
@@ -92,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     syncFiltersFromUrl();
+    updatePriceDisplay();
     applyFilters();
 
     // --- 5. View Details Navigation ---

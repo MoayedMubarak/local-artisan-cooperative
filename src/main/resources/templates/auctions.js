@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     priceRange?.addEventListener('input', function () {
         priceValue.textContent = this.value + ' BD';
-        filterByBidRange(parseInt(this.value, 10));
+        applyFilters(); // Call applyFilters to combine with other filters
     });
 
     const requireLoginToAct = (message) => window.requireLoginForAction ? window.requireLoginForAction(message) : true;
@@ -228,13 +228,17 @@ function applyFilters() {
     const searchQuery  = document.querySelector('aside input[type="text"]')?.value.trim().toLowerCase() ?? '';
     const checkedBoxes = [...document.querySelectorAll('.custom-checkbox:checked')]
                             .map(cb => cb.parentElement.querySelector('span')?.textContent.trim().toLowerCase());
+    const maxPrice     = parseFloat(document.getElementById('priceRange')?.value ?? 1000);
 
     document.querySelectorAll('.auction-card').forEach(card => {
         const title   = card.querySelector('h3')?.textContent.trim().toLowerCase() ?? '';
         const artisan = card.querySelector('p')?.textContent.trim().toLowerCase() ?? '';
+        const bidText = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
+        const bidVal  = parseFloat(bidText.replace(/[^0-9.]/g, ''));
 
         const matchesSearch = !searchQuery || title.includes(searchQuery) || artisan.includes(searchQuery);
         const matchesCat    = category === 'all' || title.includes(category) || artisan.includes(category);
+        const matchesPrice  = isNaN(bidVal) || bidVal <= maxPrice;
 
         let matchesStatus = true;
         if (checkedBoxes.length > 0) {
@@ -249,7 +253,7 @@ function applyFilters() {
             );
         }
 
-        card.style.display = (matchesSearch && matchesCat && matchesStatus) ? '' : 'none';
+        card.style.display = (matchesSearch && matchesCat && matchesStatus && matchesPrice) ? '' : 'none';
     });
 }
 
