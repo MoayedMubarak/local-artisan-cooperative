@@ -237,7 +237,8 @@ function applyFilters() {
         const bidVal  = parseFloat(bidText.replace(/[^0-9.]/g, ''));
 
         const matchesSearch = !searchQuery || title.includes(searchQuery) || artisan.includes(searchQuery);
-        const matchesCat    = category === 'all' || title.includes(category) || artisan.includes(category);
+        const cardCategory = (card.dataset.category || '').toLowerCase();
+        const matchesCat = category === 'all' || cardCategory === category;
         const matchesPrice  = isNaN(bidVal) || bidVal <= maxPrice;
 
         let matchesStatus = true;
