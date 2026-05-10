@@ -251,7 +251,7 @@ function initLoginPageNavigationGuard() {
             return;
         }
 
-        const allowedAuthFlow = /login|Login|Forget-Password/i;
+        const allowedAuthFlow = /login|Login|forget(?:[-_]password)?|forgot|Forgot/i;
         if (allowedAuthFlow.test(href)) return;
 
         event.preventDefault();
