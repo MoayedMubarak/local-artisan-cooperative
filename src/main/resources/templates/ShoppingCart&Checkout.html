@@ -449,13 +449,39 @@
         </main>
     </div>
 
+    <script src="/auth-guard.js"></script>
     <script>
+        const cartPageRequiresLogin = !window.isUserAuthenticated?.();
+        if (cartPageRequiresLogin) {
+            const notice = document.createElement('div');
+            notice.id = 'cart-login-notice';
+            notice.className = 'bg-[#fff4e5] border border-[#f1d2b7] text-[#8b7355] px-6 py-4 text-center';
+            notice.textContent = 'Login/Register first to modify cart items or complete checkout. You can still browse the cart view.';
+            document.body.insertBefore(notice, document.body.firstChild);
+            const confirmBtn = document.getElementById('confirm-btn');
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-60', 'cursor-not-allowed');
+            }
+        }
+
+        function requireCheckoutLogin(message) {
+            return window.requireLoginForAction ? window.requireLoginForAction(message) : true;
+        }
+
+        document.getElementById('confirm-btn')?.addEventListener('click', function (event) {
+            if (!requireCheckoutLogin('Login/Register first to confirm your order.')) {
+                event.preventDefault();
+            }
+        });
+
         // ── STATE ──
         const SHIPPING_COST = 2.00;
         let isShipping = true; // true = ship, false = pickup
 
         // ── DELIVERY SELECTION ──
         function selectDelivery(mode) {
+            if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to change delivery options.') : true)) return;
             isShipping = (mode === 'ship');
 
             // Card styles
@@ -499,6 +525,7 @@
 
         // ── QUANTITY ──
         function updateQuantity(button, change) {
+            if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to update item quantities.') : true)) return;
             const cartItem = button.closest('.cart-item');
             const quantitySpan = cartItem.querySelector('.quantity-value');
             const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent.replace(' BD', '').trim();
@@ -515,6 +542,7 @@
 
         // ── REMOVE ──
         function removeItem(button) {
+            if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to remove items from your cart.') : true)) return;
             const cartItem = button.closest('.cart-item');
             cartItem.style.opacity = '0';
             cartItem.style.transform = 'translateX(-20px)';
@@ -545,6 +573,7 @@
 
         // ── PAYMENT SELECTION ──
         function selectPayment(card) {
+            if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to change payment method.') : true)) return;
             document.querySelectorAll('.payment-card').forEach(c => {
                 c.classList.remove('selected');
                 const radio = c.querySelector('input[type="radio"]');

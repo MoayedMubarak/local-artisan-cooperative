@@ -459,6 +459,7 @@
         </main>
     </div>
 
+    <script src="/auth-guard.js"></script>
     <script>
         // Change main image when clicking thumbnail
         function changeImage(thumbnail) {
@@ -476,6 +477,28 @@
         
         priceRange.addEventListener('input', function() {
             priceValue.textContent = this.value + ' BD';
+        });
+
+        const detailSearchInput = document.querySelector('aside input[type="text"][placeholder="Search..."]');
+        if (detailSearchInput) {
+            detailSearchInput.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                const query = detailSearchInput.value.trim();
+                if (!query) return;
+                window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            const button = event.target.closest('button');
+            if (!button) return;
+            const text = button.innerText.trim();
+            if (/Add to Cart|Add to Wishlist|Write a Review/i.test(text)) {
+                if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to perform this action.') : true)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            }
         });
     </script>
 </body>

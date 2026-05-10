@@ -1,72 +1,107 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     // --- 1. Price Range Slider ---
     const priceRange = document.getElementById('priceRange');
     const priceValue = document.getElementById('priceValue');
-    
+
     if (priceRange && priceValue) {
         priceRange.addEventListener('input', function() {
             priceValue.textContent = this.value + ' BD';
         });
     }
 
-    // --- 2. Category Filtering (Radio Buttons) ---
-    const radioInputs = document.querySelectorAll('input[type="radio"][name="category"]');
-    
-    radioInputs.forEach(radio => {
-        radio.addEventListener('change', function() {
-            const selectedCategory = this.parentElement.querySelector('span').textContent;
-            const productCards = document.querySelectorAll('.product-card');
-            
-            productCards.forEach(card => {
-                // Since we don't have data-attributes, we perform a text content search
-                // This checks if the category name exists inside the card
-                if (this.value === 'all' || card.textContent.includes(selectedCategory)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+    function updateItemCount() {
+        const productCards = Array.from(document.querySelectorAll('.product-card'));
+        const visibleCount = productCards.filter(card => card.style.display !== 'none').length;
+        const countElement = document.getElementById('item-count');
+        if (countElement) {
+            countElement.textContent = visibleCount.toString();
+        }
+    }
+
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            search: params.get('search')?.trim() || '',
+            category: params.get('category')?.trim().toLowerCase() || '',
+            auctionOnly: params.get('auction') === 'true',
+        };
+    }
+
+    function getSelectedCategoryValue() {
+        return document.querySelector('input[type="radio"][name="category"]:checked')?.value || 'all';
+    }
+
+    const productCards = Array.from(document.querySelectorAll('.product-card'));
+    const categoryRadios = document.querySelectorAll('input[type="radio"][name="category"]');
+    const auctionCheckbox = document.querySelector('input[type="checkbox"]');
+    const searchInput = document.querySelector('input[placeholder="Search..."]');
+
+    function applyFilters() {
+        const searchTerm = searchInput?.value.trim().toLowerCase() || '';
+        const selectedCategory = getSelectedCategoryValue();
+        const showAuctionsOnly = auctionCheckbox?.checked || false;
+
+        productCards.forEach(card => {
+            const cardText = card.textContent.toLowerCase();
+            const matchesSearch = !searchTerm || cardText.includes(searchTerm);
+            const matchesCategory = selectedCategory === 'all' || cardText.includes(selectedCategory);
+            const matchesAuction = !showAuctionsOnly || card.dataset.auctionCard === 'true';
+
+            card.style.display = (matchesSearch && matchesCategory && matchesAuction) ? 'block' : 'none';
         });
+
+        updateItemCount();
+    }
+
+    categoryRadios.forEach(radio => {
+        radio.addEventListener('change', applyFilters);
     });
 
-    // --- 3. Show Auctions Only (Checkbox) ---
-    const auctionCheckbox = document.querySelector('input[type="checkbox"]');
-    
     if (auctionCheckbox) {
-        auctionCheckbox.addEventListener('change', function() {
-            const showOnlyAuctions = this.checked;
-            const productCards = document.querySelectorAll('.product-card');
-            
-            productCards.forEach(card => {
-                const hasAuctionBadge = card.querySelector('.auction-badge');
-                
-                if (showOnlyAuctions) {
-                    // If checked, only show cards with the auction badge
-                    card.style.display = hasAuctionBadge ? 'block' : 'none';
-                } else {
-                    // Show all (unless hidden by category filter)
-                    card.style.display = 'block';
-                }
-            });
+        auctionCheckbox.addEventListener('change', applyFilters);
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyFilters();
+            }
         });
     }
 
-    // --- 4. Search Input ---
-    const searchInput = document.querySelector('input[placeholder="Search..."]');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const term = this.value.toLowerCase();
-            const productCards = document.querySelectorAll('.product-card');
-            
-            productCards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                if (text.includes(term)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
+    function syncFiltersFromUrl() {
+        const params = getUrlParams();
+
+        if (searchInput && params.search) {
+            searchInput.value = params.search;
+        }
+
+        if (params.category) {
+            const categoryInput = document.querySelector(`input[type="radio"][name="category"][value="${params.category}"]`);
+            if (categoryInput) {
+                categoryInput.checked = true;
+            }
+        }
+
+        if (auctionCheckbox) {
+            auctionCheckbox.checked = params.auctionOnly;
+        }
     }
+
+    syncFiltersFromUrl();
+    applyFilters();
+
+    // --- 5. View Details Navigation ---
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('button');
+        if (!button || button.textContent.trim() !== 'View Details') return;
+
+        const card = button.closest('.product-card');
+        if (!card) return;
+
+        const target = card.dataset.detailPage || 'Product-Details(Standard).html';
+        window.location.href = target;
+    });
 });

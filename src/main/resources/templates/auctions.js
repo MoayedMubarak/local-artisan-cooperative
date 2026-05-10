@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         filterByBidRange(parseInt(this.value, 10));
     });
 
+    const requireLoginToAct = (message) => window.requireLoginForAction ? window.requireLoginForAction(message) : true;
+
     // ----------------------------------------------------------
     // 2. Countdown timers
     // ----------------------------------------------------------
@@ -84,11 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!btn) return;
 
         if (btn.textContent.trim() === 'Place Bid') {
+            if (!requireLoginToAct('Login/Register first to place a bid.')) return;
             const card = btn.closest('.auction-card');
             openBidModal(card);
         }
 
         if (btn.textContent.trim() === 'Notify Me') {
+            if (!requireLoginToAct('Login/Register first to be notified about this auction.')) return;
             btn.textContent = '✓ Notified';
             btn.classList.add('bg-[#c17c5f]', 'text-white');
             btn.classList.remove('border-[#c17c5f]', 'text-[#c17c5f]');
@@ -353,6 +357,7 @@ function closeBidModal() {
 }
 
 function submitBid() {
+    if (!window.requireLoginForAction?.('Login/Register first to place a bid.')) return;
     const input    = document.getElementById('bid-input');
     const errorEl  = document.getElementById('bid-error');
     const bidValue = parseFloat(input.value);

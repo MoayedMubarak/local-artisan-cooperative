@@ -52,7 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomCheckboxes();
 
     // ----------------------------------------------------------
-    // 4. Login form submission
+    // 4. Prevent navigation from login page before authentication
+    // ----------------------------------------------------------
+    initLoginPageNavigationGuard();
+
+    // ----------------------------------------------------------
+    // 5. Login form submission
     // ----------------------------------------------------------
     window.handleLogin = function (event) {
         event.preventDefault();
@@ -78,7 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
             sessionStorage.setItem('loggedIn', 'true');
             sessionStorage.setItem('userEmail', email);
             sessionStorage.setItem('userName', 'John Doe');
-            window.location.href = 'index.html';
+
+            // Redirect back to the originally requested page (if any)
+            const url = new URL(window.location.href);
+            const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
+            sessionStorage.removeItem('postLoginNext');
+
+            window.location.href = next || 'index.html';
         }, 1200);
     };
 
@@ -137,7 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('loggedIn', 'true');
                 sessionStorage.setItem('userEmail', email);
                 showToast('Account created! Welcome to ArtsyVibe.', 'success');
-                setTimeout(() => window.location.href = 'index.html', 1500);
+
+                // Redirect back to the originally requested page (if any)
+                setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
+                    sessionStorage.removeItem('postLoginNext');
+                    window.location.href = next || 'index.html';
+                }, 1500);
             }
         }, 1500);
     };
@@ -196,6 +214,49 @@ function initCustomCheckboxes() {
             toggleCheckboxVisual(this);
         });
     });
+}
+
+function initLoginPageNavigationGuard() {
+    const loggedIn = sessionStorage.getItem('loggedIn') === 'true';
+    if (loggedIn) return;
+
+    function showLoginRequiredToast(message) {
+        if (document.getElementById('login-page-blocker-toast')) return;
+
+        const toast = document.createElement('div');
+        toast.id = 'login-page-blocker-toast';
+        toast.className = 'fixed bottom-6 left-1/2 z-50 max-w-xl w-[calc(100%-2rem)] -translate-x-1/2 rounded-2xl border border-[#e5e0d8] bg-white p-4 text-[#5c4a3d] shadow-xl';
+        toast.innerHTML = `
+            <div class="flex items-start gap-3">
+                <div class="text-2xl">⚠️</div>
+                <div>
+                    <h2 class="font-semibold text-lg">Login Required</h2>
+                    <p class="text-sm text-[#8b7355]">${message}</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3800);
+    }
+
+    document.addEventListener('click', (event) => {
+        const anchor = event.target.closest('a[href]');
+        if (!anchor) return;
+
+        const href = anchor.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+            return;
+        }
+
+        const allowedAuthFlow = /login|Login|Forget-Password/i;
+        if (allowedAuthFlow.test(href)) return;
+
+        event.preventDefault();
+        showLoginRequiredToast('You need to login or register first before browsing other pages.');
+    }, true);
 }
 
 function toggleCheckboxVisual(checkbox) {

@@ -575,6 +575,16 @@
         priceRange.addEventListener('input', function() {
             priceValue.textContent = this.value + ' BD';
         });
+
+        const detailSearchInput = document.querySelector('aside input[type="text"][placeholder="Search..."]');
+        if (detailSearchInput) {
+            detailSearchInput.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                const query = detailSearchInput.value.trim();
+                if (!query) return;
+                window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+            });
+        }
         
         // Countdown timer
         function updateCountdown() {
@@ -601,26 +611,54 @@
         setInterval(updateCountdown, 1000);
         
         // Bid form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const bidAmount = parseFloat(document.getElementById('bidAmount').value);
-            const bidderName = document.getElementById('bidderName').value.trim();
-            const currentBid = 120.00;
-            
-            if (!bidAmount || bidAmount <= currentBid) {
-                alert('Your bid must be higher than the current bid of $120.00');
-                return;
+        const bidForm = document.querySelector('form');
+        if (bidForm) {
+            bidForm.addEventListener('submit', function(e) {
+                if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to place a bid.') : true)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                e.preventDefault();
+                const bidAmount = parseFloat(document.getElementById('bidAmount').value);
+                const bidderName = document.getElementById('bidderName').value.trim();
+                const currentBid = 120.00;
+                
+                if (!bidAmount || bidAmount <= currentBid) {
+                    alert('Your bid must be higher than the current bid of $120.00');
+                    return;
+                }
+                
+                if (!bidderName) {
+                    alert('Please enter your name');
+                    return;
+                }
+                
+                alert(`Thank you, ${bidderName}! Your bid of $${bidAmount.toFixed(2)} has been placed.`);
+                this.reset();
+            });
+        }
+    </script>
+    <script src="/auth-guard.js"></script>
+    <script>
+        if (!window.isUserAuthenticated?.()) {
+            const banner = document.createElement('div');
+            banner.className = 'bg-[#fff4e5] border border-[#f1d2b7] text-[#8b7355] px-6 py-4 text-center';
+            banner.textContent = 'Login/Register first to place bids or write reviews. You can still browse this auction.';
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
+
+        document.addEventListener('click', function(event) {
+            const button = event.target.closest('button');
+            if (!button) return;
+            const text = button.innerText.trim();
+            if (/Write a Review/i.test(text)) {
+                if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to write a review.') : true)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
             }
-            
-            if (!bidderName) {
-                alert('Please enter your name');
-                return;
-            }
-            
-            alert(`Thank you, ${bidderName}! Your bid of $${bidAmount.toFixed(2)} has been placed.`);
-            this.reset();
         });
     </script>
-    <script src"Product-Details(Auction).js"></script>
 </body>
 </html>

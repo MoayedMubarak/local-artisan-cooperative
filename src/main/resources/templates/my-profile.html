@@ -631,7 +631,12 @@
         </div>
     </div>
 
+    <script src="/auth-guard.js"></script>
     <script>
+        initAuthGuard({
+            redirectTo: '/login',
+            message: 'Login/Register first to view your profile.'
+        });
 
         // Remember checkbox functionality
         const checkboxes = document.querySelectorAll('input[type="checkbox"].sr-only, #edit-address-default');

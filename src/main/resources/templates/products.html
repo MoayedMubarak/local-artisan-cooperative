@@ -223,42 +223,42 @@
                     <div class="space-y-2">
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
-                                <input type="radio" name="category" class="custom-radio sr-only" checked>
+                                <input type="radio" name="category" value="all" class="custom-radio sr-only" checked>
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">All</span>
                         </label>
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
-                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <input type="radio" name="category" value="ceramics" class="custom-radio sr-only">
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Ceramics</span>
                         </label>
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
-                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <input type="radio" name="category" value="jewelry" class="custom-radio sr-only">
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Jewelry</span>
                         </label>
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
-                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <input type="radio" name="category" value="paintings" class="custom-radio sr-only">
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Paintings</span>
                         </label>
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
-                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <input type="radio" name="category" value="textiles" class="custom-radio sr-only">
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Textiles</span>
                         </label>
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
-                                <input type="radio" name="category" class="custom-radio sr-only">
+                                <input type="radio" name="category" value="woodwork" class="custom-radio sr-only">
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Woodwork</span>
@@ -286,7 +286,7 @@
             <!-- Top Bar -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <p class="text-[#8b7355]">
-                    <span class="font-semibold text-[#5c4a3d]">12</span> items found
+                    <span id="item-count" class="font-semibold text-[#5c4a3d]">12</span> items found
                 </p>
                 <div class="flex items-center gap-3">
                     <label class="text-[#5c4a3d] font-medium">Sort by:</label>
@@ -320,7 +320,7 @@
                 </div>
 
                 <!-- Product Card 2 (Auction) -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative">
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-detail-page="Product-Details(Auction).html" data-auction-card="true">
                     <div class="relative">
                         <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=300&fit=crop" alt="Silver Moonstone Necklace" class="w-full h-56 object-cover">
                     </div>
@@ -515,6 +515,8 @@
         </main>
     </div>
 
+    <script src="/auth-guard.js"></script>
+    <script src="products.js"></script>
     <script>
         // Price range slider functionality
         const priceRange = document.getElementById('priceRange');

@@ -355,7 +355,12 @@
         </main>
     </div>
 
+    <script src="/auth-guard.js"></script>
     <script>
+        initAuthGuard({
+            redirectTo: '/login',
+            message: 'Login/Register first to view notifications.'
+        });
         // Update notification badge count
         function updateNotificationBadge() {
             const unreadCount = document.querySelectorAll('.notification-card[data-read="false"]').length;

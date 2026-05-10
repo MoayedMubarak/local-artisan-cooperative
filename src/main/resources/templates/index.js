@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 1. Search functionality
     // ----------------------------------------------------------
-    const searchInput  = document.querySelector('input[type="text"][placeholder*="ceramics"]');
-    const searchButton = searchInput?.nextElementSibling;
+    const heroSearchWrapper = document.querySelector('.hero-gradient .relative');
+    const searchInput = heroSearchWrapper?.querySelector('input[type="text"]');
+    const searchButton = heroSearchWrapper?.querySelector('button');
 
     function handleSearch() {
         const query = searchInput?.value.trim();
@@ -26,12 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 2. "Browse All" and "View Auctions" hero buttons
     // ----------------------------------------------------------
-    const heroButtons = document.querySelectorAll('.hero-gradient button');
+    const heroButtons = document.querySelectorAll('.hero-gradient .flex.flex-wrap button');
     heroButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            if (btn.textContent.trim() === 'Browse All') {
+            const text = btn.textContent.trim();
+            if (text === 'Browse All') {
                 window.location.href = 'products.html';
-            } else {
+            } else if (text === 'View Auctions') {
                 window.location.href = 'auctions.html';
             }
         });
