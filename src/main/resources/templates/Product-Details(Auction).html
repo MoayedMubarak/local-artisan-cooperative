@@ -557,6 +557,9 @@
         </main>
     </div>
 
+    <script src="/src/main/resources/static/auth-guard.js"></script>
+    <script src="/src/main/resources/static/Product-Details(Auction).js"></script>
+    
     <script>
         // Change main image when clicking thumbnail
         function changeImage(thumbnail) {
@@ -586,6 +589,7 @@
             });
         }
         
+
         // Countdown timer
         function updateCountdown() {
             const now = new Date();
@@ -639,7 +643,7 @@
             });
         }
     </script>
-    <script src="/auth-guard.js"></script>
+
     <script>
         if (!window.isUserAuthenticated?.()) {
             const banner = document.createElement('div');
