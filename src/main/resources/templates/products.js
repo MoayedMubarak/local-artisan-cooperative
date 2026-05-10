@@ -43,8 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         productCards.forEach(card => {
             const cardText = card.textContent.toLowerCase();
+            const cardCategory = card.dataset.category?.trim().toLowerCase() || '';
             const matchesSearch = !searchTerm || cardText.includes(searchTerm);
-            const matchesCategory = selectedCategory === 'all' || cardText.includes(selectedCategory);
+            const matchesCategory = selectedCategory === 'all' || cardCategory === selectedCategory || cardText.includes(selectedCategory);
             const matchesAuction = !showAuctionsOnly || card.dataset.auctionCard === 'true';
 
             card.style.display = (matchesSearch && matchesCategory && matchesAuction) ? 'block' : 'none';
