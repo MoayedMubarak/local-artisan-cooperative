@@ -144,7 +144,7 @@ function updateNotificationBadge() {
  * Read cart item count from sessionStorage and update any cart badge on the page.
  */
 function updateCartBadge() {
-    const badges = document.querySelectorAll('.fa-shopping-cart')
+    document.querySelectorAll('.fa-shopping-cart')
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
