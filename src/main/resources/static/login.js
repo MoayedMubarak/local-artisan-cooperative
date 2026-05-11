@@ -51,10 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     initCustomCheckboxes();
 
-    // ----------------------------------------------------------
-    // 4. Prevent navigation from login page before authentication
-    // ----------------------------------------------------------
-    initLoginPageNavigationGuard();
+    // Navigation from the login page is unrestricted —
+    // protected pages redirect to login themselves via initAuthGuard.
 
     // ----------------------------------------------------------
     // 5. Login form submission
