@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - ArtsyVibe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #faf9f6; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(139,115,85,0.1), 0 2px 4px -1px rgba(139,115,85,0.06); }
+        .hero-pattern {
+            background-color: #5c4a3d;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c17c5f' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-card { transition: transform 0.3s ease; }
+        .team-card:hover .team-overlay { opacity: 1; }
+        .team-overlay { transition: opacity 0.3s ease; }
+        .value-icon { background: linear-gradient(135deg, #c17c5f20, #c17c5f40); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center gap-3 group">
+                    <img src="/images/Logo.png" alt="ArtsyVibe Logo" class="h-10 w-auto object-contain" style="filter: drop-shadow(0 0 0.5px rgba(193,124,95,1));">
+                    <span class="text-2xl font-semibold" style="font-family:'Playfair Display',serif;">ArtsyVibe</span>
+                </a>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="/" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="/products" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="/auctions" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Auctions</a>
+                <a href="/about" class="text-[#c17c5f] font-semibold">About Us</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/profile" class="group flex items-center gap-2 transition-colors">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <div class="relative">
+                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                        </div>
+                        <div class="text-sm">
+                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="/notifications" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                </a>
+                <a href="/cart">
+                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern py-24 px-6 text-center text-white">
+        <div class="max-w-4xl mx-auto">
+            <p class="text-[#c17c5f] font-semibold uppercase tracking-widest text-sm mb-4">Our Story</p>
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                Crafted with Purpose,<br>Sold with Heart
+            </h1>
+            <p class="text-xl text-[#d4c5b5] max-w-2xl mx-auto leading-relaxed">
+                ArtsyVibe was born from a simple belief — that every handcrafted piece tells a story, 
+                and every artisan deserves a stage to share it with the world.
+            </p>
+        </div>
+    </section>
+
+    <!-- Our Mission -->
+    <section class="py-20 px-6 bg-white">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            <div>
+                <p class="text-[#c17c5f] font-semibold uppercase tracking-widest text-sm mb-3">Who We Are</p>
+                <h2 class="text-4xl font-bold text-[#5c4a3d] mb-6">A Marketplace Built on Craftsmanship</h2>
+                <p class="text-[#8b7355] text-lg leading-relaxed mb-6">
+                    Founded in 2020, ArtsyVibe is a curated online marketplace dedicated to celebrating 
+                    handcrafted goods from independent artisans around the world. We bridge the gap between 
+                    skilled creators and conscious consumers who value authenticity over mass production.
+                </p>
+                <p class="text-[#8b7355] text-lg leading-relaxed mb-8">
+                    From hand-thrown ceramics and woven textiles to carved woodwork and silver jewelry — 
+                    every item on our platform is unique, thoughtfully made, and carries the fingerprint 
+                    of the person who created it.
+                </p>
+                <div class="flex gap-4">
+                    <a href="/products" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-full font-medium transition-colors">
+                        Shop Now
+                    </a>
+                    <a href="/contact" class="border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white px-6 py-3 rounded-full font-medium transition-colors">
+                        Get in Touch
+                    </a>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=350&fit=crop" alt="Artisan at work" class="rounded-2xl w-full h-64 object-cover mt-8 card-shadow">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=350&fit=crop" alt="Handcrafted ceramics" class="rounded-2xl w-full h-64 object-cover card-shadow">
+                <img src="https://images.unsplash.com/photo-1617791160536-598cf32026fb?w=300&h=200&fit=crop" alt="Artisan jewelry" class="rounded-2xl w-full h-48 object-cover card-shadow">
+                <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=300&h=200&fit=crop" alt="Woven textiles" class="rounded-2xl w-full h-48 object-cover card-shadow">
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="py-16 px-6 bg-[#faf9f6]">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="stat-card bg-white rounded-2xl p-8 text-center card-shadow">
+                    <div class="text-4xl font-bold text-[#c17c5f] mb-2">500+</div>
+                    <div class="text-[#8b7355] font-medium">Artisans Supported</div>
+                </div>
+                <div class="stat-card bg-white rounded-2xl p-8 text-center card-shadow">
+                    <div class="text-4xl font-bold text-[#c17c5f] mb-2">12K+</div>
+                    <div class="text-[#8b7355] font-medium">Unique Products</div>
+                </div>
+                <div class="stat-card bg-white rounded-2xl p-8 text-center card-shadow">
+                    <div class="text-4xl font-bold text-[#c17c5f] mb-2">48K+</div>
+                    <div class="text-[#8b7355] font-medium">Happy Customers</div>
+                </div>
+                <div class="stat-card bg-white rounded-2xl p-8 text-center card-shadow">
+                    <div class="text-4xl font-bold text-[#c17c5f] mb-2">30+</div>
+                    <div class="text-[#8b7355] font-medium">Countries Reached</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Values -->
+    <section class="py-20 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14">
+                <p class="text-[#c17c5f] font-semibold uppercase tracking-widest text-sm mb-3">What Drives Us</p>
+                <h2 class="text-4xl font-bold text-[#5c4a3d]">Our Core Values</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-[#faf9f6] rounded-2xl p-8 card-shadow">
+                    <div class="value-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#5c4a3d] mb-3">Authentic Craftsmanship</h3>
+                    <p class="text-[#8b7355] leading-relaxed">Every product on ArtsyVibe is handmade. We carefully vet each artisan to ensure quality and authenticity — no mass-produced imitations, ever.</p>
+                </div>
+                <div class="bg-[#faf9f6] rounded-2xl p-8 card-shadow">
+                    <div class="value-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-heart text-2xl text-[#c17c5f]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#5c4a3d] mb-3">Fair Artisan Earnings</h3>
+                    <p class="text-[#8b7355] leading-relaxed">We keep our commission low so artisans earn what they deserve. We believe creators should be the primary beneficiaries of their own work.</p>
+                </div>
+                <div class="bg-[#faf9f6] rounded-2xl p-8 card-shadow">
+                    <div class="value-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-leaf text-2xl text-[#c17c5f]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#5c4a3d] mb-3">Sustainable Practices</h3>
+                    <p class="text-[#8b7355] leading-relaxed">We encourage artisans to use natural, locally-sourced, and recycled materials — building a marketplace that's kind to the planet.</p>
+                </div>
+                <div class="bg-[#faf9f6] rounded-2xl p-8 card-shadow">
+                    <div class="value-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-globe text-2xl text-[#c17c5f]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#5c4a3d] mb-3">Cultural Preservation</h3>
+                    <p class="text-[#8b7355] leading-relaxed">We celebrate heritage crafts from around the world — helping keep ancient techniques alive by connecting them with modern audiences.</p>
+                </div>
+                <div class="bg-[#faf9f6] rounded-2xl p-8 card-shadow">
+                    <div class="value-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-2xl text-[#c17c5f]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#5c4a3d] mb-3">Buyer Protection</h3>
+                    <p class="text-[#8b7355] leading-relaxed">Shop with confidence. Our buyer guarantee ensures you receive exactly what you ordered — or your money back, no questions asked.</p>
+                </div>
+                <div class="bg-[#faf9f6] rounded-2xl p-8 card-shadow">
+                    <div class="value-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-2xl text-[#c17c5f]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#5c4a3d] mb-3">Community First</h3>
+                    <p class="text-[#8b7355] leading-relaxed">We foster a community where artisans support each other and customers become long-term patrons — not just one-time buyers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meet the Team -->
+    <section class="py-20 px-6 bg-[#faf9f6]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14">
+                <p class="text-[#c17c5f] font-semibold uppercase tracking-widest text-sm mb-3">The People Behind It</p>
+                <h2 class="text-4xl font-bold text-[#5c4a3d]">Meet Our Team</h2>
+                <p class="text-[#8b7355] mt-4 max-w-xl mx-auto">A passionate group of designers, developers, and craft lovers working together to build the best artisan marketplace on the web.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="team-card bg-white rounded-2xl overflow-hidden card-shadow relative group">
+                    <div class="relative overflow-hidden h-56">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face" alt="Sara Al-Rashid" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="team-overlay absolute inset-0 bg-[#c17c5f]/80 opacity-0 flex items-center justify-center gap-4">
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-bold text-[#5c4a3d] text-lg">Sara Al-Rashid</h4>
+                        <p class="text-[#c17c5f] text-sm font-medium mb-2">Co-Founder & CEO</p>
+                        <p class="text-[#8b7355] text-sm">Former gallery curator with 10 years in the art world, Sara leads our vision and artisan partnerships.</p>
+                    </div>
+                </div>
+                <div class="team-card bg-white rounded-2xl overflow-hidden card-shadow relative group">
+                    <div class="relative overflow-hidden h-56">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face" alt="Omar Khalil" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="team-overlay absolute inset-0 bg-[#c17c5f]/80 opacity-0 flex items-center justify-center gap-4">
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-bold text-[#5c4a3d] text-lg">Omar Khalil</h4>
+                        <p class="text-[#c17c5f] text-sm font-medium mb-2">Co-Founder & CTO</p>
+                        <p class="text-[#8b7355] text-sm">Full-stack engineer passionate about building platforms that empower creators at scale.</p>
+                    </div>
+                </div>
+                <div class="team-card bg-white rounded-2xl overflow-hidden card-shadow relative group">
+                    <div class="relative overflow-hidden h-56">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face" alt="Layla Hassan" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="team-overlay absolute inset-0 bg-[#c17c5f]/80 opacity-0 flex items-center justify-center gap-4">
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-bold text-[#5c4a3d] text-lg">Layla Hassan</h4>
+                        <p class="text-[#c17c5f] text-sm font-medium mb-2">Head of Design</p>
+                        <p class="text-[#8b7355] text-sm">Award-winning UX designer who crafts experiences as carefully as the artisans on our platform.</p>
+                    </div>
+                </div>
+                <div class="team-card bg-white rounded-2xl overflow-hidden card-shadow relative group">
+                    <div class="relative overflow-hidden h-56">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face" alt="Yusuf Mansour" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="team-overlay absolute inset-0 bg-[#c17c5f]/80 opacity-0 flex items-center justify-center gap-4">
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white hover:text-[#faf9f6] text-xl"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-bold text-[#5c4a3d] text-lg">Yusuf Mansour</h4>
+                        <p class="text-[#c17c5f] text-sm font-medium mb-2">Artisan Relations</p>
+                        <p class="text-[#8b7355] text-sm">Travels the world discovering talented artisans and building relationships that bring their work to our platform.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="py-20 px-6 bg-white">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-14">
+                <p class="text-[#c17c5f] font-semibold uppercase tracking-widest text-sm mb-3">How We Got Here</p>
+                <h2 class="text-4xl font-bold text-[#5c4a3d]">Our Journey</h2>
+            </div>
+            <div class="relative">
+                <div class="absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-[#e5e0d8] h-full"></div>
+                <div class="space-y-12">
+                    <div class="flex items-center gap-8">
+                        <div class="w-1/2 text-right pr-8">
+                            <h4 class="font-bold text-[#5c4a3d] text-lg">The Idea</h4>
+                            <p class="text-[#8b7355] text-sm mt-1">Sara and Omar met at an artisan fair in Cairo and realised talented makers had no reliable online home.</p>
+                        </div>
+                        <div class="relative z-10 w-10 h-10 bg-[#c17c5f] rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">20</div>
+                        <div class="w-1/2 pl-8">
+                            <span class="text-[#c17c5f] font-semibold">2020</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <div class="w-1/2 text-right pr-8">
+                            <span class="text-[#c17c5f] font-semibold">2021</span>
+                        </div>
+                        <div class="relative z-10 w-10 h-10 bg-[#c17c5f] rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">21</div>
+                        <div class="w-1/2 pl-8">
+                            <h4 class="font-bold text-[#5c4a3d] text-lg">Beta Launch</h4>
+                            <p class="text-[#8b7355] text-sm mt-1">ArtsyVibe launched with 50 artisans and 500 products. Within 3 months, 5,000 customers had made their first purchase.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <div class="w-1/2 text-right pr-8">
+                            <h4 class="font-bold text-[#5c4a3d] text-lg">Live Auctions</h4>
+                            <p class="text-[#8b7355] text-sm mt-1">We introduced our live auction feature, allowing collectors to bid on one-of-a-kind pieces in real time.</p>
+                        </div>
+                        <div class="relative z-10 w-10 h-10 bg-[#c17c5f] rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">22</div>
+                        <div class="w-1/2 pl-8">
+                            <span class="text-[#c17c5f] font-semibold">2022</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <div class="w-1/2 text-right pr-8">
+                            <span class="text-[#c17c5f] font-semibold">2023</span>
+                        </div>
+                        <div class="relative z-10 w-10 h-10 bg-[#c17c5f] rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">23</div>
+                        <div class="w-1/2 pl-8">
+                            <h4 class="font-bold text-[#5c4a3d] text-lg">Global Reach</h4>
+                            <p class="text-[#8b7355] text-sm mt-1">Expanded to 30+ countries with 500+ artisans and over 48,000 satisfied customers worldwide.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <div class="w-1/2 text-right pr-8">
+                            <h4 class="font-bold text-[#5c4a3d] text-lg">What's Next</h4>
+                            <p class="text-[#8b7355] text-sm mt-1">Mobile app, artisan workshops, and same-day local delivery — building the future of handcrafted commerce.</p>
+                        </div>
+                        <div class="relative z-10 w-10 h-10 bg-[#a5664d] rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">24</div>
+                        <div class="w-1/2 pl-8">
+                            <span class="text-[#c17c5f] font-semibold">2024 →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-20 px-6 bg-[#5c4a3d] text-white text-center">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-4xl font-bold mb-4">Ready to Discover Something Unique?</h2>
+            <p class="text-[#d4c5b5] text-lg mb-8">Browse thousands of handcrafted products from artisans who pour their heart into every piece.</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a href="/products" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-8 py-3 rounded-full font-medium transition-colors shadow-lg">Shop the Collection</a>
+                <a href="/contact" class="bg-white text-[#5c4a3d] hover:bg-[#faf9f6] px-8 py-3 rounded-full font-medium transition-colors shadow-lg">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#3d2f25] text-white py-12 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl font-semibold" style="font-family:'Playfair Display',serif;">ArtsyVibe</span>
+                </div>
+                <p class="text-[#d4c5b5]">Connecting talented artisans with appreciative customers worldwide.</p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                <ul class="space-y-2">
+                    <li><a href="/about" class="text-[#d4c5b5] hover:text-[#c17c5f] transition-colors">About Us</a></li>
+                    <li><a href="/contact" class="text-[#d4c5b5] hover:text-[#c17c5f] transition-colors">Contact</a></li>
+                    <li><a href="/products" class="text-[#d4c5b5] hover:text-[#c17c5f] transition-colors">Products</a></li>
+                    <li><a href="/auctions" class="text-[#d4c5b5] hover:text-[#c17c5f] transition-colors">Auctions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Stay Updated</h4>
+                <p class="text-[#d4c5b5] mb-4">Subscribe for new arrivals and special offers.</p>
+                <div class="flex">
+                    <input type="email" placeholder="Your email" class="flex-1 px-4 py-2 rounded-l-lg border-0 focus:outline-none text-[#5c4a3d]"/>
+                    <button class="bg-[#c17c5f] hover:bg-[#a5664d] px-4 py-2 rounded-r-lg transition-colors"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-[#7a6655] mt-8 pt-8 text-center text-[#d4c5b5]">
+            <p>&copy; 2024 ArtsyVibe. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
