@@ -25,22 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 2. "Browse All" and "View Auctions" hero buttons
-    // ----------------------------------------------------------
-    const heroButtons = document.querySelectorAll('.hero-gradient .flex.flex-wrap button');
-    heroButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const text = btn.textContent.trim();
-            if (text === 'Browse All') {
-                window.location.href = 'products.html';
-            } else if (text === 'View Auctions') {
-                window.location.href = 'auctions.html';
-            }
-        });
-    });
-
-    // ----------------------------------------------------------
-    // 3. Category cards — navigate to products page filtered by category
+    // 2. Category cards — navigate to products page filtered by category
     // ----------------------------------------------------------
     const categoryCards = document.querySelectorAll('.category-card');
     categoryCards.forEach(card => {
@@ -57,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 4. Featured product "View Details" buttons
+    // 3. Featured product "View Details" buttons
     // ----------------------------------------------------------
     const viewDetailsBtns = document.querySelectorAll('.product-card button');
     viewDetailsBtns.forEach(btn => {
@@ -72,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 5. Newsletter subscription (footer)
+    // 4. Newsletter subscription (footer)
     // ----------------------------------------------------------
     const newsletterBtn = document.querySelector('footer button');
     const newsletterInput = document.querySelector('footer input[type="email"]');
@@ -93,12 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 6. Notification badge — update from stored count
+    // 5. Notification badge — update from stored count
     // ----------------------------------------------------------
     updateNotificationBadge();
 
     // ----------------------------------------------------------
-    // 7. Cart badge — update from stored count
+    // 6. Cart badge — update from stored count
     // ----------------------------------------------------------
     updateCartBadge();
 });
