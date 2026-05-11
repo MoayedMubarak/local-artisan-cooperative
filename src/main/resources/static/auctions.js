@@ -225,6 +225,7 @@ function filterByBidRange(maxBid) {
 
 function applyFilters() {
     const category     = getActiveCategory();
+    const activeTab    = getActiveTab();
     const searchQuery  = document.querySelector('aside input[type="text"]')?.value.trim().toLowerCase() ?? '';
     const checkedBoxes = [...document.querySelectorAll('.custom-checkbox:checked')]
                             .map(cb => cb.parentElement.querySelector('span')?.textContent.trim().toLowerCase());
@@ -241,12 +242,19 @@ function applyFilters() {
         const matchesCat = category === 'all' || cardCategory === category;
         const matchesPrice  = isNaN(bidVal) || bidVal <= maxPrice;
 
+        const hasLive     = card.querySelector('.live-badge') !== null;
+        const hasUpcoming = card.querySelector('.bg-blue-500') !== null;
+        const hasEnded    = card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
+
+        let matchesTab = true;
+        if (activeTab === 'upcoming')      matchesTab = hasUpcoming;
+        else if (activeTab === 'ended')   matchesTab = hasEnded;
+        else if (activeTab === 'live now') matchesTab = hasLive;
+        else if (activeTab === 'live')     matchesTab = hasLive;
+        else if (activeTab === 'all')      matchesTab = true;
+
         let matchesStatus = true;
         if (checkedBoxes.length > 0) {
-            const hasLive     = card.querySelector('.live-badge') !== null;
-            const hasUpcoming = card.querySelector('.bg-blue-500') !== null;
-            const hasEnded    = card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
-
             matchesStatus = checkedBoxes.some(s =>
                 (s === 'live now'  && hasLive) ||
                 (s === 'upcoming'  && hasUpcoming) ||
@@ -254,7 +262,9 @@ function applyFilters() {
             );
         }
 
-        card.style.display = (matchesSearch && matchesCat && matchesStatus && matchesPrice) ? '' : 'none';
+        card.style.display = (matchesSearch && matchesCat && matchesPrice && matchesTab && matchesStatus)
+            ? ''
+            : 'none';
     });
 }
 
