@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (priceRange) {
         priceRange.addEventListener('input', function() {
             updatePriceDisplay();
-            applyFilters(); // Apply filters when price changes
+            applyFilters();
         });
     }
 
@@ -22,6 +22,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const countElement = document.getElementById('item-count');
         if (countElement) {
             countElement.textContent = visibleCount.toString();
+        }
+
+        // Show/hide no-results message
+        let noResults = document.getElementById('no-results-msg');
+        if (visibleCount === 0) {
+            if (!noResults) {
+                noResults = document.createElement('div');
+                noResults.id = 'no-results-msg';
+                noResults.className = 'col-span-3 text-center py-16 text-[#8b7355]';
+                noResults.innerHTML = '<i class="fas fa-search text-4xl mb-4 block text-[#d4c5b5]"></i><p class="text-lg font-medium">No products match your filters.</p><p class="text-sm mt-1">Try adjusting your search or category.</p>';
+                const grid = document.querySelector('.grid.grid-cols-1');
+                if (grid) grid.appendChild(noResults);
+            }
+            noResults.style.display = 'block';
+        } else if (noResults) {
+            noResults.style.display = 'none';
         }
     }
 
@@ -39,9 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const productCards = Array.from(document.querySelectorAll('.product-card'));
+    const grid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2') || document.querySelector('#product-grid') || productCards[0]?.parentElement;
     const categoryRadios = document.querySelectorAll('input[type="radio"][name="category"]');
     const auctionCheckbox = document.querySelector('input[type="checkbox"]');
     const searchInput = document.querySelector('input[placeholder="Search..."]');
+    const sortSelect = document.querySelector('select');
 
     function applyFilters() {
         const searchTerm = searchInput?.value.trim().toLowerCase() || '';
@@ -53,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardText = card.textContent.toLowerCase();
             const cardCategory = card.dataset.category?.trim().toLowerCase() || '';
             const cardPrice = card.dataset.price ? parseFloat(card.dataset.price) : 0;
-            
+
             const matchesSearch = !searchTerm || cardText.includes(searchTerm);
             const matchesCategory = selectedCategory === 'all' || cardCategory === selectedCategory || cardText.includes(selectedCategory);
             const matchesAuction = !showAuctionsOnly || card.dataset.auctionCard === 'true';
@@ -63,6 +81,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         updateItemCount();
+
+        // Re-sort after filtering so the visible order stays correct
+        if (sortSelect) sortProducts(sortSelect.value);
+    }
+
+    // --- 2. Sort Products ---
+    function sortProducts(criteria) {
+        const parent = productCards[0]?.parentElement;
+        if (!parent) return;
+
+        const visible = productCards.filter(c => c.style.display !== 'none');
+        const hidden  = productCards.filter(c => c.style.display === 'none');
+
+        visible.sort((a, b) => {
+            const priceA = parseFloat(a.dataset.price) || 0;
+            const priceB = parseFloat(b.dataset.price) || 0;
+            const nameA  = a.querySelector('h3')?.textContent.trim().toLowerCase() || '';
+            const nameB  = b.querySelector('h3')?.textContent.trim().toLowerCase() || '';
+
+            if (criteria === 'price-low')  return priceA - priceB;
+            if (criteria === 'price-high') return priceB - priceA;
+            if (criteria === 'name')       return nameA.localeCompare(nameB);
+            return 0; // 'featured' / 'newest' — keep original order
+        });
+
+        // Re-append in sorted order; hidden cards go to the end
+        [...visible, ...hidden].forEach(c => parent.appendChild(c));
+    }
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            sortProducts(sortSelect.value);
+        });
     }
 
     categoryRadios.forEach(radio => {
@@ -106,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePriceDisplay();
     applyFilters();
 
-    // --- 5. View Details Navigation ---
+    // --- 3. View Details Navigation ---
     document.addEventListener('click', function(event) {
         const button = event.target.closest('button');
         if (!button || button.textContent.trim() !== 'View Details') return;

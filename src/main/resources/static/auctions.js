@@ -2,6 +2,10 @@
 // auctions.js — ArtsyVibe Auctions Page
 // ============================================================
 
+// Shared filter state — single source of truth
+let _activeTab      = 'all';
+let _activeCategory = 'all';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------------
@@ -12,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     priceRange?.addEventListener('input', function () {
         priceValue.textContent = this.value + ' BD';
-        applyFilters(); // Call applyFilters to combine with other filters
+        applyFilters();
     });
 
     const requireLoginToAct = (message) => window.requireLoginForAction ? window.requireLoginForAction(message) : true;
@@ -24,12 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownInterval = setInterval(tickCountdowns, 1000);
 
     // ----------------------------------------------------------
-    // 3. Tab switching (Live Now / Upcoming / Ended)
+    // 3. Tab switching (Live Now / Upcoming / Ended / All)
     // ----------------------------------------------------------
     window.switchTab = function (button, tabType) {
         document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
         button.classList.add('active');
-        filterByTab(tabType);
+        _activeTab = tabType;   // store in shared state
+        applyFilters();
     };
 
     // ----------------------------------------------------------
@@ -38,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.filterCategory = function (button, category) {
         document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
         button.classList.add('active');
+        _activeCategory = category;   // store in shared state
         applyFilters();
     };
 
@@ -111,6 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 11. Build and inject bid modal into DOM
     // ----------------------------------------------------------
     buildBidModal();
+
+    // Initial render — apply default filters
+    applyFilters();
 });
 
 // ============================================================
@@ -179,8 +188,6 @@ function markAuctionEnded(countdownEl) {
         btn.className   = 'w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed';
         btn.disabled    = true;
     }
-    const bidLabel = card.querySelector('.text-xs.text-\\[\\#8b7355\\].uppercase');
-    if (bidLabel) bidLabel.textContent = 'Final Bid';
 
     showToast('An auction has just ended!', 'info');
 }
@@ -189,47 +196,25 @@ function markAuctionEnded(countdownEl) {
 // Filtering & Sorting
 // ============================================================
 
-function getActiveTab() {
-    const active = document.querySelector('.tab-pill.active');
-    return active?.textContent.trim().toLowerCase() ?? 'live now';
+function isLiveCard(card) {
+    return card.querySelector('.live-badge') !== null;
 }
 
-function getActiveCategory() {
-    const active = document.querySelector('.filter-pill.active');
-    return active?.textContent.trim().toLowerCase() ?? 'all';
+function isUpcomingCard(card) {
+    return card.querySelector('.bg-blue-500') !== null;
 }
 
-function filterByTab(tabType) {
-    document.querySelectorAll('.auction-card').forEach(card => {
-        const hasLive     = card.querySelector('.live-badge') !== null;
-        const hasUpcoming = card.querySelector('.bg-blue-500') !== null;
-        const hasEnded    = card.querySelector('.bg-gray-500') !== null || card.classList.contains('ended');
-
-        let show = false;
-        if      (tabType === 'all')      show = true;
-        else if (tabType === 'upcoming') show = hasUpcoming;
-        else if (tabType === 'ended')    show = hasEnded;
-        else if (tabType === 'live')     show = hasLive;
-
-        card.style.display = show ? '' : 'none';
-    });
-}
-
-function filterByBidRange(maxBid) {
-    document.querySelectorAll('.auction-card').forEach(card => {
-        const bidText = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
-        const bidVal  = parseFloat(bidText.replace(/[^0-9.]/g, ''));
-        card.style.display = (isNaN(bidVal) || bidVal <= maxBid) ? '' : 'none';
-    });
+function isEndedCard(card) {
+    return card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
 }
 
 function applyFilters() {
-    const category     = getActiveCategory();
-    const activeTab    = getActiveTab();
-    const searchQuery  = document.querySelector('aside input[type="text"]')?.value.trim().toLowerCase() ?? '';
+    const searchQuery = document.querySelector('aside input[type="text"]')?.value.trim().toLowerCase() ?? '';
+    const maxPrice    = parseFloat(document.getElementById('priceRange')?.value ?? 1000);
     const checkedBoxes = [...document.querySelectorAll('.custom-checkbox:checked')]
                             .map(cb => cb.parentElement.querySelector('span')?.textContent.trim().toLowerCase());
-    const maxPrice     = parseFloat(document.getElementById('priceRange')?.value ?? 1000);
+
+    let visibleCount = 0;
 
     document.querySelectorAll('.auction-card').forEach(card => {
         const title   = card.querySelector('h3')?.textContent.trim().toLowerCase() ?? '';
@@ -237,35 +222,49 @@ function applyFilters() {
         const bidText = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
         const bidVal  = parseFloat(bidText.replace(/[^0-9.]/g, ''));
 
-        const matchesSearch = !searchQuery || title.includes(searchQuery) || artisan.includes(searchQuery);
         const cardCategory = (card.dataset.category || '').toLowerCase();
-        const matchesCat = category === 'all' || cardCategory === category;
-        const matchesPrice  = isNaN(bidVal) || bidVal <= maxPrice;
 
-        const hasLive     = card.querySelector('.live-badge') !== null;
-        const hasUpcoming = card.querySelector('.bg-blue-500') !== null;
-        const hasEnded    = card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
+        const matchesSearch   = !searchQuery || title.includes(searchQuery) || artisan.includes(searchQuery);
+        const matchesCat      = _activeCategory === 'all' || cardCategory === _activeCategory;
+        const matchesPrice    = isNaN(bidVal) || bidVal <= maxPrice;
 
+        // Tab match using shared state variable (not DOM text)
         let matchesTab = true;
-        if (activeTab === 'upcoming')      matchesTab = hasUpcoming;
-        else if (activeTab === 'ended')   matchesTab = hasEnded;
-        else if (activeTab === 'live now') matchesTab = hasLive;
-        else if (activeTab === 'live')     matchesTab = hasLive;
-        else if (activeTab === 'all')      matchesTab = true;
+        if      (_activeTab === 'upcoming') matchesTab = isUpcomingCard(card);
+        else if (_activeTab === 'ended')    matchesTab = isEndedCard(card);
+        else if (_activeTab === 'live')     matchesTab = isLiveCard(card);
+        else if (_activeTab === 'all')      matchesTab = true;
 
+        // Sidebar status checkbox match
         let matchesStatus = true;
         if (checkedBoxes.length > 0) {
             matchesStatus = checkedBoxes.some(s =>
-                (s === 'live now'  && hasLive) ||
-                (s === 'upcoming'  && hasUpcoming) ||
-                (s === 'ended'     && hasEnded)
+                (s === 'live now'  && isLiveCard(card)) ||
+                (s === 'upcoming'  && isUpcomingCard(card)) ||
+                (s === 'ended'     && isEndedCard(card))
             );
         }
 
-        card.style.display = (matchesSearch && matchesCat && matchesPrice && matchesTab && matchesStatus)
-            ? ''
-            : 'none';
+        const show = matchesSearch && matchesCat && matchesPrice && matchesTab && matchesStatus;
+        card.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
     });
+
+    // No-results message
+    let noResults = document.getElementById('no-auction-results');
+    const grid    = document.getElementById('auction-grid');
+    if (visibleCount === 0 && grid) {
+        if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.id        = 'no-auction-results';
+            noResults.className = 'col-span-3 text-center py-16 text-[#8b7355]';
+            noResults.innerHTML = '<i class="fas fa-gavel text-4xl mb-4 block text-[#d4c5b5]"></i><p class="text-lg font-medium">No auctions match your filters.</p><p class="text-sm mt-1">Try a different tab, category, or price range.</p>';
+            grid.appendChild(noResults);
+        }
+        noResults.style.display = 'block';
+    } else if (noResults) {
+        noResults.style.display = 'none';
+    }
 }
 
 function sortAuctions(criteria) {

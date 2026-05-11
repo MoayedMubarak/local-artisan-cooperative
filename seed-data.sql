@@ -1,9 +1,9 @@
--- ============================================================
+-- =============================================================
 --  ArtsyVibe Seed Data
 --  Run this file against your PostgreSQL database to populate
 --  all tables with 10 rows of dummy data each.
 --  Order matters — parent tables are inserted before children.
--- ============================================================
+-- =============================================================
 
 -- 1. USERS (base table for ISA hierarchy)
 INSERT INTO users (name, email, password, role) VALUES
