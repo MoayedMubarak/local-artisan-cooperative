@@ -46,7 +46,7 @@ public class MainController {
 
     @GetMapping("/cart")
     public String cart() {
-        return "ShoppingCart&Checkout";
+        return "cart";
     }
 
     @GetMapping("/login")
