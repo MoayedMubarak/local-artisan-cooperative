@@ -355,14 +355,16 @@
         </main>
     </div>
 
-    <script src="/src/main/resources/static/auth-guard.js"></script>
-    <script src="/src/main/resources/static/notifications.js"></script>
+    <script src="/auth-guard.js"></script>
+    <script src="/notifications.js"></script>
     
     <script>
-        initAuthGuard({
-            redirectTo: '/login',
-            message: 'Login/Register first to view notifications.'
-        });
+        if (typeof initAuthGuard === 'function') {
+            initAuthGuard({
+                redirectTo: '/login',
+                message: 'Login/Register first to view notifications.'
+            });
+        }
         // Update notification badge count
         function updateNotificationBadge() {
             const unreadCount = document.querySelectorAll('.notification-card[data-read="false"]').length;
@@ -488,6 +490,7 @@
     </script>
 </body>
 </html>
+
 
 
 

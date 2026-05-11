@@ -449,8 +449,8 @@
         </main>
     </div>
 
-    <script src="/src/main/resources/static/auth-guard.js"></script>
-    <script src="/src/main/resources/static/cart.js"></script>
+    <script src="/auth-guard.js"></script>
+    <script src="/cart.js"></script>
     
     <script>
         const cartPageRequiresLogin = !window.isUserAuthenticated?.();
@@ -598,12 +598,17 @@
         }
 
         // ── PRICE SLIDER ──
-        document.getElementById('priceRange').addEventListener('input', function() {
-            document.getElementById('priceValue').textContent = this.value + ' BD';
-        }); 
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        if (priceRange && priceValue) {
+            priceRange.addEventListener('input', function() {
+                priceValue.textContent = this.value + ' BD';
+            });
+        }
     </script>
 </body>
 </html>
+
 
 
 
