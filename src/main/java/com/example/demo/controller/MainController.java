@@ -56,17 +56,17 @@ public class MainController {
 
     @GetMapping("/profile")
     public String profile() {
-        return "my-profile";
+        return "myprofile";
     }
 
     @GetMapping("/orders")
     public String orders() {
-        return "my-orders";
+        return "myorders";
     }
 
     @GetMapping("/wishlist")
     public String wishlist() {
-        return "my-wishlist";
+        return "mywishlist";
     }
 
     @GetMapping("/notifications")
@@ -76,6 +76,6 @@ public class MainController {
 
     @GetMapping("/forgot-password")
     public String forgotPassword() {
-        return "Forget-Password";
+        return "ForgetPassword";
     }
 }
