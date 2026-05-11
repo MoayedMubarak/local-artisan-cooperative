@@ -214,63 +214,6 @@ function initCustomCheckboxes() {
     });
 }
 
-function initLoginPageNavigationGuard() {
-    const loggedIn = sessionStorage.getItem('loggedIn') === 'true';
-    if (loggedIn) return;
-
-    // Public pages — always accessible without login
-    const publicPaths = ['/', '/products', '/auctions', '/about', '/contact'];
-
-    function isPublicPath(href) {
-        try {
-            const url = new URL(href, window.location.origin);
-            // Allow auth flow pages
-            if (/login|forget(?:[-_]password)?|forgot/i.test(url.pathname)) return true;
-            // Allow exact public paths
-            return publicPaths.some(p => url.pathname === p || url.pathname.startsWith(p + '/'));
-        } catch {
-            return false;
-        }
-    }
-
-    function showLoginRequiredToast(message) {
-        if (document.getElementById('login-page-blocker-toast')) return;
-
-        const toast = document.createElement('div');
-        toast.id = 'login-page-blocker-toast';
-        toast.className = 'fixed bottom-6 left-1/2 z-50 max-w-xl w-[calc(100%-2rem)] -translate-x-1/2 rounded-2xl border border-[#e5e0d8] bg-white p-4 text-[#5c4a3d] shadow-xl';
-        toast.innerHTML = `
-            <div class="flex items-start gap-3">
-                <div class="text-2xl">⚠️</div>
-                <div>
-                    <h2 class="font-semibold text-lg">Login Required</h2>
-                    <p class="text-sm text-[#8b7355]">${message}</p>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.remove();
-        }, 3800);
-    }
-
-    document.addEventListener('click', (event) => {
-        const anchor = event.target.closest('a[href]');
-        if (!anchor) return;
-
-        const href = anchor.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
-            return;
-        }
-
-        // Always allow navigation to public pages
-        if (isPublicPath(href)) return;
-
-        event.preventDefault();
-        showLoginRequiredToast('You need to login or register first to access this page.');
-    }, true);
-}
 
 function toggleCheckboxVisual(checkbox) {
     const icon   = checkbox.parentElement.querySelector('.checkbox-icon');
