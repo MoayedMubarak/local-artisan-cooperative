@@ -127,7 +127,7 @@ function showSuccessState(email) {
                     try again
                 </button>.
             </p>
-            <a href="login.html"
+            <a href="/login"
                class="inline-flex items-center text-[#c17c5f] hover:text-[#a5664d] font-medium text-lg transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Login
             </a>

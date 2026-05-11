@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const query = searchInput?.value.trim();
         if (!query) return;
         // Navigate to products page with query parameter
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        window.location.href = `/products?search=${encodeURIComponent(query)}`;
     }
 
     searchButton?.addEventListener('click', handleSearch);
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     categoryCards.forEach(card => {
         card.addEventListener('click', () => {
             const category = card.querySelector('h3')?.textContent.trim().toLowerCase();
-            window.location.href = `products.html?category=${encodeURIComponent(category)}`;
+            window.location.href = `/products?category=${encodeURIComponent(category)}`;
         });
         // Keyboard accessibility
         card.setAttribute('tabindex', '0');
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // In a real app this would use a product ID from data attributes.
             // For now we navigate to a generic product detail page.
             console.log('View details for:', productName);
-            window.location.href = 'Product-Details(Standard).html';
+            window.location.href = '/ProductDetailsStandard';
         });
     });
 

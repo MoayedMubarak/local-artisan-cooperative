@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setTimeout(() => {
                 alert('Order confirmed! Redirecting to confirmation...');
-                // window.location.href = 'Order-Conformation.html';
+                // window.location.href = '/OrderConformation';
             }, 2000);
         });
     }

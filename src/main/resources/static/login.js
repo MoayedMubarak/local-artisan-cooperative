@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
             sessionStorage.removeItem('postLoginNext');
 
-            window.location.href = next || 'index.html';
+            window.location.href = next || '/index';
         }, 1200);
     };
 
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const url = new URL(window.location.href);
                     const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
                     sessionStorage.removeItem('postLoginNext');
-                    window.location.href = next || 'index.html';
+                    window.location.href = next || '/index';
                 }, 1500);
             }
         }, 1500);

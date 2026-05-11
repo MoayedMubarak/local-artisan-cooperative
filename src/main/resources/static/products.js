@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = button.closest('.product-card');
         if (!card) return;
 
-        const target = card.dataset.detailPage || 'Product-Details(Standard).html';
+        const target = card.dataset.detailPage || '/ProductDetailsStandard';
         window.location.href = target;
     });
 });

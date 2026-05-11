@@ -179,14 +179,14 @@
             
             <!-- Center Links -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
-                <a href="products.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
-                <a href="auctions.html" class="text-[#c17c5f] font-semibold">Auctions</a>
+                <a href="/index" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="/products" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="/auctions" class="text-[#c17c5f] font-semibold">Auctions</a>
             </div>
             
            <div class="flex items-center space-x-4">
                 <!-- User Menu -->
-                <a href="myprofile.html" class="group flex items-center gap-2 transition-colors">
+                <a href="/myprofile" class="group flex items-center gap-2 transition-colors">
                     <div class="hidden md:flex items-center space-x-2">
                         <!-- Profile Icon Container with Badge -->
                         <div class="relative">
@@ -203,13 +203,13 @@
                 </a>
                 
                 <!-- Notifications Bell Icon -->
-                <a href="notifications.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                <a href="/notifications" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
                     <i class="fas fa-bell text-xl"></i>
                     <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
                 </a>
                 
                 <!-- Cart Icon -->
-                <a href="cart.html">
+                <a href="/cart">
                     <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
                         <i class="fas fa-shopping-cart text-xl"></i>
                         <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
@@ -317,11 +317,11 @@
             <!-- Breadcrumb -->
             <nav class="mb-6 text-sm">
                 <ol class="flex items-center space-x-2 text-[#8b7355]">
-                    <li><a href="index.html" class="hover:text-[#c17c5f] transition-colors">Home</a></li>
+                    <li><a href="/index" class="hover:text-[#c17c5f] transition-colors">Home</a></li>
                     <li><span>/</span></li>
-                    <li><a href="products.html" class="hover:text-[#c17c5f] transition-colors">Products</a></li>
+                    <li><a href="/products" class="hover:text-[#c17c5f] transition-colors">Products</a></li>
                     <li><span>/</span></li>
-                    <li><a href="products.html" class="hover:text-[#c17c5f] transition-colors">Jewelry</a></li>
+                    <li><a href="/products" class="hover:text-[#c17c5f] transition-colors">Jewelry</a></li>
                     <li><span>/</span></li>
                     <li class="text-[#5c4a3d] font-medium">Silver Moonstone Necklace</li>
                 </ol>
@@ -585,7 +585,7 @@
                 if (e.key !== 'Enter') return;
                 const query = detailSearchInput.value.trim();
                 if (!query) return;
-                window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+                window.location.href = `/products?search=${encodeURIComponent(query)}`;
             });
         }
         
@@ -666,5 +666,6 @@
     </script>
 </body>
 </html>
+
 
 

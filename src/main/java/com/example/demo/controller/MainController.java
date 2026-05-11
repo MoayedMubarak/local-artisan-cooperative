@@ -78,4 +78,49 @@ public class MainController {
     public String forgotPassword() {
         return "ForgetPassword";
     }
+
+    @GetMapping("/index")
+    public String indexAlt() {
+        return "index";
+    }
+
+    @GetMapping("/Login")
+    public String loginAlt() {
+        return "Login";
+    }
+
+    @GetMapping("/ForgetPassword")
+    public String forgetPasswordAlt() {
+        return "ForgetPassword";
+    }
+
+    @GetMapping("/myprofile")
+    public String myProfile() {
+        return "myprofile";
+    }
+
+    @GetMapping("/myorders")
+    public String myOrders() {
+        return "myorders";
+    }
+
+    @GetMapping("/mywishlist")
+    public String myWishlist() {
+        return "mywishlist";
+    }
+
+    @GetMapping("/OrderConformation")
+    public String orderConformation() {
+        return "OrderConformation";
+    }
+
+    @GetMapping("/ProductDetailsAuction")
+    public String productDetailsAuction() {
+        return "ProductDetailsAuction";
+    }
+
+    @GetMapping("/ProductDetailsStandard")
+    public String productDetailsStandard() {
+        return "ProductDetailsStandard";
+    }
 }
