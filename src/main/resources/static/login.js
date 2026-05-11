@@ -220,6 +220,21 @@ function initLoginPageNavigationGuard() {
     const loggedIn = sessionStorage.getItem('loggedIn') === 'true';
     if (loggedIn) return;
 
+    // Public pages — always accessible without login
+    const publicPaths = ['/', '/products', '/auctions', '/about', '/contact'];
+
+    function isPublicPath(href) {
+        try {
+            const url = new URL(href, window.location.origin);
+            // Allow auth flow pages
+            if (/login|forget(?:[-_]password)?|forgot/i.test(url.pathname)) return true;
+            // Allow exact public paths
+            return publicPaths.some(p => url.pathname === p || url.pathname.startsWith(p + '/'));
+        } catch {
+            return false;
+        }
+    }
+
     function showLoginRequiredToast(message) {
         if (document.getElementById('login-page-blocker-toast')) return;
 
@@ -251,11 +266,11 @@ function initLoginPageNavigationGuard() {
             return;
         }
 
-        const allowedAuthFlow = /login|Login|forget(?:[-_]password)?|forgot|Forgot/i;
-        if (allowedAuthFlow.test(href)) return;
+        // Always allow navigation to public pages
+        if (isPublicPath(href)) return;
 
         event.preventDefault();
-        showLoginRequiredToast('You need to login or register first before browsing other pages.');
+        showLoginRequiredToast('You need to login or register first to access this page.');
     }, true);
 }
 
