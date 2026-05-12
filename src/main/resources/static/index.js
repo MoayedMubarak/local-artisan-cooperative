@@ -11,12 +11,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = heroSearchWrapper?.querySelector('input[type="text"]');
     const searchButton = heroSearchWrapper?.querySelector('button');
 
+    const loginButtonWrapper = document.getElementById('login-button-wrapper');
+    const userSection = document.getElementById('user-section');
+    const signOutButton = document.getElementById('sign-out-button');
+    const navUserName = document.getElementById('nav-user-name');
+    const navUserEmail = document.getElementById('nav-user-email');
+    const notificationBadge = document.getElementById('notification-badge');
+    const cartBadge = document.getElementById('cart-badge');
+
     function handleSearch() {
         const query = searchInput?.value.trim();
         if (!query) return;
         // Navigate to products page with query parameter
         window.location.href = `/products?search=${encodeURIComponent(query)}`;
     }
+
+    function updateLoginState() {
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+        if (loggedIn) {
+            loginButtonWrapper?.classList.add('hidden');
+            userSection?.classList.remove('hidden');
+
+            const userName = sessionStorage.getItem('userName') || 'John Doe';
+            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
+            if (navUserName) navUserName.textContent = userName;
+            if (navUserEmail) navUserEmail.textContent = userEmail;
+
+            updateNotificationBadge();
+        } else {
+            loginButtonWrapper?.classList.remove('hidden');
+            userSection?.classList.add('hidden');
+        }
+
+        updateCartBadge();
+    }
+
+    signOutButton?.addEventListener('click', () => {
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('notificationCount');
+        sessionStorage.removeItem('cartCount');
+        updateLoginState();
+        showToast('You have logged out.', 'info');
+    });
 
     searchButton?.addEventListener('click', handleSearch);
 
@@ -78,14 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 5. Notification badge — update from stored count
+    // 5. Login state and badge initialization
     // ----------------------------------------------------------
-    updateNotificationBadge();
-
-    // ----------------------------------------------------------
-    // 6. Cart badge — update from stored count
-    // ----------------------------------------------------------
-    updateCartBadge();
+    updateLoginState();
 });
 
 // ============================================================
