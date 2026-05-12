@@ -437,96 +437,15 @@
         </main>
     </div>
 
-    <script src="/authguard.js"></script>
+    <!-- <script src="/authguard.js"></script> -->
     <script src="/mywishlist.js"></script>
-    
     <script>
-        initAuthGuard({
-            redirectTo: '/login',
-            message: 'Login/Register first to view your wishlist.'
-        });
-        // Price range slider functionality
-        const priceRange = document.getElementById('priceRange');
-        const priceValue = document.getElementById('priceValue');
-        
-        priceRange.addEventListener('input', function() {
-            priceValue.textContent = this.value + ' BD';
-        });
-
-        // Filter wishlist by category
-        function filterWishlist(category, button) {
-            // Update active pill
-            document.querySelectorAll('.filter-pill').forEach(pill => {
-                pill.classList.remove('active');
+        if (window.initAuthGuard) {
+            initAuthGuard({
+                redirectTo: '/login',
+                message: 'Login/Register first to view your wishlist.'
             });
-            button.classList.add('active');
-
-            // Filter table rows
-            const rows = document.querySelectorAll('.wishlist-item');
-            rows.forEach(row => {
-                if (category === 'all' || row.dataset.category === category) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // Remove from wishlist
-        function removeFromWishlist(button) {
-            const row = button.closest('.wishlist-item');
-            row.style.opacity = '0';
-            row.style.transform = 'translateX(-20px)';
-            
-            setTimeout(() => {
-                row.remove();
-                updateWishlistCount();
-                checkEmptyState();
-            }, 300);
-        }
-
-        // Add to cart
-        function addToCart(button) {
-            const originalContent = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-check mr-1"></i>Added!';
-            button.classList.remove('bg-[#c17c5f]');
-            button.classList.add('bg-green-600');
-            
-            setTimeout(() => {
-                button.innerHTML = originalContent;
-                button.classList.remove('bg-green-600');
-                button.classList.add('bg-[#c17c5f]');
-                
-                // Update cart count
-                const cartBadge = document.getElementById('cart-count');
-                let currentCount = parseInt(cartBadge.textContent);
-                cartBadge.textContent = currentCount + 1;
-            }, 1500);
-        }
-
-        // Update wishlist count
-        function updateWishlistCount() {
-            const count = document.querySelectorAll('.wishlist-item').length;
-            document.getElementById('wishlist-count').textContent = count;
-        }
-
-        // Check if wishlist is empty
-        function checkEmptyState() {
-            const count = document.querySelectorAll('.wishlist-item').length;
-            const table = document.querySelector('table');
-            const filters = document.querySelector('.filter-pill').parentElement.parentElement;
-            const emptyState = document.getElementById('empty-state');
-            
-            if (count === 0) {
-                table.parentElement.classList.add('hidden');
-                filters.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-            }
         }
     </script>
 </body>
 </html>
-
-
-
-

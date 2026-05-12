@@ -368,14 +368,16 @@
         </main>
     </div>
 
-    <script src="/authguard.js"></script>
-    <script src=/myorders.js"></script>
+    <!-- <script src="/authguard.js"></script> -->
+    <script src="/myorders.js"></script>
 
     <script>
-        initAuthGuard({
-            redirectTo: '/login',
-            message: 'Login/Register first to view your orders.'
-        });
+        if (window.initAuthGuard) {
+            initAuthGuard({
+                redirectTo: '/login',
+                message: 'Login/Register first to view your orders.'
+            });
+        }
         // Price range slider functionality
         const priceRange = document.getElementById('priceRange');
         const priceValue = document.getElementById('priceValue');

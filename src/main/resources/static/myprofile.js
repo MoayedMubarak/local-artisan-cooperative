@@ -149,9 +149,12 @@ window.saveShopInfo = function () {
 // ============================================================
 
 window.deleteAccount = function () {
-    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-        showToast('Account deletion initiated. You will be logged out shortly.', 'info');
+    const message = 'Are you sure you want to delete your account? This action cannot be undone.';
+    if (confirm(message)) {
+        showToast('Account deletion confirmed. You will be logged out shortly.', 'info');
         setTimeout(() => window.location.href = '/login', 2500);
+    } else {
+        showToast('Account deletion cancelled.', 'info');
     }
 };
 
