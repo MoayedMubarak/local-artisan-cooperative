@@ -3,7 +3,7 @@
 // ============================================================
 
 // Shared filter state — single source of truth
-let _activeTab      = 'all';
+let _activeTab      = 'live';
 let _activeCategory = 'all';
 
 document.addEventListener('DOMContentLoaded', () => {
