@@ -355,142 +355,15 @@
         </main>
     </div>
 
-    <script src="/authguard.js"></script>
+    <!-- <script src="/authguard.js"></script> -->
     <script src="/notifications.js"></script>
-    
-    <script>
+    <!-- <script>
         if (typeof initAuthGuard === 'function') {
             initAuthGuard({
                 redirectTo: '/login',
                 message: 'Login/Register first to view notifications.'
             });
         }
-        // Update notification badge count
-        function updateNotificationBadge() {
-            const unreadCount = document.querySelectorAll('.notification-card[data-read="false"]').length;
-            const badge = document.getElementById('notification-badge');
-            
-            if (unreadCount > 0) {
-                badge.textContent = unreadCount;
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-            }
-            
-            return unreadCount;
-        }
-
-        // Toggle read/unread status
-        function toggleRead(card) {
-            const isRead = card.dataset.read === 'true';
-            
-            if (isRead) {
-                // Mark as unread
-                card.dataset.read = 'false';
-                card.classList.remove('read');
-                card.classList.add('unread');
-                
-                // Add unread dot
-                const dotContainer = card.querySelector('.flex.items-start.gap-4');
-                const existingDot = dotContainer.querySelector('.unread-dot');
-                if (!existingDot) {
-                    const unreadDot = document.createElement('div');
-                    unreadDot.className = 'unread-dot mt-1.5';
-                    dotContainer.insertBefore(unreadDot, dotContainer.firstChild);
-                }
-            } else {
-                // Mark as read
-                card.dataset.read = 'true';
-                card.classList.remove('unread');
-                card.classList.add('read');
-                
-                // Remove unread dot
-                const unreadDot = card.querySelector('.unread-dot');
-                if (unreadDot) {
-                    unreadDot.remove();
-                }
-                
-                // Replace with empty spacer
-                const dotContainer = card.querySelector('.flex.items-start.gap-4');
-                const existingSpacer = dotContainer.querySelector('.w-2.mt-1\\.5');
-                if (!existingSpacer) {
-                    const spacer = document.createElement('div');
-                    spacer.className = 'w-2 mt-1.5';
-                    dotContainer.insertBefore(spacer, dotContainer.firstChild);
-                }
-            }
-            
-            updateNotificationBadge();
-        }
-
-        // Mark all as read
-        function markAllAsRead() {
-            const unreadCards = document.querySelectorAll('.notification-card[data-read="false"]');
-            
-            unreadCards.forEach(card => {
-                card.dataset.read = 'true';
-                card.classList.remove('unread');
-                card.classList.add('read');
-                
-                // Remove unread dot
-                const unreadDot = card.querySelector('.unread-dot');
-                if (unreadDot) {
-                    unreadDot.remove();
-                }
-                
-                // Replace with empty spacer
-                const dotContainer = card.querySelector('.flex.items-start.gap-4');
-                const existingSpacer = dotContainer.querySelector('.w-2.mt-1\\.5');
-                if (!existingSpacer) {
-                    const spacer = document.createElement('div');
-                    spacer.className = 'w-2 mt-1.5';
-                    dotContainer.insertBefore(spacer, dotContainer.firstChild);
-                }
-            });
-            
-            updateNotificationBadge();
-        }
-
-        // Filter notifications by type
-        function filterNotifications(button, type) {
-            // Remove active class from all filter pills
-            document.querySelectorAll('.filter-pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
-            
-            // Add active class to clicked pill
-            button.classList.add('active');
-            
-            // Filter notification cards
-            const cards = document.querySelectorAll('.notification-card');
-            let visibleCount = 0;
-            
-            cards.forEach(card => {
-                if (type === 'all' || card.dataset.type === type) {
-                    card.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            
-            // Show/hide empty state
-            const emptyState = document.getElementById('empty-state');
-            if (visibleCount === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-            }
-        }
-
-        // Initialize badge count on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateNotificationBadge();
-        });
-    </script>
+    </script> -->
 </body>
 </html>
-
-
-
-

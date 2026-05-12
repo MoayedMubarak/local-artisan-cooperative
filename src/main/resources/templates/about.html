@@ -8,18 +8,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
         body { font-family: 'Inter', sans-serif; background-color: #faf9f6; }
+        
         h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+        
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(139,115,85,0.1), 0 2px 4px -1px rgba(139,115,85,0.06); }
+        
         .hero-pattern {
             background-color: #5c4a3d;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c17c5f' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         .stat-card:hover { transform: translateY(-4px); }
+        
         .stat-card { transition: transform 0.3s ease; }
+        
         .team-card:hover .team-overlay { opacity: 1; }
+        
         .team-overlay { transition: opacity 0.3s ease; }
+        
         .value-icon { background: linear-gradient(135deg, #c17c5f20, #c17c5f40); }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 50%, #e8dcc8 100%);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -326,10 +338,10 @@
     </section>
 
     <!-- CTA -->
-    <section class="py-20 px-6 bg-[#5c4a3d] text-white text-center">
+    <section class="hero-gradient py-20 px-6 text-center">
         <div class="max-w-2xl mx-auto">
-            <h2 class="text-4xl font-bold mb-4">Ready to Discover Something Unique?</h2>
-            <p class="text-[#d4c5b5] text-lg mb-8">Browse thousands of handcrafted products from artisans who pour their heart into every piece.</p>
+            <h2 class="text-[#5c4a3d] text-4xl font-bold mb-4">Ready to Discover Something Unique?</h2>
+            <p class="text-[#8b7355] text-lg mb-8">Browse thousands of handcrafted products from artisans who pour their heart into every piece.</p>
             <div class="flex flex-wrap gap-4 justify-center">
                 <a href="/products" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-8 py-3 rounded-full font-medium transition-colors shadow-lg">Shop the Collection</a>
                 <a href="/contact" class="bg-white text-[#5c4a3d] hover:bg-[#faf9f6] px-8 py-3 rounded-full font-medium transition-colors shadow-lg">Contact Us</a>
@@ -338,7 +350,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-[#3d2f25] text-white py-12 px-6">
+    <footer class="bg-[#5c4a3d] text-white py-12 px-6 mt-auto">
         <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
             <div>
                 <div class="flex items-center space-x-2 mb-4">
