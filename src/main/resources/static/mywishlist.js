@@ -96,7 +96,7 @@ function checkEmptyState() {
 
 function incrementCartCount() {
     const badges = document.querySelectorAll('.fa-shopping-cart + span, .fa-shopping-cart ~ span');
-    let newCount = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10) + 1;
+    let newCount = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10) + 1;
     sessionStorage.setItem('cartCount', newCount);
 
     document.querySelectorAll('.fa-shopping-cart').forEach(icon => {
