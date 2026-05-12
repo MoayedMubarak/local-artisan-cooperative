@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // Constants
     const SHIPPING_COST = 2.00;
     let isShipping = true; // Default state
@@ -63,15 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. Remove Item ---
     window.removeItem = function(button) {
         const cartItem = button.closest('.cart-item');
-        
+
         // Animation
         cartItem.style.opacity = '0';
         cartItem.style.transform = 'translateX(-20px)';
-        
+
         setTimeout(() => {
             cartItem.remove();
             updateCartTotal();
-            
+
             // Check if empty
             if (!document.querySelectorAll('.cart-item').length) {
                 alert('Your cart is empty!'); // Fallback or could show empty state div
@@ -84,11 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.payment-card').forEach(c => {
             c.classList.remove('selected');
             const radio = c.querySelector('input[type="radio"]');
+            const indicator = c.querySelector('.w-6.h-6');
+            if (indicator) {
+                indicator.className = 'w-6 h-6 border-2 border-[#e5e0d8] rounded-full mr-4';
+                indicator.innerHTML = '';
+            }
             if (radio) radio.checked = false;
         });
 
         card.classList.add('selected');
         const radio = card.querySelector('input[type="radio"]');
+        const indicator = card.querySelector('.w-6.h-6');
+        if (indicator) {
+            indicator.className = 'w-6 h-6 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full mr-4 flex items-center justify-center';
+            indicator.innerHTML = '<i class="fas fa-check text-white text-xs"></i>';
+        }
         if (radio) radio.checked = true;
     };
 
@@ -109,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (itemsSubtotalEl) itemsSubtotalEl.textContent = itemsTotal.toFixed(2) + ' BD';
         if (cartTotalEl) cartTotalEl.textContent = grandTotal.toFixed(2) + ' BD';
-        
+
         if (confirmBtn) {
             confirmBtn.innerHTML = `<i class="fas fa-check-circle mr-3"></i>Confirm Order (${grandTotal.toFixed(2)} BD)`;
         }
@@ -121,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmBtn.addEventListener('click', () => {
             // Basic validation
             const selectedPayment = document.querySelector('.payment-card.selected input[type="radio"]');
-            
+
             if (!selectedPayment) {
                 alert('Please select a payment method.');
                 return;
