@@ -370,41 +370,15 @@
 
     <!-- <script src="/authguard.js"></script> -->
     <script src="/myorders.js"></script>
-
-    <script>
+    
+    <!-- <script>
         if (window.initAuthGuard) {
             initAuthGuard({
                 redirectTo: '/login',
                 message: 'Login/Register first to view your orders.'
             });
         }
-        // Price range slider functionality
-        const priceRange = document.getElementById('priceRange');
-        const priceValue = document.getElementById('priceValue');
-        
-        priceRange.addEventListener('input', function() {
-            priceValue.textContent = this.value + ' BD';
-        });
-
-        // Filter orders by status
-        function filterOrders(status, button) {
-            // Update active pill
-            document.querySelectorAll('.filter-pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
-            button.classList.add('active');
-
-            // Filter table rows
-            const rows = document.querySelectorAll('.order-item');
-            rows.forEach(row => {
-                if (status === 'all' || row.dataset.status === status) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-    </script>
+    </script> -->
 </body>
 </html>
 
