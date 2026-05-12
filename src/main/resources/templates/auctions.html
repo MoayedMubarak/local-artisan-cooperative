@@ -797,52 +797,6 @@
         // Update countdowns every second
         setInterval(updateCountdowns, 1000);
 
-        // Tab switching functionality
-        function switchTab(button, tabType) {
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab-pill').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Add active class to clicked tab
-            button.classList.add('active');
-            
-            // Filter auction cards based on tab
-            const cards = document.querySelectorAll('.auction-card');
-            
-            cards.forEach(card => {
-                const hasLiveBadge = card.querySelector('.live-badge');
-                const hasUpcomingBadge = card.querySelector('.bg-blue-500');
-                const hasEndedBadge = card.querySelector('.bg-gray-500');
-                
-                if (tabType === 'all') {
-                    card.style.display = 'block';
-                } else if (tabType === 'upcoming') {
-                    card.style.display = hasUpcomingBadge ? 'block' : 'none';
-                } else if (tabType === 'ended') {
-                    card.style.display = hasEndedBadge ? 'block' : 'none';
-                } else if (tabType === 'live') {
-                    card.style.display = hasLiveBadge ? 'block' : 'none';
-                }
-            });
-        }
-
-        // Category filter functionality
-        function filterCategory(button, category) {
-            // Sync the new data-category based filtering in auctions.js
-            if (typeof window.filterCategory === 'function') return;
-            // Remove active class from all filter pills
-            document.querySelectorAll('.filter-pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
-            
-            // Add active class to clicked pill
-            button.classList.add('active');
-            
-            // In a real application, you would filter the cards based on category
-            console.log('Filtering by:', category);
-        }
-
         // Custom checkbox functionality
         const checkboxes = document.querySelectorAll('.custom-checkbox');
         checkboxes.forEach(checkbox => {
