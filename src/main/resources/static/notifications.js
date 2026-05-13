@@ -101,10 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         updateBadgeCount();
+        saveReadState();
     };
 
     // --- 3. Mark All as Read ---
-    window.markAllAsRead = function() {
+    window.markAllAsRead = function(skipToast) {
         const unreadCards = document.querySelectorAll('.notification-card[data-read="false"]');
         
         unreadCards.forEach(card => {
@@ -130,7 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         updateBadgeCount();
-        showToast('All notifications marked as read', 'success');
+        saveReadState();
+        if (skipToast !== true) {
+            showToast('All notifications marked as read', 'success');
+        }
     };
 
     // --- 4. Update Navbar Badge ---
@@ -184,7 +188,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    // --- 6. Persist state across reloads ---
+    function saveReadState() {
+        const cards = document.querySelectorAll('.notification-card');
+        const readIndices = [];
+        cards.forEach((card, index) => {
+            if (card.getAttribute('data-read') === 'true') {
+                readIndices.push(index);
+            }
+        });
+        sessionStorage.setItem('readNotifications', JSON.stringify(readIndices));
+    }
+
+    function loadReadState() {
+        const readIndicesStr = sessionStorage.getItem('readNotifications');
+        
+        // Backwards compatibility with previous notificationCount trick
+        if (sessionStorage.getItem('notificationCount') === '0' && !readIndicesStr) {
+            window.markAllAsRead(true);
+            return;
+        }
+
+        if (readIndicesStr) {
+            try {
+                const readIndices = JSON.parse(readIndicesStr);
+                const cards = document.querySelectorAll('.notification-card');
+                cards.forEach((card, index) => {
+                    if (readIndices.includes(index) && card.getAttribute('data-read') === 'false') {
+                        card.setAttribute('data-read', 'true');
+                        card.classList.remove('unread');
+                        card.classList.add('read');
+                        
+                        const unreadDot = card.querySelector('.unread-dot');
+                        if (unreadDot) unreadDot.remove();
+
+                        const dotContainer = card.querySelector('.flex.items-start.gap-4');
+                        if (!dotContainer.querySelector('.w-2.mt-1\\.5')) {
+                            const spacer = document.createElement('div');
+                            spacer.className = 'w-2 mt-1.5';
+                            dotContainer.insertBefore(spacer, dotContainer.firstChild);
+                        }
+                    } else if (!readIndices.includes(index) && card.getAttribute('data-read') === 'true') {
+                        card.setAttribute('data-read', 'false');
+                        card.classList.remove('read');
+                        card.classList.add('unread');
+                        
+                        const dotContainer = card.querySelector('.flex.items-start.gap-4');
+                        if (!dotContainer.querySelector('.unread-dot')) {
+                            const unreadDot = document.createElement('div');
+                            unreadDot.className = 'unread-dot mt-1.5';
+                            dotContainer.insertBefore(unreadDot, dotContainer.firstChild);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Failed to load readNotifications", e);
+            }
+        }
+        updateBadgeCount();
+    }
+
     updateLoginState();
+    loadReadState();
 });
 
 // ============================================================
