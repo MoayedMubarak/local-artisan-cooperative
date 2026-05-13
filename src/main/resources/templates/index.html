@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -227,15 +227,98 @@
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow" th:each="product : ${products}" th:if="${!product.auctionItem}">
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
                     <div class="relative">
-                        <img th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-56 object-cover">
+                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&amp;h=300&amp;fit=crop" alt="Handmade Ceramic Vase" class="w-full h-56 object-cover">
                     </div>
                     <div class="p-5">
-                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2" th:text="${product.title}">Product Title</h3>
-                        <p class="text-[#8b7355] mb-3" th:text="'by ' + ${product.artisanName}">by Artist</p>
+                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2">Handmade Ceramic Vase</h3>
+                        <p class="text-[#8b7355] mb-3">by Elena Rodriguez</p>
                         <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-[#c17c5f]" th:text="${#numbers.formatDecimal(product.price, 1, 3)} + ' BD'">0.000 BD</span>
+                            <span class="text-2xl font-bold text-[#c17c5f]">85.000 BD</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&amp;h=300&amp;fit=crop" alt="Silver Moonstone Necklace" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2">Silver Moonstone Necklace</h3>
+                        <p class="text-[#8b7355] mb-3">by Marcus Chen</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-2xl font-bold text-[#c17c5f]">100.000 BD</span>
+                                <p class="text-xs text-[#8b7355]">Current Bid</p>
+                            </div>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&amp;h=300&amp;fit=crop" alt="Abstract Oil Painting" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2">Abstract Oil Painting</h3>
+                        <p class="text-[#8b7355] mb-3">by Sarah Mitchell</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-[#c17c5f]">350.000 BD</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=400&amp;h=300&amp;fit=crop" alt="Woven Wool Blanket" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2">Woven Wool Blanket</h3>
+                        <p class="text-[#8b7355] mb-3">by Anna Kowalski</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-[#c17c5f]">195.000 BD</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&amp;h=300&amp;fit=crop" alt="Oak Wood Cutting Board" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2">Oak Wood Cutting Board</h3>
+                        <p class="text-[#8b7355] mb-3">by James Thompson</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-[#c17c5f]">65.000 BD</span>
+                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1681091638141-a87495ae612f?q=80&amp;w=987&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Hammered Silver Cuff" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2">Hammered Silver Cuff</h3>
+                        <p class="text-[#8b7355] mb-3">by Maya Singh</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-[#c17c5f]">48.000 BD</span>
                             <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                 View Details
                             </button>

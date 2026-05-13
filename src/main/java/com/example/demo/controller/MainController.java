@@ -22,10 +22,6 @@ public class MainController {
 
     @GetMapping("/")
     public String index(Model model) {
-        // Fetch featured products (non-auction items) - limit to 6
-        model.addAttribute("products", productRepository.findByIsAuctionItem(false));
-        // Fetch featured auctions
-        model.addAttribute("auctions", auctionRepository.findAll());
         return "index";
     }
 
