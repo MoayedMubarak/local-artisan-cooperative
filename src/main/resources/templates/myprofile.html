@@ -418,14 +418,19 @@
                     <section class="bg-white rounded-xl card-shadow p-8">
                         <h3 class="text-xl font-bold text-[#5c4a3d] mb-4" style="font-family: 'Playfair Display', serif;">Account Settings</h3>
                         <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div>
                                     <h4 class="font-semibold text-red-800">Delete Account</h4>
                                     <p class="text-sm text-red-600 mt-1">Permanently delete your account and all associated data. This action cannot be undone.</p>
                                 </div>
-                                <button type="button" onclick="deleteAccount()" class="px-4 py-2 border-2 border-red-500 text-red-500 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-colors">
-                                    Delete Account
-                                </button>
+                                <div class="flex flex-wrap gap-3 justify-start md:justify-end">
+                                    <button type="button" onclick="logout()" class="px-4 py-2 border-2 border-[#8b7355] text-[#5c4a3d] rounded-xl font-semibold hover:bg-[#8b7355] hover:text-white transition-colors">
+                                        Logout
+                                    </button>
+                                    <button type="button" onclick="deleteAccount()" class="px-4 py-2 border-2 border-red-500 text-red-500 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-colors">
+                                        Delete Account
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </section>
