@@ -3,7 +3,7 @@
 // ============================================================
 
 // Shared filter state — single source of truth
-let _activeTab      = 'live';
+let _activeTab      = 'all';   // Default: show all auctions
 let _activeCategory = 'all';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,11 +31,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Tab switching (Live Now / Upcoming / Ended / All)
     // ----------------------------------------------------------
     window.switchTab = function (button, tabType) {
-        document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
-        button.classList.add('active');
-        _activeTab = tabType;   // store in shared state
+        if (_activeTab === tabType) {
+            _activeTab = 'all';
+        } else {
+            _activeTab = tabType;
+        }
+
+        updateTabButtons(_activeTab, button);
+        updateAuctionHeader(_activeTab);
         applyFilters();
     };
+
+    function updateTabButtons(tabType, clickedButton) {
+        document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
+        if (tabType === 'all') {
+            const allTab = document.querySelector('.tab-pill[data-tab="all"]');
+            if (allTab) allTab.classList.add('active');
+            return;
+        }
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+            return;
+        }
+        const activeTab = document.querySelector(`.tab-pill[data-tab="${tabType}"]`);
+        if (activeTab) activeTab.classList.add('active');
+    }
+
+    function updateAuctionHeader(tabType) {
+        const header = document.getElementById('auction-page-header');
+        const subtext = document.getElementById('auction-page-subtext');
+        if (!header || !subtext) return;
+
+        if (tabType === 'live') {
+            header.textContent = 'Live Auctions';
+            subtext.textContent = 'Bid on items currently available in live bidding.';
+        } else if (tabType === 'upcoming') {
+            header.textContent = 'Upcoming Auctions';
+            subtext.textContent = 'See the next unique handcrafted items arriving soon.';
+        } else if (tabType === 'ended') {
+            header.textContent = 'Ended Auctions';
+            subtext.textContent = 'Review completed auctions and sold treasures.';
+        } else {
+            header.textContent = 'All Auctions';
+            subtext.textContent = 'Browse live, upcoming, and ended handcrafted auctions.';
+        }
+    }
 
     // ----------------------------------------------------------
     // 4. Category filter pills
@@ -43,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.filterCategory = function (button, category) {
         document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
         button.classList.add('active');
-        _activeCategory = category;   // store in shared state
+        _activeCategory = category;
         applyFilters();
     };
 
@@ -85,42 +125,113 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebarSearch?.addEventListener('input', () => applyFilters());
 
     // ----------------------------------------------------------
-    // 9. "Place Bid" buttons
+    // 9. "Place Bid" and "View Details" buttons
+    //    — clicking either navigates to the product detail page
     // ----------------------------------------------------------
     document.getElementById('auction-grid')?.addEventListener('click', (e) => {
         const btn = e.target.closest('button');
         if (!btn) return;
 
-        if (btn.textContent.trim() === 'Place Bid') {
+        const btnText = btn.textContent.trim();
+
+        if (btnText === 'Place Bid') {
             if (!requireLoginToAct('Login/Register first to place a bid.')) return;
-            const card = btn.closest('.auction-card');
-            openBidModal(card);
+            navigateToProductPage(btn);
         }
 
-        if (btn.textContent.trim() === 'Notify Me') {
+        if (btnText === 'Notify Me') {
             if (!requireLoginToAct('Login/Register first to be notified about this auction.')) return;
-            btn.textContent = '✓ Notified';
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i>Notified';
             btn.classList.add('bg-[#c17c5f]', 'text-white');
             btn.classList.remove('border-[#c17c5f]', 'text-[#c17c5f]');
+            btn.disabled = true;
             showToast('You will be notified when this auction starts!', 'success');
         }
     });
 
     // ----------------------------------------------------------
-    // 10. Load More button
+    // 10. Clicking the card image or title also navigates
+    // ----------------------------------------------------------
+    document.getElementById('auction-grid')?.addEventListener('click', (e) => {
+        // Only navigate if clicking the image or title, not a button
+        const card = e.target.closest('.auction-card');
+        if (!card) return;
+        if (e.target.closest('button')) return; // handled above
+
+        const isImage = e.target.tagName === 'IMG';
+        const isTitle = e.target.closest('h3');
+
+        if (isImage || isTitle) {
+            navigateToProductPage(card.querySelector('button'));
+        }
+    });
+
+    // ----------------------------------------------------------
+    // 11. Load More button
     // ----------------------------------------------------------
     document.querySelector('.mt-8 button')?.addEventListener('click', () => {
         showToast('No more auctions to load right now.', 'info');
     });
 
-    // ----------------------------------------------------------
-    // 11. Build and inject bid modal into DOM
-    // ----------------------------------------------------------
-    buildBidModal();
+    // Ensure the page starts in the full "all auctions" state.
+    const defaultTab = document.querySelector('.tab-pill[data-tab="all"]');
+    if (defaultTab) {
+        switchTab(defaultTab, 'all');
+    } else {
+        updateTabButtons('all', null);
+        updateAuctionHeader('all');
+    }
+
+    document.querySelectorAll('.auction-card').forEach(card => {
+        card.style.display = '';
+    });
 
     // Initial render — apply default filters
     applyFilters();
 });
+
+// ============================================================
+// Navigate to Product Detail Page
+// Reads card data and passes it as URL query params
+// ============================================================
+
+function navigateToProductPage(placeBidBtn) {
+    if (!placeBidBtn) return;
+
+    const card = placeBidBtn.closest('.auction-card');
+    if (!card) return;
+
+    // Extract all data from the card
+    const productId   = card.getAttribute('data-product-id') ?? '';
+    const name        = card.querySelector('h3')?.textContent.trim() ?? '';
+    const artist      = card.querySelector('p.text-sm')?.textContent.trim() ?? '';
+    const currentBid  = card.querySelector('.text-xl.font-bold')?.textContent.trim() ?? '0.000 BD';
+    const imgSrc      = card.querySelector('img')?.src ?? '';
+    const category    = card.getAttribute('data-category') ?? '';
+    const bidsCount   = card.querySelector('.text-xs.text-\\[\\#8b7355\\]')?.textContent.trim() ?? '0 bids';
+
+    // Read countdown time remaining
+    const countdownEl = card.querySelector('.countdown');
+    const hoursLeft   = countdownEl?.dataset.hours   ?? '0';
+    const minsLeft    = countdownEl?.dataset.minutes ?? '0';
+    const secsLeft    = countdownEl?.dataset.seconds ?? '0';
+
+    // Build query string so ProductDetailsAuction.html can read the data
+    const params = new URLSearchParams({
+        id:       productId,
+        name:     name,
+        artist:   artist,
+        bid:      currentBid,
+        img:      imgSrc,
+        category: category,
+        bids:     bidsCount,
+        hours:    hoursLeft,
+        minutes:  minsLeft,
+        seconds:  secsLeft,
+    });
+
+    window.location.href = `/ProductDetailsAuction?${params.toString()}`;
+}
 
 // ============================================================
 // Countdown logic
@@ -188,47 +299,40 @@ function markAuctionEnded(countdownEl) {
         btn.className   = 'w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed';
         btn.disabled    = true;
     }
-
-    showToast('An auction has just ended!', 'info');
 }
 
 // ============================================================
-// Filtering & Sorting
+// Filter logic
 // ============================================================
-
-function isLiveCard(card) {
-    return card.querySelector('.live-badge') !== null;
-}
-
-function isUpcomingCard(card) {
-    return card.querySelector('.bg-blue-500') !== null;
-}
-
-function isEndedCard(card) {
-    return card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
-}
 
 function applyFilters() {
-    const searchQuery = document.querySelector('aside input[type="text"]')?.value.trim().toLowerCase() ?? '';
-    const maxPrice    = parseFloat(document.getElementById('priceRange')?.value ?? 1000);
+    const grid         = document.getElementById('auction-grid');
+    if (!grid) return;
+
+    const cards        = grid.querySelectorAll('.auction-card');
+    const priceMax     = parseFloat(document.getElementById('priceRange')?.value ?? 1000);
+    const searchTerm   = (document.querySelector('aside input[type="text"]')?.value ?? '').toLowerCase().trim();
     const checkedBoxes = [...document.querySelectorAll('.custom-checkbox:checked')]
-                            .map(cb => cb.parentElement.querySelector('span')?.textContent.trim().toLowerCase());
+                            .map(cb => cb.closest('label')?.textContent.trim().toLowerCase() ?? '');
 
     let visibleCount = 0;
 
-    document.querySelectorAll('.auction-card').forEach(card => {
-        const title   = card.querySelector('h3')?.textContent.trim().toLowerCase() ?? '';
-        const artisan = card.querySelector('p')?.textContent.trim().toLowerCase() ?? '';
-        const bidText = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
-        const bidVal  = parseFloat(bidText.replace(/[^0-9.]/g, ''));
+    cards.forEach(card => {
+        // Search match
+        const title  = card.querySelector('h3')?.textContent.toLowerCase() ?? '';
+        const artist = card.querySelector('p.text-sm')?.textContent.toLowerCase() ?? '';
+        const matchesSearch = !searchTerm || title.includes(searchTerm) || artist.includes(searchTerm);
 
-        const cardCategory = (card.dataset.category || '').toLowerCase();
+        // Category match
+        const cardCat   = card.getAttribute('data-category') ?? '';
+        const matchesCat = _activeCategory === 'all' || cardCat === _activeCategory;
 
-        const matchesSearch   = !searchQuery || title.includes(searchQuery) || artisan.includes(searchQuery);
-        const matchesCat      = _activeCategory === 'all' || cardCategory === _activeCategory;
-        const matchesPrice    = isNaN(bidVal) || bidVal <= maxPrice;
+        // Price match
+        const bidText  = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
+        const bidValue = parseFloat(bidText.replace(/[^0-9.]/g, '')) || 0;
+        const matchesPrice = bidValue <= priceMax;
 
-        // Tab match using shared state variable (not DOM text)
+        // Tab match
         let matchesTab = true;
         if      (_activeTab === 'upcoming') matchesTab = isUpcomingCard(card);
         else if (_activeTab === 'ended')    matchesTab = isEndedCard(card);
@@ -252,19 +356,29 @@ function applyFilters() {
 
     // No-results message
     let noResults = document.getElementById('no-auction-results');
-    const grid    = document.getElementById('auction-grid');
-    if (visibleCount === 0 && grid) {
+    const grid2   = document.getElementById('auction-grid');
+    if (visibleCount === 0 && grid2) {
         if (!noResults) {
             noResults = document.createElement('div');
             noResults.id        = 'no-auction-results';
             noResults.className = 'col-span-3 text-center py-16 text-[#8b7355]';
             noResults.innerHTML = '<i class="fas fa-gavel text-4xl mb-4 block text-[#d4c5b5]"></i><p class="text-lg font-medium">No auctions match your filters.</p><p class="text-sm mt-1">Try a different tab, category, or price range.</p>';
-            grid.appendChild(noResults);
+            grid2.appendChild(noResults);
         }
         noResults.style.display = 'block';
     } else if (noResults) {
         noResults.style.display = 'none';
     }
+}
+
+function isLiveCard(card) {
+    return card.querySelector('.live-badge') !== null && !card.classList.contains('ended');
+}
+function isUpcomingCard(card) {
+    return card.querySelector('.bg-blue-500') !== null;
+}
+function isEndedCard(card) {
+    return card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
 }
 
 function sortAuctions(criteria) {
@@ -274,9 +388,7 @@ function sortAuctions(criteria) {
 
     cards.sort((a, b) => {
         if (criteria === 'ending-soonest') {
-            const secA = totalSeconds(a);
-            const secB = totalSeconds(b);
-            return secA - secB;
+            return totalSeconds(a) - totalSeconds(b);
         }
         if (criteria === 'lowest-bid') {
             return getBidValue(a) - getBidValue(b);
@@ -284,7 +396,7 @@ function sortAuctions(criteria) {
         if (criteria === 'highest-bid') {
             return getBidValue(b) - getBidValue(a);
         }
-        return 0; // newest — leave as-is
+        return 0;
     });
 
     cards.forEach(c => grid.appendChild(c));
@@ -299,112 +411,6 @@ function totalSeconds(card) {
 function getBidValue(card) {
     const text = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
     return parseFloat(text.replace(/[^0-9.]/g, '')) || 0;
-}
-
-// ============================================================
-// Bid Modal
-// ============================================================
-
-function buildBidModal() {
-    if (document.getElementById('bid-modal')) return;
-
-    const modal = document.createElement('div');
-    modal.id        = 'bid-modal';
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4';
-    modal.innerHTML = `
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-[#5c4a3d]" style="font-family:'Playfair Display',serif;">Place a Bid</h3>
-                <button id="bid-modal-close" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <p id="bid-product-name" class="text-[#5c4a3d] font-semibold mb-1"></p>
-            <p class="text-sm text-[#8b7355] mb-4">Current Bid: <span id="bid-current" class="font-bold text-[#c17c5f]"></span></p>
-            <label class="block text-[#5c4a3d] font-semibold mb-2">Your Bid (BD)</label>
-            <input id="bid-input" type="number" step="0.001" min="0" placeholder="Enter your bid amount"
-                   class="w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] mb-2
-                          focus:border-[#c17c5f] focus:outline-none focus:ring-2 focus:ring-[#c17c5f]/20"/>
-            <p id="bid-error" class="text-red-500 text-sm mb-4 hidden"></p>
-            <button id="bid-submit" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white py-3 rounded-xl font-bold transition-colors shadow-lg">
-                Confirm Bid
-            </button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    document.getElementById('bid-modal-close')?.addEventListener('click', closeBidModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeBidModal(); });
-    document.getElementById('bid-submit')?.addEventListener('click', submitBid);
-    document.getElementById('bid-input')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') submitBid();
-    });
-}
-
-let _activeBidCard = null;
-
-function openBidModal(card) {
-    _activeBidCard = card;
-    const name    = card.querySelector('h3')?.textContent.trim() ?? 'Item';
-    const current = card.querySelector('.text-xl.font-bold')?.textContent.trim() ?? '0.000 BD';
-
-    document.getElementById('bid-product-name').textContent = name;
-    document.getElementById('bid-current').textContent      = current;
-    document.getElementById('bid-input').value              = '';
-    document.getElementById('bid-input').min                = (parseFloat(current) + 0.001).toFixed(3);
-
-    const errorEl = document.getElementById('bid-error');
-    errorEl.classList.add('hidden');
-    errorEl.textContent = '';
-
-    const modal = document.getElementById('bid-modal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.getElementById('bid-input').focus();
-}
-
-function closeBidModal() {
-    const modal = document.getElementById('bid-modal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    _activeBidCard = null;
-}
-
-function submitBid() {
-    if (!window.requireLoginForAction?.('Login/Register first to place a bid.')) return;
-    const input    = document.getElementById('bid-input');
-    const errorEl  = document.getElementById('bid-error');
-    const bidValue = parseFloat(input.value);
-    const minBid   = parseFloat(input.min);
-
-    errorEl.classList.add('hidden');
-
-    if (isNaN(bidValue) || bidValue <= 0) {
-        errorEl.textContent = 'Please enter a valid bid amount.';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-
-    if (bidValue <= minBid - 0.001) {
-        errorEl.textContent = `Your bid must be higher than the current bid (${(minBid - 0.001).toFixed(3)} BD).`;
-        errorEl.classList.remove('hidden');
-        return;
-    }
-
-    // Update card UI
-    if (_activeBidCard) {
-        const bidDisplay = _activeBidCard.querySelector('.text-xl.font-bold');
-        if (bidDisplay) bidDisplay.textContent = `${bidValue.toFixed(3)} BD`;
-
-        const bidsCount = _activeBidCard.querySelector('.text-xs.text-\\[\\#8b7355\\]');
-        if (bidsCount) {
-            const current = parseInt(bidsCount.textContent) || 0;
-            bidsCount.textContent = `${current + 1} bids`;
-        }
-    }
-
-    closeBidModal();
-    showToast(`Bid of ${bidValue.toFixed(3)} BD placed successfully!`, 'success');
 }
 
 // ============================================================

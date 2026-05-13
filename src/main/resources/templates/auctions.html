@@ -275,55 +275,6 @@
                     </div>
                 </div>
                 
-                <!-- Category Filter -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Categories</h3>
-                    <div class="space-y-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only" checked>
-                                <div class="w-4 h-4 border-2 border-[#c17c5f] rounded-full mr-3 bg-[#c17c5f]"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] font-medium">All</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Ceramics</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Jewelry</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Paintings</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Textiles</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Woodwork</span>
-                        </label>
-                    </div>
-                </div>
-                
                 <!-- Price Range Slider -->
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Bid Range</h3>
@@ -345,20 +296,23 @@
         <main class="flex-1">
             <!-- Page Header -->
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">Live Auctions</h1>
-                <p class="text-[#8b7355]">Bid on unique handcrafted items before time runs out.</p>
+                <h1 id="auction-page-header" class="text-3xl font-bold text-[#5c4a3d] mb-2">All Auctions</h1>
+                <p id="auction-page-subtext" class="text-[#8b7355]">Browse live, upcoming, and ended handcrafted auctions.</p>
             </div>
 
             <!-- Secondary Tab Bar -->
             <div class="bg-white rounded-xl p-2 card-shadow mb-6">
                 <div class="flex flex-wrap gap-2">
-                    <button class="tab-pill active px-5 py-2.5 rounded-full font-medium" onclick="switchTab(this, 'live')">
+                    <button class="tab-pill active px-5 py-2.5 rounded-full font-medium" data-tab="all" onclick="switchTab(this, 'all')">
+                        <i class="fas fa-th-large mr-2"></i>All Auctions
+                    </button>
+                    <button class="tab-pill px-5 py-2.5 rounded-full font-medium" data-tab="live" onclick="switchTab(this, 'live')">
                         <i class="fas fa-fire mr-2"></i>Live Now
                     </button>
-                    <button class="tab-pill px-5 py-2.5 rounded-full font-medium" onclick="switchTab(this, 'upcoming')">
+                    <button class="tab-pill px-5 py-2.5 rounded-full font-medium" data-tab="upcoming" onclick="switchTab(this, 'upcoming')">
                         <i class="fas fa-clock mr-2"></i>Upcoming
                     </button>
-                    <button class="tab-pill px-5 py-2.5 rounded-full font-medium" onclick="switchTab(this, 'ended')">
+                    <button class="tab-pill px-5 py-2.5 rounded-full font-medium" data-tab="ended" onclick="switchTab(this, 'ended')">
                         <i class="fas fa-check-circle mr-2"></i>Ended
                     </button>
                 </div>
@@ -407,12 +361,12 @@
             <!-- Product Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="auction-grid">
                 <!-- Auction Card 1 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="ceramics">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="ceramics" data-product-id="1">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&amp;h=300&amp;fit=crop" 
                             alt="Ceramic Vase" 
-                            class="w-full h-48 object-cover"
+                            class="w-full h-48 object-cover cursor-pointer"
                         />
                         <span class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
@@ -420,7 +374,7 @@
                         </span>
                     </div>
                     <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Handcrafted Ceramic Vase</h3>
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate cursor-pointer hover:text-[#c17c5f] transition-colors">Handcrafted Ceramic Vase</h3>
                         <p class="text-sm text-[#8b7355] mb-3 truncate">by Elena Martinez</p>
                         
                         <div class="flex items-end justify-between mb-3">
@@ -445,7 +399,7 @@
                 </div>
 
                 <!-- Auction Card 2 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="jewelry">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="jewelry" data-product-id="2">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&amp;h=300&amp;fit=crop" 
@@ -483,7 +437,7 @@
                 </div>
 
                 <!-- Auction Card 3 - UPCOMING -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="paintings">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="paintings" data-product-id="3">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1580136607983-ec9577fd9072?q=80&amp;w=1605&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
@@ -519,7 +473,7 @@
                 </div>
 
                 <!-- Auction Card 4 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="textiles">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="textiles" data-product-id="4">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1547462515-204fc3a3d805?q=80&amp;w=1035&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
@@ -557,7 +511,7 @@
                 </div>
 
                 <!-- Auction Card 5 - ENDED -->
-                <div class="auction-card ended bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork">
+                <div class="auction-card ended bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork" data-product-id="5">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1544441893-675973e31985?w=400&amp;h=300&amp;fit=crop" 
@@ -594,7 +548,7 @@
                 </div>
 
                 <!-- Auction Card 6 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="jewelry">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="jewelry" data-product-id="6">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1705326455036-0fab8ecba04d?q=80&amp;w=1770&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
@@ -632,7 +586,7 @@
                 </div>
 
                 <!-- Auction Card 7 - UPCOMING -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork" data-product-id="7">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&amp;h=300&amp;fit=crop" 
@@ -668,7 +622,7 @@
                 </div>
 
                 <!-- Auction Card 8 - ENDED -->
-                <div class="auction-card ended bg-white rounded-xl card-shadow overflow-hidden" data-category="textiles">
+                <div class="auction-card ended bg-white rounded-xl card-shadow overflow-hidden" data-category="textiles" data-product-id="8">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1631287383810-40c3bd3fa9ee?q=80&amp;w=1707&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
@@ -705,7 +659,7 @@
                 </div>
 
                 <!-- Auction Card 9 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork">
+                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork" data-product-id="9">
                     <div class="relative">
                         <img 
                             src="https://images.unsplash.com/photo-1645389773319-c8a9f48512e4?q=80&amp;w=987&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
@@ -754,66 +708,7 @@
 
     <script src="/static/authguard.js"></script>
     
-    <script>
-        // Price range slider functionality
-        const priceRange = document.getElementById('priceRange');
-        const priceValue = document.getElementById('priceValue');
-        
-        priceRange.addEventListener('input', function() {
-            priceValue.textContent = this.value + ' BD';
-        });
-
-        // Countdown timer functionality
-        function updateCountdowns() {
-            const countdowns = document.querySelectorAll('.countdown');
-            
-            countdowns.forEach(countdown => {
-                let hours = parseInt(countdown.dataset.hours);
-                let minutes = parseInt(countdown.dataset.minutes);
-                let seconds = parseInt(countdown.dataset.seconds);
-                
-                if (seconds > 0) {
-                    seconds--;
-                } else {
-                    seconds = 59;
-                    if (minutes > 0) {
-                        minutes--;
-                    } else {
-                        minutes = 59;
-                        if (hours > 0) {
-                            hours--;
-                        }
-                    }
-                }
-                
-                countdown.dataset.hours = hours;
-                countdown.dataset.minutes = minutes;
-                countdown.dataset.seconds = seconds;
-                
-                countdown.textContent = `${hours}h ${minutes}m ${seconds}s`;
-            });
-        }
-        
-        // Update countdowns every second
-        setInterval(updateCountdowns, 1000);
-
-        // Custom checkbox functionality
-        const checkboxes = document.querySelectorAll('.custom-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const icon = this.parentElement.querySelector('.checkbox-icon');
-                if (this.checked) {
-                    icon.style.opacity = '1';
-                    this.parentElement.querySelector('div').classList.add('bg-[#c17c5f]', 'border-[#c17c5f]');
-                } else {
-                    icon.style.opacity = '0';
-                    this.parentElement.querySelector('div').classList.remove('bg-[#c17c5f]', 'border-[#c17c5f]');
-                }
-            });
-        });
-    </script>
-    <script src="/auctions.js"></script>
+    <!-- All JS logic is handled by auctions.js -->
+    <script src="/auctions.js?v=2"></script>
 </body>
 </html>
-
-

@@ -399,11 +399,11 @@
                             <div class="grid grid-cols-2 gap-4 mb-6">
                                 <div class="bg-white rounded-lg p-4">
                                     <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Current Bid</p>
-                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] whitespace-nowrap">120.00 BD</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] whitespace-nowrap" id="current-bid-display">120.00 BD</p>
                                 </div>
                                 <div class="bg-white rounded-lg p-4">
                                     <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Highest Bidder</p>
-                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate">Jennifer M.</p>
+                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name">Jennifer M.</p>
                                 </div>
                             </div>
                             
@@ -437,7 +437,7 @@
                                             type="number" 
                                             min="121" 
                                             step="1" 
-                                            placeholder="121.00" 
+                                            placeholder="Min: 121 BD" 
                                             class="w-full pl-4 pr-12 py-3 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] font-semibold"
                                             id="bidAmount"
                                         />
@@ -455,13 +455,17 @@
                                     />
                                 </div>
                                 
-                                <button type="submit" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg flex items-center justify-center">
+                                <button type="submit" id="bid-submit-btn" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg flex items-center justify-center">
                                     <i class="fas fa-gavel mr-2"></i>Place Bid
                                 </button>
                                 
                                 <p class="text-xs text-[#8b7355] text-center">
-                                    <i class="fas fa-info-circle mr-1"></i>Bids must be higher than the current bid (120.00 BD) to be valid.
+                                    <i class="fas fa-info-circle mr-1"></i>Bids must be whole BD amounts and at least 1 BD above the current bid. No fils allowed.
                                 </p>
+
+                                <button type="button" id="back-to-auctions" class="w-full mt-2 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                                    <i class="fas fa-arrow-left mr-2"></i>Back to Auctions
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -666,7 +670,3 @@
     </script>
 </body>
 </html>
-
-
-
-
