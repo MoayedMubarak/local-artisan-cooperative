@@ -26,11 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateLoginState() {
-        const loggedIn = sessionStorage.getItem('loggedIn') === 'true' || sessionStorage.getItem('isLoggedIn') === 'true';
-
-
-
-
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
         if (loggedIn) {
             loginButtonWrapper?.classList.add('hidden');
             userSection?.classList.remove('hidden');

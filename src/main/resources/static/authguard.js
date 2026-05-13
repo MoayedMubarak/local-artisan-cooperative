@@ -1,16 +1,11 @@
 (function () {
   function getLoggedIn() {
     try {
-      // Support both keys used across different page JS files.
-      const a = sessionStorage.getItem('loggedIn');
-      const b = sessionStorage.getItem('isLoggedIn');
-      return a === 'true' || b === 'true';
-
+      return sessionStorage.getItem('loggedIn') === 'true';
     } catch (e) {
       return false;
     }
   }
-
 
   function normalizeRedirectTo(redirectTo) {
     if (!redirectTo) return '/login';
