@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             // Store minimal session data
             sessionStorage.setItem('loggedIn', 'true');
+            sessionStorage.setItem('isLoggedIn', 'true');
             sessionStorage.setItem('userEmail', email);
             sessionStorage.setItem('userName', 'John Doe');
 
@@ -144,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
             } else {
                 sessionStorage.setItem('loggedIn', 'true');
+                sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userEmail', email);
                 showToast('Account created! Welcome to ArtsyVibe.', 'success');
 

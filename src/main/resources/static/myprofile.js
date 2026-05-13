@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartBadge = document.getElementById('cart-badge');
 
     function updateLoginState() {
-        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
         if (loggedIn) {
             loginButtonWrapper?.classList.add('hidden');
             userSection?.classList.remove('hidden');
@@ -184,6 +184,7 @@ window.deleteAccount = function () {
         showToast('Account deletion confirmed. You will be logged out shortly.', 'info');
         setTimeout(() => {
             sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('isLoggedIn');
             sessionStorage.removeItem('userEmail');
             sessionStorage.removeItem('userName');
             sessionStorage.removeItem('postLoginNext');
@@ -196,6 +197,7 @@ window.deleteAccount = function () {
 
 window.logout = function () {
     sessionStorage.removeItem('loggedIn');
+    sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('userEmail');
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('postLoginNext');
