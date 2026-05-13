@@ -77,10 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
         showButtonLoading(form.querySelector('button[type="submit"]'), 'Logging in…');
 
         setTimeout(() => {
-            // Store minimal session data
+            // Store minimal session data (support both keys: loggedIn + isLoggedIn)
             sessionStorage.setItem('loggedIn', 'true');
+            sessionStorage.setItem('isLoggedIn', 'true');
             sessionStorage.setItem('userEmail', email);
             sessionStorage.setItem('userName', 'John Doe');
+
 
             // Redirect back to the originally requested page (if any)
             const url = new URL(window.location.href);
@@ -144,8 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
             } else {
                 sessionStorage.setItem('loggedIn', 'true');
+                sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userEmail', email);
+
                 showToast('Account created! Welcome to ArtsyVibe.', 'success');
+
 
                 // Redirect back to the originally requested page (if any)
                 setTimeout(() => {
