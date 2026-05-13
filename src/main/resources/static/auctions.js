@@ -137,15 +137,55 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnText === 'Place Bid') {
             if (!requireLoginToAct('Login/Register first to place a bid.')) return;
             navigateToProductPage(btn);
+            return;
         }
 
         if (btnText === 'Notify Me') {
             if (!requireLoginToAct('Login/Register first to be notified about this auction.')) return;
+            btn.dataset.notifyState = 'notified';
+            btn.dataset.originalHtml = btn.innerHTML;
+            btn.dataset.originalClass = btn.className;
             btn.innerHTML = '<i class="fas fa-check mr-2"></i>Notified';
-            btn.classList.add('bg-[#c17c5f]', 'text-white');
+            btn.classList.add('bg-[#c17c5f]', 'text-white', 'notified');
             btn.classList.remove('border-[#c17c5f]', 'text-[#c17c5f]');
-            btn.disabled = true;
+            btn.title = 'Click to cancel notification';
             showToast('You will be notified when this auction starts!', 'success');
+            return;
+        }
+
+        if (btn.dataset.notifyState === 'notified') {
+            btn.dataset.notifyState = 'canceled';
+            btn.innerHTML = 'Notify Me';
+            btn.className = btn.dataset.originalClass || 'w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors';
+            btn.style.backgroundColor = '';
+            btn.style.borderColor = '';
+            btn.style.color = '';
+            delete btn.dataset.hoverHtml;
+            btn.title = 'Notify me when this auction starts';
+            showToast('Notification canceled.', 'info');
+        }
+    });
+
+    document.getElementById('auction-grid')?.addEventListener('mouseover', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.dataset.notifyState !== 'notified') return;
+        if (!btn.dataset.hoverHtml) {
+            btn.dataset.hoverHtml = btn.innerHTML;
+        }
+        btn.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Cancel Notification';
+        btn.style.backgroundColor = '#ef4444';
+        btn.style.borderColor = '#ef4444';
+        btn.style.color = 'white';
+    });
+
+    document.getElementById('auction-grid')?.addEventListener('mouseout', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.dataset.notifyState !== 'notified') return;
+        if (btn.dataset.hoverHtml) {
+            btn.innerHTML = btn.dataset.hoverHtml;
+            btn.style.backgroundColor = '';
+            btn.style.borderColor = '';
+            btn.style.color = '';
         }
     });
 

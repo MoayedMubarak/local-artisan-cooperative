@@ -220,100 +220,10 @@
     </nav>
 
     <!-- Main Content Area -->
-    <div class="flex flex-1 max-w-7xl mx-auto w-full px-6 py-8 gap-8">
-        <!-- Left Sidebar (Reused from products.html) -->
-        <aside class="w-[250px] flex-shrink-0 hidden lg:block">
-            <div class="bg-white rounded-xl p-6 card-shadow sticky top-24">
-                <!-- Search Input -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Search Products</h3>
-                    <div class="relative">
-                        <input 
-                            type="text" 
-                            placeholder="Search..." 
-                            class="w-full px-4 py-2 pl-10 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
-                        />
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#b8a99a]"></i>
-                    </div>
-                </div>
-                
-                <!-- Category Filter -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Categories</h3>
-                    <div class="space-y-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">All</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Ceramics</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only" checked>
-                                <div class="w-4 h-4 border-2 border-[#c17c5f] rounded-full mr-3"></div>
-                            </div>
-                            <span class="text-[#c17c5f] font-medium">Jewelry</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Paintings</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Textiles</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative">
-                                <input type="radio" name="category" class="sr-only">
-                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
-                            </div>
-                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Woodwork</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Price Range Slider -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Price Range</h3>
-                    <div class="px-2">
-                        <input type="range" min="0" max="1000" value="500" class="w-full" id="priceRange">
-                        <div class="flex justify-between mt-2 text-sm text-[#8b7355]">
-                            <span>0 BD</span>
-                            <span class="font-semibold text-[#c17c5f]" id="priceValue">500 BD</span>
-                            <span>1000 BD</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Show Auctions Only Checkbox -->
-                <div>
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" class="sr-only" checked>
-                        <div class="w-5 h-5 border-2 border-[#c17c5f] bg-[#c17c5f] rounded mr-3 flex items-center justify-center">
-                            <i class="fas fa-check text-white text-xs"></i>
-                        </div>
-                        <span class="text-[#c17c5f] font-medium">Show Auctions Only</span>
-                    </label>
-                </div>
-            </div>
-        </aside>
+    <div class="flex justify-center w-full px-6 py-8">
 
         <!-- Main Content -->
-        <main class="flex-1">
+        <main class="w-full max-w-6xl">
             <!-- Breadcrumb -->
             <nav class="mb-6 text-sm">
                 <ol class="flex items-center space-x-2 text-[#8b7355]">
@@ -396,12 +306,12 @@
                             </div>
                             
                             <!-- Current Bid Info -->
-                            <div class="grid grid-cols-2 gap-4 mb-6">
-                                <div class="bg-white rounded-lg p-4">
-                                    <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Current Bid</p>
-                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] whitespace-nowrap" id="current-bid-display">120.00 BD</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
+                                    <p class="text-sm text-[#8b7355] mb-1">Current Bid</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] break-words break-all max-w-full" id="current-bid-display">120.00 BD</p>
                                 </div>
-                                <div class="bg-white rounded-lg p-4">
+                                <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
                                     <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Highest Bidder</p>
                                     <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name">Jennifer M.</p>
                                 </div>
