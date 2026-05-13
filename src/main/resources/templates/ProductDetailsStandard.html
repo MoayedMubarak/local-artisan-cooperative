@@ -159,36 +159,34 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <!-- User Menu -->
-                <a href="/profile" class="group flex items-center gap-2 transition-colors">
-                    <div class="hidden md:flex items-center space-x-2">
-                        <!-- Profile Icon Container with Badge -->
-                        <div class="relative">
-                            <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
-                            <!-- This is the badge, like your cart icon has -->
+                <div id="login-button-wrapper" class="flex items-center">
+                    <a href="/login" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#c17c5f] to-[#a5664d] text-white text-sm font-semibold shadow-lg shadow-[#c17c5f]/20 transition-all hover:from-[#b06b4f] hover:to-[#8f5d3f]">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                </div>
 
+                <div id="user-section" class="hidden items-center space-x-4">
+                    <a href="/profile" class="group flex items-center gap-2 transition-colors">
+                        <div class="hidden md:flex items-center space-x-2">
+                            <div class="relative">
+                                <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
+                            </div>
+                            <div class="text-sm">
+                                <p id="nav-user-name" class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
+                                <p id="nav-user-email" class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
+                            </div>
                         </div>
-                        
-                        <div class="text-sm">
-                            <!-- Name changes color on hover because of group-hover -->
-                            <p class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
-                            <p class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
-                        </div>
-                    </div>
-                </a>
-                
-                <!-- Notifications Bell Icon -->
-                <a href="/notifications" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
-                </a>
-                
-                <!-- Cart Icon -->
-                <a href="/cart">
-                    <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
-                        <i class="fas fa-shopping-cart text-xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </button>
+                    </a>
+                    <a id="notifications-link" href="/notifications" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">4</span>
+                    </a>
+                </div>
+
+                <a id="cart-link" href="/cart" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
                 </a>
             </div>
         </div>

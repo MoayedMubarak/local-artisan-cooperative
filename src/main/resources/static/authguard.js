@@ -128,5 +128,27 @@
       redirectToLogin({ redirectTo, next: intendedNext });
     }, 1200);
   };
+
+  window.updateNavAuthState = function updateNavAuthState() {
+    const loginWrapper = document.getElementById('login-button-wrapper');
+    const userSection = document.getElementById('user-section');
+    const userName = document.getElementById('nav-user-name');
+    const userEmail = document.getElementById('nav-user-email');
+    const loggedIn = getLoggedIn();
+
+    if (loggedIn) {
+      if (loginWrapper) loginWrapper.classList.add('hidden');
+      if (userSection) userSection.classList.remove('hidden');
+      if (userName) userName.textContent = sessionStorage.getItem('userName') || 'Profile';
+      if (userEmail) userEmail.textContent = sessionStorage.getItem('userEmail') || '';
+    } else {
+      if (loginWrapper) loginWrapper.classList.remove('hidden');
+      if (userSection) userSection.classList.add('hidden');
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.updateNavAuthState();
+  });
 })();
 
