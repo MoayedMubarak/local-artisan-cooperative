@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 5. Login form submission
     // ----------------------------------------------------------
-    window.handleLogin = function (event) {
+    window.handleLogin = async function (event) {
         event.preventDefault();
         const form     = event.target;
         const email    = form.querySelector('input[type="email"]')?.value.trim();
@@ -73,29 +73,47 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Simulate login — replace with real API call
         showButtonLoading(form.querySelector('button[type="submit"]'), 'Logging in…');
 
-        setTimeout(() => {
-            // Store minimal session data
-            sessionStorage.setItem('loggedIn', 'true');
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userEmail', email);
-            sessionStorage.setItem('userName', 'John Doe');
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
 
-            // Redirect back to the originally requested page (if any)
-            const url = new URL(window.location.href);
-            const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
-            sessionStorage.removeItem('postLoginNext');
+            if (response.ok && data.success) {
+                // Store minimal session data
+                sessionStorage.setItem('loggedIn', 'true');
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userEmail', data.user.email);
+                sessionStorage.setItem('userName', data.user.name);
+                sessionStorage.setItem('userRole', data.user.role);
+                sessionStorage.setItem('userId', data.user.userId);
 
-            window.location.href = next || '/index';
-        }, 1200);
+                // Redirect back to the originally requested page (if any)
+                const url = new URL(window.location.href);
+                const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
+                sessionStorage.removeItem('postLoginNext');
+
+                window.location.href = next || '/index';
+            } else {
+                showFormError(form, data.message || 'Invalid email or password');
+                resetButtonLoading(form.querySelector('button[type="submit"]'), 'Login');
+            }
+        } catch (error) {
+            showFormError(form, 'An error occurred. Please try again.');
+            resetButtonLoading(form.querySelector('button[type="submit"]'), 'Login');
+        }
     };
 
     // ----------------------------------------------------------
     // 5. Customer registration form submission
     // ----------------------------------------------------------
-    window.handleRegister = function (event) {
+    window.handleRegister = async function (event) {
         event.preventDefault();
         const form = event.target;
 
@@ -138,26 +156,80 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitBtn = form.querySelector('button[type="submit"]');
         showButtonLoading(submitBtn, isArtisan ? 'Sending request…' : 'Creating account…');
 
-        setTimeout(() => {
-            if (isArtisan) {
-                showToast('Your artisan account request has been submitted for review!', 'success');
-                resetButtonLoading(submitBtn, 'Send Request to Create Artisan Account');
-                form.reset();
-            } else {
-                sessionStorage.setItem('loggedIn', 'true');
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userEmail', email);
-                showToast('Account created! Welcome to ArtsyVibe.', 'success');
+        let payload = {};
+        let endpoint = '';
+        
+        if (isArtisan) {
+            const fullName = inputs[0].value;
+            const phone = inputs[2].value;
+            const password = passwords[0].value;
+            const shopName = form.querySelectorAll('input[type="text"]')[1]?.value;
+            const biography = form.querySelector('textarea')?.value;
+            
+            payload = {
+                name: fullName,
+                email: email,
+                phone: phone,
+                password: password,
+                shopName: shopName,
+                biography: biography
+            };
+            endpoint = '/api/auth/register/artisan';
+        } else {
+            const fullName = inputs[0].value;
+            const phone = inputs[2].value;
+            const password = passwords[0].value;
+            
+            payload = {
+                name: fullName,
+                email: email,
+                phone: phone,
+                password: password
+            };
+            endpoint = '/api/auth/register/customer';
+        }
 
-                // Redirect back to the originally requested page (if any)
-                setTimeout(() => {
-                    const url = new URL(window.location.href);
-                    const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
-                    sessionStorage.removeItem('postLoginNext');
-                    window.location.href = next || '/index';
-                }, 1500);
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                if (isArtisan) {
+                    showToast('Your artisan account request has been submitted for review!', 'success');
+                    resetButtonLoading(submitBtn, 'Send Request to Create Artisan Account');
+                    form.reset();
+                } else {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userEmail', data.user.email);
+                    sessionStorage.setItem('userName', data.user.name);
+                    sessionStorage.setItem('userRole', data.user.role);
+                    sessionStorage.setItem('userId', data.user.userId);
+                    
+                    showToast('Account created! Welcome to ArtsyVibe.', 'success');
+
+                    // Redirect back to the originally requested page (if any)
+                    setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
+                        sessionStorage.removeItem('postLoginNext');
+                        window.location.href = next || '/index';
+                    }, 1500);
+                }
+            } else {
+                showFormError(form, data.message || 'Registration failed');
+                resetButtonLoading(submitBtn, isArtisan ? 'Send Request to Create Artisan Account' : 'Create Account');
             }
-        }, 1500);
+        } catch (error) {
+            showFormError(form, 'An error occurred. Please try again.');
+            resetButtonLoading(submitBtn, isArtisan ? 'Send Request to Create Artisan Account' : 'Create Account');
+        }
     };
 
     // ----------------------------------------------------------
