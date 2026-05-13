@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .timeline-step {
+            position: relative;
+            padding-left: 2.5rem;
+        }
+
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e5e0d8;
+        }
+
+        .timeline-step:last-child::before {
+            bottom: auto;
+            height: 50%;
+        }
+
+        .timeline-step:first-child::before {
+            top: 50%;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: -0.625rem;
+            top: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .timeline-step.completed .timeline-icon {
+            background-color: #c17c5f;
+            color: white;
+        }
+
+        .timeline-step.current .timeline-icon {
+            background-color: #fef3c7;
+            color: #c17c5f;
+            border: 2px solid #c17c5f;
+        }
+
+        .timeline-step.pending .timeline-icon {
+            background-color: #f5f5f4;
+            color: #a8a29e;
+        }
+
+        .timeline-step.completed::before {
+            background-color: #c17c5f;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1f2937;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 10;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .tracking-input, .delivery-date-input {
+            transition: all 0.2s ease;
+        }
+
+        .tracking-input:focus, .delivery-date-input:focus {
+            outline: none;
+            border-color: #c17c5f;
+            box-shadow: 0 0 0 3px rgba(193, 124, 95, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
+                <!-- Notifications Bell -->
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">5</span>
+                </button>
+
+                <div class="flex items-center space-x-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" 
+                        alt="Elena Martinez" 
+                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div class="text-sm">
+                        <p class="font-semibold text-[#5c4a3d]">Elena Martinez</p>
+                        <p class="text-[#8b7355]">elena@artisan.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Artisan Profile -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center gap-4">
+                    <img 
+                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" 
+                        alt="Elena Martinez" 
+                        class="w-14 h-14 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold">Elena Martinez</h3>
+                        <p class="text-[#d4c5b5] text-sm">Ceramics Artist</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="artisan-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-chart-line w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-products.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>My Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-auctions.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>My Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-order-detail.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                            <i class="fas fa-receipt w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-analytics.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-chart-bar w-5"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-settings.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Settings Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Back Link -->
+            <a href="artisan-orders.html" class="inline-flex items-center gap-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-6">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Orders</span>
+            </a>
+
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-3xl font-bold text-[#5c4a3d]">Order #ORD-2847</h1>
+                <p class="text-[#8b7355]">March 15, 2025</p>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column (Wider) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Order Items Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Items</h2>
+                        </div>
+                        <div class="p-6">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-left text-sm text-[#8b7355] border-b border-[#e5e0d8]">
+                                        <th class="pb-3 font-medium">Product</th>
+                                        <th class="pb-3 font-medium text-center">Quantity</th>
+                                        <th class="pb-3 font-medium text-right">Unit Price</th>
+                                        <th class="pb-3 font-medium text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#e5e0d8]">
+                                    <tr>
+                                        <td class="py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                                    <img 
+                                                        src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop" 
+                                                        alt="Handcrafted Ceramic Vase" 
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-300 text-gray-500\'><i class=\'fas fa-image text-xl\'></i></div>'"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-[#5c4a3d]">Handcrafted Ceramic Vase</p>
+                                                    <p class="text-sm text-[#8b7355]">SKU: CER-VASE-001</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 text-center text-[#5c4a3d]">2</td>
+                                        <td class="py-4 text-right text-[#5c4a3d]">BD 85.000</td>
+                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 170.000</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                                    <img 
+                                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=80&h=80&fit=crop" 
+                                                        alt="Artisan Tea Set" 
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-300 text-gray-500\'><i class=\'fas fa-image text-xl\'></i></div>'"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-[#5c4a3d]">Artisan Tea Set</p>
+                                                    <p class="text-sm text-[#8b7355]">SKU: CER-TEA-003</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 text-center text-[#5c4a3d]">1</td>
+                                        <td class="py-4 text-right text-[#5c4a3d]">BD 120.000</td>
+                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 120.000</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                                    <img 
+                                                        src="https://images.unsplash.com/photo-1565193566173-034e40b7c3f8?w=80&h=80&fit=crop" 
+                                                        alt="Rustic Mug Set" 
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-300 text-gray-500\'><i class=\'fas fa-image text-xl\'></i></div>'"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-[#5c4a3d]">Rustic Mug Set (4pcs)</p>
+                                                    <p class="text-sm text-[#8b7355]">SKU: CER-MUG-007</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 text-center text-[#5c4a3d]">3</td>
+                                        <td class="py-4 text-right text-[#5c4a3d]">BD 45.000</td>
+                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 135.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Order Totals -->
+                            <div class="mt-6 pt-6 border-t border-[#e5e0d8] space-y-2">
+                                <div class="flex justify-between text-[#8b7355]">
+                                    <span>Subtotal</span>
+                                    <span>BD 425.000</span>
+                                </div>
+                                <div class="flex justify-between text-[#8b7355]">
+                                    <span>Shipping Fee</span>
+                                    <span>BD 15.000</span>
+                                </div>
+                                <div class="flex justify-between text-lg font-semibold text-[#5c4a3d] pt-2 border-t border-[#e5e0d8]">
+                                    <span>Total</span>
+                                    <span>BD 440.000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Timeline Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Timeline</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <!-- Order Placed - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Order Placed</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 15, 2025 at 10:30 AM</p>
+                                        <p class="text-sm text-[#8b7355]">Customer placed the order successfully</p>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Confirmed - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Payment Confirmed</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 15, 2025 at 10:32 AM</p>
+                                        <p class="text-sm text-[#8b7355]">Payment received via PayPal</p>
+                                    </div>
+                                </div>
+
+                                <!-- Processing - Current -->
+                                <div class="timeline-step current">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-box-open"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Processing</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 16, 2025 at 9:00 AM</p>
+                                        <p class="text-sm text-[#8b7355]">Preparing items for shipment</p>
+                                    </div>
+                                </div>
+
+                                <!-- Shipped - Pending -->
+                                <div class="timeline-step pending" id="step-shipped">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-shipping-fast"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Shipped</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">Pending</p>
+                                        <p class="text-sm text-[#8b7355]">Awaiting dispatch</p>
+                                        <div id="shipped-inputs" class="hidden mt-3 space-y-2">
+                                            <div class="flex items-center gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    id="trackingNumber" 
+                                                    placeholder="Enter tracking number" 
+                                                    class="tracking-input flex-1 border border-[#e5e0d8] rounded-lg px-3 py-2 text-sm text-[#5c4a3d]"
+                                                />
+                                                <button onclick="saveTrackingNumber()" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors">
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delivered - Pending -->
+                                <div class="timeline-step pending" id="step-delivered">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Delivered</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">Pending</p>
+                                        <p class="text-sm text-[#8b7355]">Awaiting delivery confirmation</p>
+                                        <div id="delivered-inputs" class="hidden mt-3 space-y-2">
+                                            <div class="flex items-center gap-2">
+                                                <input 
+                                                    type="date" 
+                                                    id="expectedDeliveryDate" 
+                                                    class="delivery-date-input flex-1 border border-[#e5e0d8] rounded-lg px-3 py-2 text-sm text-[#5c4a3d]"
+                                                />
+                                                <button onclick="saveDeliveryDate()" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors">
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Narrower) -->
+                <div class="space-y-6">
+                    <!-- Customer Information Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Customer Information</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-14 h-14 rounded-full bg-[#c17c5f] flex items-center justify-center text-white text-xl font-semibold">
+                                    JD
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-[#5c4a3d]">John Doe</h3>
+                                    <p class="text-sm text-[#8b7355]">john.doe@email.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-[#8b7355]">
+                                <i class="fas fa-phone"></i>
+                                <span class="text-sm" id="customerPhone">+973 3344 5566</span>
+                                <span id="phoneWarning" class="tooltip hidden" data-tooltip="Phone number format may be incorrect.">
+                                    <i class="fas fa-exclamation-triangle text-amber-500"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Shipping Address</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-map-marker-alt text-[#c17c5f] mt-1"></i>
+                                <div class="text-[#5c4a3d] text-sm leading-relaxed">
+                                    <p>Building 1234, Road 5678</p>
+                                    <p>Block 901, Seef District</p>
+                                    <p>Manama, Bahrain</p>
+                                    <p class="text-[#8b7355] mt-2">Postal Code: 35678</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Status Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Status</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-[#8b7355] mb-2">Current Status</label>
+                                <select id="orderStatus" class="w-full border border-[#e5e0d8] rounded-lg px-4 py-2.5 text-[#5c4a3d] focus:outline-none focus:border-[#c17c5f]">
+                                    <option value="pending" selected>Pending</option>
+                                    <option value="processing">Processing</option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="delivered">Delivered</option>
+                                </select>
+                            </div>
+                            <button id="updateStatusBtn" onclick="updateOrderStatus()" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white font-medium py-2.5 rounded-lg transition-colors">
+                                Update Status
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Payment Information</h2>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8b7355]">Payment Method</span>
+                                <span class="font-medium text-[#5c4a3d]">PayPal</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8b7355]">Payment Status</span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                    <i class="fas fa-check-circle"></i>
+                                    Paid
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8b7355]">Transaction ID</span>
+                                <span class="text-sm text-[#8b7355]">TXN-8472639105</span>
+                            </div>
+                            <div class="pt-3 border-t border-[#e5e0d8]">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#8b7355]">Amount Paid</span>
+                                    <span class="font-semibold text-[#5c4a3d]">BD 440.000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Refund Request Panel -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden border-l-4 border-amber-500">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-exclamation-triangle text-amber-500 text-xl"></i>
+                                    <h2 class="text-xl font-semibold text-amber-600">Refund Request</h2>
+                                </div>
+                                <span class="text-sm text-[#8b7355]">March 18, 2025 at 2:45 PM</span>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <!-- Refund Reason -->
+                            <div>
+                                <p class="text-sm font-medium text-[#8b7355] mb-2">Customer's Reason:</p>
+                                <blockquote class="bg-amber-50 border-l-4 border-amber-400 p-4 italic text-[#5c4a3d]">
+                                    "The item arrived damaged and does not match the description. The ceramic vase has a large crack on the side and the color is significantly different from what was shown in the product images."
+                                </blockquote>
+                            </div>
+
+                            <!-- Attached Evidence Section -->
+                            <div>
+                                <p class="text-sm font-medium text-[#8b7355] mb-2 flex items-center gap-2">
+                                    <i class="fas fa-paperclip"></i>
+                                    Attached Photos
+                                </p>
+                                <div class="flex gap-3">
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(0)">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=160&h=160&fit=crop" 
+                                            alt="Evidence photo 1" 
+                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
+                                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e0d8%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%238b7355%22 font-size=%2224%22><tspan>📷</tspan></text></svg>'"
+                                        />
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <i class="fas fa-expand text-white text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(1)">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=160&h=160&fit=crop" 
+                                            alt="Evidence photo 2" 
+                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
+                                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e0d8%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%238b7355%22 font-size=%2224%22><tspan>📷</tspan></text></svg>'"
+                                        />
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <i class="fas fa-expand text-white text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(2)">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=160&h=160&fit=crop" 
+                                            alt="Evidence photo 3" 
+                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
+                                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e0d8%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%238b7355%22 font-size=%2224%22><tspan>📷</tspan></text></svg>'"
+                                        />
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <i class="fas fa-expand text-white text-xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Refund Amount -->
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="text-[#8b7355]">Requested Refund Amount</span>
+                                <span class="text-lg font-semibold text-amber-600">BD 85.000</span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-3 pt-4" id="refundActions">
+                                <button onclick="handleRefundDecision('accept')" class="refund-btn flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg transition-colors">
+                                    Accept Refund
+                                </button>
+                                <button onclick="handleRefundDecision('decline')" class="refund-btn flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 font-medium py-2.5 rounded-lg transition-colors">
+                                    Decline Refund
+                                </button>
+                                <button onclick="handleRefundDecision('escalate')" class="refund-btn flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-2.5 rounded-lg transition-colors">
+                                    Escalate to Admin
+                                </button>
+                            </div>
+
+                            <!-- Notice -->
+                            <p class="text-xs text-[#8b7355] text-center pt-2">
+                                Your decision will be reviewed and finalized by the administrator before any funds are returned.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active class from all links
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                // Add active class to clicked link
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // Validate phone number on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            validatePhoneNumber();
+        });
+
+        // Validate Bahraini phone number format
+        function validatePhoneNumber() {
+            const phoneElement = document.getElementById('customerPhone');
+            const warningElement = document.getElementById('phoneWarning');
+            const phoneNumber = phoneElement.textContent.trim();
+
+            // Bahraini format: +973 followed by 8 digits starting with 3 or 6
+            const bahrainiPattern = /^\+973\s?[36]\d{7}$/;
+
+            if (!bahrainiPattern.test(phoneNumber)) {
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        // Update order status
+        function updateOrderStatus() {
+            const btn = document.getElementById('updateStatusBtn');
+            const status = document.getElementById('orderStatus').value;
+
+            // Disable button to prevent double-click
+            btn.disabled = true;
+            btn.classList.add('btn-disabled');
+            btn.textContent = 'Updating...';
+
+            // Simulate API call
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.textContent = 'Update Status';
+
+                showNotification(`Order status updated to ${status.charAt(0).toUpperCase() + status.slice(1)}`, 'success');
+
+                // Show relevant input fields based on status
+                updateTimelineInputs(status);
+            }, 1000);
+        }
+
+        // Update timeline inputs based on status
+        function updateTimelineInputs(status) {
+            const shippedInputs = document.getElementById('shipped-inputs');
+            const deliveredInputs = document.getElementById('delivered-inputs');
+
+            if (status === 'shipped') {
+                shippedInputs.classList.remove('hidden');
+            }
+
+            if (status === 'delivered') {
+                shippedInputs.classList.remove('hidden');
+                deliveredInputs.classList.remove('hidden');
+            }
+        }
+
+        // Save tracking number
+        function saveTrackingNumber() {
+            const trackingNumber = document.getElementById('trackingNumber').value.trim();
+
+            if (!trackingNumber) {
+                showNotification('Please enter a tracking number', 'error');
+                return;
+            }
+
+            showNotification(`Tracking number saved: ${trackingNumber}`, 'success');
+        }
+
+        // Save expected delivery date
+        function saveDeliveryDate() {
+            const deliveryDate = document.getElementById('expectedDeliveryDate').value;
+
+            if (!deliveryDate) {
+                showNotification('Please select an expected delivery date', 'error');
+                return;
+            }
+
+            showNotification(`Expected delivery date saved: ${deliveryDate}`, 'success');
+        }
+
+        // Handle refund decision
+        function handleRefundDecision(decision) {
+            const refundButtons = document.querySelectorAll('.refund-btn');
+
+            if (decision === 'accept') {
+                showNotification('Refund request accepted. Awaiting administrator approval.', 'success');
+            } else if (decision === 'decline') {
+                showNotification('Refund request declined. Customer will be notified.', 'info');
+            } else if (decision === 'escalate') {
+                // Disable all refund buttons
+                refundButtons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('btn-disabled');
+                });
+                showNotification('Refund escalated to admin for review.', 'info');
+            }
+        }
+
+        // Evidence photos for lightbox
+        const evidencePhotos = [
+            'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=800&h=600&fit=crop'
+        ];
+
+        // Open lightbox with image
+        function openLightbox(index) {
+            const lightbox = document.createElement('div');
+            lightbox.id = 'lightbox';
+            lightbox.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center cursor-pointer';
+            lightbox.onclick = closeLightbox;
+
+            const img = document.createElement('img');
+            img.src = evidencePhotos[index];
+            img.alt = 'Evidence photo';
+            img.className = 'max-w-full max-h-full w-auto h-auto object-contain p-4';
+            img.onclick = (e) => e.stopPropagation();
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'absolute top-4 right-4 text-white hover:text-gray-300 transition-colors';
+            closeBtn.innerHTML = '<i class="fas fa-times text-3xl"></i>';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                closeLightbox();
+            };
+
+            lightbox.appendChild(closeBtn);
+            lightbox.appendChild(img);
+            document.body.appendChild(lightbox);
+        }
+
+        // Close lightbox
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            if (lightbox) {
+                lightbox.style.opacity = '0';
+                lightbox.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => {
+                    lightbox.remove();
+                }, 200);
+            }
+        }
+
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+
+            // Determine color based on type
+            let bgColor = '#c17c5f'; // terracotta for info
+            if (type === 'success') {
+                bgColor = '#16a34a'; // green for success
+            } else if (type === 'error') {
+                bgColor = '#dc2626'; // red for error
+            }
+
+            notification.className = 'fixed bottom-4 right-4 text-white px-6 py-3 rounded-xl shadow-lg z-50 transition-opacity duration-300';
+            notification.style.backgroundColor = bgColor;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

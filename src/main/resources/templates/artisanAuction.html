@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Auctions - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-ended {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .status-upcoming {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .table-row {
+            transition: all 0.2s ease;
+        }
+
+        .table-row:hover {
+            background-color: #f5ebe0;
+        }
+
+        .form-input {
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #c17c5f;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(193, 124, 95, 0.1);
+        }
+
+        .tab-pill {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .tab-pill.active {
+            background-color: #c17c5f;
+            color: white;
+            border-color: #c17c5f;
+        }
+
+        .tab-pill:not(.active) {
+            background-color: white;
+            color: #8b7355;
+            border-color: #e5e0d8;
+        }
+
+        .tab-pill:not(.active):hover {
+            border-color: #c17c5f;
+            color: #c17c5f;
+        }
+
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Center Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Home</a>
+                <a href="products.html" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium">Products</a>
+                <a href="artisan-dashboard.html" class="text-[#c17c5f] font-semibold">Artisan Dashboard</a>
+            </div>
+
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-2xl text-[#8b7355]"></i>
+                    <div class="text-sm">
+                        <p class="font-semibold text-[#5c4a3d]">Elena Martinez</p>
+                        <p class="text-[#8b7355]">elena@artisan.com</p>
+                    </div>
+                </div>
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Artisan Profile -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center gap-4">
+                    <img 
+                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" 
+                        alt="Elena Martinez" 
+                        class="w-14 h-14 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold">Elena Martinez</h3>
+                        <p class="text-[#d4c5b5] text-sm">Ceramics Artist</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="artisan-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-chart-line w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-products.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>My Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="artisan-auctions.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>My Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-receipt w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-chart-bar w-5"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Settings Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">My Auctions</h1>
+                    <p class="text-[#8b7355]">Manage your auction listings and track bids.</p>
+                </div>
+                <button onclick="openModal()" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg flex items-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    Add New Auction
+                </button>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="bg-white rounded-xl p-2 card-shadow mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <button class="tab-pill active px-5 py-2.5 rounded-full border-2 font-medium" onclick="filterAuctions(this, 'all')">
+                        All
+                    </button>
+                    <button class="tab-pill px-5 py-2.5 rounded-full border-2 font-medium" onclick="filterAuctions(this, 'active')">
+                        Active
+                    </button>
+                    <button class="tab-pill px-5 py-2.5 rounded-full border-2 font-medium" onclick="filterAuctions(this, 'upcoming')">
+                        Upcoming
+                    </button>
+                    <button class="tab-pill px-5 py-2.5 rounded-full border-2 font-medium" onclick="filterAuctions(this, 'ended')">
+                        Ended
+                    </button>
+                </div>
+            </div>
+
+            <!-- Auctions Table -->
+            <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-[#f5ebe0]">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Product Image</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Product Name</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Starting Bid</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Current Bid</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">End Time</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Status</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Highest Bidder</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#e5e0d8]">
+                            <!-- Auction 1 - Active -->
+                            <tr class="table-row" data-status="active">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop" 
+                                        alt="Handcrafted Ceramic Vase" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Handcrafted Ceramic Vase</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$50.00</td>
+                                <td class="px-6 py-4 text-sm font-bold text-[#c17c5f]">$125.00</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-1">
+                                        <i class="far fa-clock text-[#c17c5f]"></i>
+                                        <span>2h 34m</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-active">Active</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">JD</span>
+                                        </div>
+                                        <span>John D.</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmCancel()">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Auction 2 - Active -->
+                            <tr class="table-row" data-status="active">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f925f40?w=80&h=80&fit=crop" 
+                                        alt="Ceramic Bowl Set" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Ceramic Bowl Set</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$75.00</td>
+                                <td class="px-6 py-4 text-sm font-bold text-[#c17c5f]">$180.00</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-1">
+                                        <i class="far fa-clock text-[#c17c5f]"></i>
+                                        <span>5h 12m</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-active">Active</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">SM</span>
+                                        </div>
+                                        <span>Sarah M.</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmCancel()">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Auction 3 - Upcoming -->
+                            <tr class="table-row" data-status="upcoming">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1590422749830-674860a6e4d4?w=80&h=80&fit=crop" 
+                                        alt="Artisan Tea Set" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Artisan Tea Set</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$120.00</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">—</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-1">
+                                        <i class="far fa-calendar text-blue-500"></i>
+                                        <span>Starts in 1d 5h</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-upcoming">Upcoming</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">—</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmCancel()">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Auction 4 - Active -->
+                            <tr class="table-row" data-status="active">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1565193566173-033e4e379cda?w=80&h=80&fit=crop" 
+                                        alt="Decorative Plant Pot" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Decorative Plant Pot</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$30.00</td>
+                                <td class="px-6 py-4 text-sm font-bold text-[#c17c5f]">$65.00</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-1">
+                                        <i class="far fa-clock text-[#c17c5f]"></i>
+                                        <span>45m</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-active">Active</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">MK</span>
+                                        </div>
+                                        <span>Michael K.</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmCancel()">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Auction 5 - Ended -->
+                            <tr class="table-row" data-status="ended">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop" 
+                                        alt="Ceramic Dinner Plates" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Ceramic Dinner Plates (Set of 4)</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$80.00</td>
+                                <td class="px-6 py-4 text-sm font-bold text-gray-500">$150.00</td>
+                                <td class="px-6 py-4 text-sm text-gray-500">
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Ended</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-ended">Ended</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">EW</span>
+                                        </div>
+                                        <span>Emily W.</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" disabled>
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" disabled>
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Auction 6 - Ended -->
+                            <tr class="table-row" data-status="ended">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f925f40?w=80&h=80&fit=crop" 
+                                        alt="Rustic Mug Set" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Rustic Mug Set</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$40.00</td>
+                                <td class="px-6 py-4 text-sm font-bold text-gray-500">$95.00</td>
+                                <td class="px-6 py-4 text-sm text-gray-500">
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Ended</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-ended">Ended</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">DL</span>
+                                        </div>
+                                        <span>David L.</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" disabled>
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" disabled>
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Auction 7 - Upcoming -->
+                            <tr class="table-row" data-status="upcoming">
+                                <td class="px-6 py-4">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1590422749830-674860a6e4d4?w=80&h=80&fit=crop" 
+                                        alt="Ceramic Serving Platter" 
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <h3 class="font-semibold text-[#5c4a3d]">Ceramic Serving Platter</h3>
+                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#8b7355]">$90.00</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">—</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-1">
+                                        <i class="far fa-calendar text-blue-500"></i>
+                                        <span>Starts in 3d 12h</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-upcoming">Upcoming</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">—</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmCancel()">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
+                    <p class="text-sm text-[#8b7355]">Showing 1-7 of 12 auctions</p>
+                    <div class="flex items-center gap-2">
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors" disabled>
+                            Previous
+                        </button>
+                        <button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg">1</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors">2</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Auction Modal -->
+    <div id="auction-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl card-shadow w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-[#e5e0d8] sticky top-0 bg-white rounded-t-2xl">
+                <h3 class="text-xl font-bold text-[#5c4a3d]" style="font-family: 'Playfair Display', serif;">Add New Auction</h3>
+                <button onclick="closeModal()" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6">
+                <form id="auction-form" onsubmit="saveAuction(event)">
+                    <div class="space-y-5">
+                        <!-- Select Product -->
+                        <div>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Select Product</label>
+                            <select class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
+                                <option value="">Choose a product from your inventory</option>
+                                <option value="1">Handcrafted Ceramic Vase - $85.00</option>
+                                <option value="2">Ceramic Bowl Set - $120.00</option>
+                                <option value="3">Artisan Tea Set - $195.00</option>
+                                <option value="4">Decorative Plant Pot - $45.00</option>
+                            </select>
+                        </div>
+
+                        <!-- Starting Bid and Reserve Price Row -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[#5c4a3d] font-semibold mb-2">Starting Bid ($)</label>
+                                <input 
+                                    type="number" 
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a]"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-[#5c4a3d] font-semibold mb-2">Reserve Price ($)</label>
+                                <input 
+                                    type="number" 
+                                    placeholder="Optional"
+                                    step="0.01"
+                                    min="0"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a]"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Auction Duration -->
+                        <div>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Auction Duration</label>
+                            <select class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
+                                <option value="">Select duration</option>
+                                <option value="1">1 day</option>
+                                <option value="3">3 days</option>
+                                <option value="5">5 days</option>
+                                <option value="7">7 days</option>
+                                <option value="14">14 days</option>
+                            </select>
+                        </div>
+
+                        <!-- End Time (Auto-calculated, shown for reference) -->
+                        <div>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Expected End Time</label>
+                            <input 
+                                type="text" 
+                                placeholder="Will be calculated based on duration"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] bg-[#f5ebe0]"
+                                readonly
+                            />
+                        </div>
+
+                        <!-- Auction Description -->
+                        <div>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Auction Notes (Optional)</label>
+                            <textarea 
+                                rows="3"
+                                placeholder="Add any special notes or conditions for this auction..."
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] resize-none"
+                            ></textarea>
+                        </div>
+
+                        <!-- Terms Checkbox -->
+                        <div>
+                            <label class="flex items-start cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    class="w-5 h-5 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f] mt-0.5"
+                                    required
+                                >
+                                <span class="ml-3 text-sm text-[#8b7355]">I agree to the auction terms and conditions. I understand that once the auction ends, I am committed to selling the item to the highest bidder if the reserve price is met.</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-3 p-6 border-t border-[#e5e0d8] sticky bottom-0 bg-white rounded-b-2xl">
+                <button type="button" onclick="closeModal()" class="px-6 py-3 border-2 border-[#e5e0d8] text-[#8b7355] hover:text-[#5c4a3d] hover:border-[#c17c5f] rounded-xl font-medium transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" form="auction-form" class="px-6 py-3 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-xl font-semibold transition-colors shadow-lg">
+                    Create Auction
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active class from all links
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                // Add active class to clicked link
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // Modal functions
+        function openModal() {
+            const modal = document.getElementById('auction-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('auction-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('auction-form').reset();
+        }
+
+        // Filter auctions by status
+        function filterAuctions(button, status) {
+            // Update tab pills
+            document.querySelectorAll('.tab-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            button.classList.add('active');
+
+            // Filter table rows
+            const rows = document.querySelectorAll('.table-row');
+
+            rows.forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Save auction
+        function saveAuction(event) {
+            event.preventDefault();
+            // In a real application, you would submit the form data to a server
+            alert('Auction created successfully!');
+            closeModal();
+        }
+
+        // Confirm cancel auction
+        function confirmCancel() {
+            if (confirm('Are you sure you want to cancel this auction? This action cannot be undone.')) {
+                alert('Auction cancelled successfully!');
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('auction-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

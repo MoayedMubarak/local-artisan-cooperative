@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Settings - Artisan Co-op</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap");
+
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: #faf9f6;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                font-family: "Playfair Display", serif;
+            }
+
+            .terracotta {
+                color: #c17c5f;
+            }
+
+            .bg-terracotta {
+                background-color: #c17c5f;
+            }
+
+            .bg-terracotta-dark {
+                background-color: #a5664d;
+            }
+
+            .hover\:bg-terracotta-dark:hover {
+                background-color: #a5664d;
+            }
+
+            .border-terracotta {
+                border-color: #c17c5f;
+            }
+
+            .text-earth {
+                color: #8b7355;
+            }
+
+            .bg-earth {
+                background-color: #8b7355;
+            }
+
+            .card-shadow {
+                box-shadow:
+                    0 4px 6px -1px rgba(139, 115, 85, 0.1),
+                    0 2px 4px -1px rgba(139, 115, 85, 0.06);
+            }
+
+            .card-shadow:hover {
+                box-shadow:
+                    0 10px 15px -3px rgba(139, 115, 85, 0.15),
+                    0 4px 6px -2px rgba(139, 115, 85, 0.1);
+            }
+
+            .sidebar-link {
+                transition: all 0.2s ease;
+            }
+
+            .sidebar-link:hover {
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .sidebar-link.active {
+                background-color: rgba(255, 255, 255, 0.2);
+                border-left: 3px solid white;
+            }
+
+            .form-input {
+                transition: all 0.2s ease;
+            }
+
+            .form-input:focus {
+                border-color: #c17c5f;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(193, 124, 95, 0.1);
+            }
+
+            /* Toggle Switch */
+            .toggle-switch {
+                position: relative;
+                width: 50px;
+                height: 26px;
+            }
+
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .toggle-slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #e5e0d8;
+                transition: 0.3s;
+                border-radius: 26px;
+            }
+
+            .toggle-slider:before {
+                position: absolute;
+                content: "";
+                height: 20px;
+                width: 20px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.3s;
+                border-radius: 50%;
+            }
+
+            input:checked + .toggle-slider {
+                background-color: #c17c5f;
+            }
+
+            input:checked + .toggle-slider:before {
+                transform: translateX(24px);
+            }
+
+            /* Modal */
+            .modal-overlay {
+                transition: opacity 0.3s ease;
+            }
+
+            .modal-content {
+                transition: transform 0.3s ease;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen flex flex-col">
+        <!-- Top Navigation Bar -->
+        <nav
+            class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50"
+        >
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-hands text-2xl terracotta"></i>
+                    <span
+                        class="text-2xl font-semibold"
+                        style="font-family: &quot;Playfair Display&quot;, serif"
+                        >Artisan Co-op</span
+                    >
+                </div>
+
+                <!-- Center Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a
+                        href="index.html"
+                        class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium"
+                        >Home</a
+                    >
+                    <a
+                        href="products.html"
+                        class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium"
+                        >Products</a
+                    >
+                    <a
+                        href="artisan-dashboard.html"
+                        class="text-[#c17c5f] font-semibold"
+                        >Artisan Dashboard</a
+                    >
+                </div>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <i
+                            class="fas fa-user-circle text-2xl text-[#8b7355]"
+                        ></i>
+                        <div class="text-sm">
+                            <p class="font-semibold text-[#5c4a3d]">
+                                Elena Martinez
+                            </p>
+                            <p class="text-[#8b7355]">elena@artisan.com</p>
+                        </div>
+                    </div>
+                    <button
+                        class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative"
+                    >
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span
+                            class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                            >0</span
+                        >
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area with Sidebar -->
+        <div class="flex flex-1">
+            <!-- Left Sidebar -->
+            <aside
+                class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto"
+            >
+                <!-- Artisan Profile -->
+                <div class="p-6 border-b border-[#7a6655]">
+                    <div class="flex items-center gap-4">
+                        <img
+                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face"
+                            alt="Elena Martinez"
+                            class="w-14 h-14 rounded-full object-cover border-2 border-[#c17c5f]"
+                        />
+                        <div>
+                            <h3 class="text-white font-semibold">
+                                Elena Martinez
+                            </h3>
+                            <p class="text-[#d4c5b5] text-sm">
+                                Ceramics Artist
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="p-4">
+                    <ul class="space-y-1">
+                        <li>
+                            <a
+                                href="artisan-dashboard.html"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-chart-line w-5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="artisan-products.html"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-box w-5"></i>
+                                <span>My Products</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="artisan-auctions.html"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-gavel w-5"></i>
+                                <span>My Auctions</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="artisan-orders.html"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-receipt w-5"></i>
+                                <span>Orders</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="artisan-analytics.html"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-chart-bar w-5"></i>
+                                <span>Analytics</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="artisan-settings.html"
+                                class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-cog w-5"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Settings Section -->
+                <div class="p-4 mt-8 border-t border-[#7a6655]">
+                    <ul class="space-y-1">
+                        <li>
+                            <a
+                                href="#"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-cog w-5"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="index.html"
+                                class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg"
+                            >
+                                <i class="fas fa-sign-out-alt w-5"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 ml-64 p-8">
+                <!-- Page Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">
+                        Settings
+                    </h1>
+                    <p class="text-[#8b7355]">
+                        Manage your account preferences and shop details.
+                    </p>
+                </div>
+
+                <!-- Profile Information Section -->
+                <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">
+                        Profile Information
+                    </h2>
+
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <!-- Avatar Upload -->
+                        <div class="flex flex-col items-center">
+                            <img
+                                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face"
+                                alt="Profile Photo"
+                                class="w-32 h-32 rounded-full object-cover border-4 border-[#e5e0d8] mb-4"
+                            />
+                            <button
+                                class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm transition-colors"
+                            >
+                                Change Photo
+                            </button>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="flex-1 space-y-4">
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Full Name</label
+                                >
+                                <input
+                                    type="text"
+                                    value="Elena Martinez"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Email</label
+                                >
+                                <input
+                                    type="email"
+                                    value="elena@artisan.com"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Phone Number</label
+                                >
+                                <input
+                                    type="tel"
+                                    value="+973 3312 3456"
+                                    placeholder="+973 XXXX XXXX"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Specialty/Title</label
+                                >
+                                <input
+                                    type="text"
+                                    value="Ceramics Artist"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                />
+                            </div>
+
+                            <button
+                                class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+                            >
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shop Information Section -->
+                <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">
+                        Shop Information
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-[#5c4a3d] font-semibold mb-2"
+                                >Shop Name</label
+                            >
+                            <input
+                                type="text"
+                                value="Elena's Ceramics Studio"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[#5c4a3d] font-semibold mb-2"
+                                >Biography</label
+                            >
+                            <textarea
+                                rows="4"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white resize-none"
+                            >
+Passionate ceramics artist with over 10 years of experience creating handcrafted pottery. Each piece is uniquely designed and made with love in my home studio. I specialize in functional ware and decorative pieces inspired by nature.</textarea
+                            >
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[#5c4a3d] font-semibold mb-2"
+                                >Shop Banner Image</label
+                            >
+                            <div
+                                class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-4"
+                            >
+                                <div class="mb-4">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&h=300&fit=crop"
+                                        alt="Shop Banner"
+                                        class="w-full h-48 object-cover rounded-lg"
+                                    />
+                                </div>
+                                <div class="flex items-center justify-center">
+                                    <label class="cursor-pointer">
+                                        <span
+                                            class="bg-[#f5ebe0] hover:bg-[#e8dcc8] text-[#c17c5f] px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2"
+                                        >
+                                            <i class="fas fa-upload"></i>
+                                            Upload New Banner
+                                        </span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            class="hidden"
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+                        >
+                            Save Shop Info
+                        </button>
+                    </div>
+                </div>
+
+                <!-- My Addresses Section -->
+                <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">
+                        My Addresses
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Address Card 1 - Default -->
+                        <div
+                            class="border border-[#e5e0d8] rounded-xl p-4 relative"
+                        >
+                            <div class="absolute top-4 right-4 flex gap-2">
+                                <button
+                                    class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-1"
+                                >
+                                    <i class="fas fa-pen text-sm"></i>
+                                </button>
+                                <button
+                                    class="text-[#8b7355] hover:text-red-500 transition-colors p-1"
+                                >
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-start gap-3 mb-2">
+                                <div
+                                    class="w-10 h-10 bg-[#f5ebe0] rounded-lg flex items-center justify-center flex-shrink-0"
+                                >
+                                    <i
+                                        class="fas fa-map-marker-alt text-[#c17c5f]"
+                                    ></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3
+                                            class="font-semibold text-[#5c4a3d]"
+                                        >
+                                            Studio
+                                        </h3>
+                                        <span
+                                            class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium"
+                                            >Default</span
+                                        >
+                                    </div>
+                                    <p class="text-sm text-[#8b7355]">
+                                        Block 312, Road 2815<br />Seef District,
+                                        Manama<br />Bahrain
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Card 2 -->
+                        <div
+                            class="border border-[#e5e0d8] rounded-xl p-4 relative"
+                        >
+                            <div class="absolute top-4 right-4 flex gap-2">
+                                <button
+                                    class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-1"
+                                >
+                                    <i class="fas fa-pen text-sm"></i>
+                                </button>
+                                <button
+                                    class="text-[#8b7355] hover:text-red-500 transition-colors p-1"
+                                >
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-start gap-3 mb-2">
+                                <div
+                                    class="w-10 h-10 bg-[#f5ebe0] rounded-lg flex items-center justify-center flex-shrink-0"
+                                >
+                                    <i
+                                        class="fas fa-map-marker-alt text-[#c17c5f]"
+                                    ></i>
+                                </div>
+                                <div>
+                                    <h3
+                                        class="font-semibold text-[#5c4a3d] mb-1"
+                                    >
+                                        Home
+                                    </h3>
+                                    <p class="text-sm text-[#8b7355]">
+                                        Building 45, Road 1204<br />Juffair,
+                                        Manama<br />Bahrain
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add New Address Card -->
+                        <div
+                            onclick="openModal()"
+                            class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#c17c5f] hover:bg-[#f5ebe0] transition-all min-h-[120px]"
+                        >
+                            <div
+                                class="w-12 h-12 bg-[#f5ebe0] rounded-full flex items-center justify-center mb-2"
+                            >
+                                <i
+                                    class="fas fa-plus text-[#c17c5f] text-xl"
+                                ></i>
+                            </div>
+                            <span class="text-[#8b7355] font-medium"
+                                >Add New Address</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Preferences Section -->
+                <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">
+                        Notification Preferences
+                    </h2>
+
+                    <div class="space-y-4">
+                        <!-- Toggle 1 -->
+                        <div
+                            class="flex items-center justify-between py-3 border-b border-[#e5e0d8] last:border-0"
+                        >
+                            <div>
+                                <p class="font-semibold text-[#5c4a3d]">
+                                    New Order Received
+                                </p>
+                                <p class="text-sm text-[#8b7355]">
+                                    Get notified when a customer places an order
+                                </p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 2 -->
+                        <div
+                            class="flex items-center justify-between py-3 border-b border-[#e5e0d8] last:border-0"
+                        >
+                            <div>
+                                <p class="font-semibold text-[#5c4a3d]">
+                                    Bid Placed on My Auction
+                                </p>
+                                <p class="text-sm text-[#8b7355]">
+                                    Receive alerts when someone bids on your
+                                    auction
+                                </p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 3 -->
+                        <div
+                            class="flex items-center justify-between py-3 border-b border-[#e5e0d8] last:border-0"
+                        >
+                            <div>
+                                <p class="font-semibold text-[#5c4a3d]">
+                                    Auction Ending Soon
+                                </p>
+                                <p class="text-sm text-[#8b7355]">
+                                    Reminder before your auction ends
+                                </p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 4 -->
+                        <div
+                            class="flex items-center justify-between py-3 border-b border-[#e5e0d8] last:border-0"
+                        >
+                            <div>
+                                <p class="font-semibold text-[#5c4a3d]">
+                                    Review Posted on My Product
+                                </p>
+                                <p class="text-sm text-[#8b7355]">
+                                    Know when customers leave reviews
+                                </p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 5 -->
+                        <div
+                            class="flex items-center justify-between py-3 border-b border-[#e5e0d8] last:border-0"
+                        >
+                            <div>
+                                <p class="font-semibold text-[#5c4a3d]">
+                                    Refund Request Received
+                                </p>
+                                <p class="text-sm text-[#8b7355]">
+                                    Alert for refund or return requests
+                                </p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">
+                        Security
+                    </h2>
+
+                    <div class="space-y-4 max-w-md">
+                        <div>
+                            <label
+                                class="block text-[#5c4a3d] font-semibold mb-2"
+                                >Current Password</label
+                            >
+                            <input
+                                type="password"
+                                placeholder="Enter current password"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[#5c4a3d] font-semibold mb-2"
+                                >New Password</label
+                            >
+                            <input
+                                type="password"
+                                placeholder="Enter new password"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[#5c4a3d] font-semibold mb-2"
+                                >Confirm New Password</label
+                            >
+                            <input
+                                type="password"
+                                placeholder="Confirm new password"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                            />
+                        </div>
+
+                        <button
+                            class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+                        >
+                            Update Password
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Danger Zone Section -->
+                <div class="bg-white rounded-xl border-2 border-red-200 p-6">
+                    <h2 class="text-xl font-bold text-red-600 mb-2">
+                        Danger Zone
+                    </h2>
+                    <p class="text-[#8b7355] mb-4">
+                        Once you delete your account, there is no going back.
+                        Please be certain.
+                    </p>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-[#5c4a3d]">
+                                Delete Account
+                            </h3>
+                            <p class="text-sm text-[#8b7355]">
+                                Permanently remove your account and all
+                                associated data
+                            </p>
+                        </div>
+                        <button
+                            class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+                        >
+                            Delete My Account
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Add Address Modal -->
+        <div
+            id="address-modal"
+            class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 modal-overlay"
+        >
+            <div
+                class="bg-white rounded-2xl card-shadow w-full max-w-lg max-h-[90vh] overflow-y-auto modal-content"
+            >
+                <!-- Modal Header -->
+                <div
+                    class="flex items-center justify-between p-6 border-b border-[#e5e0d8] sticky top-0 bg-white rounded-t-2xl"
+                >
+                    <h3
+                        class="text-xl font-bold text-[#5c4a3d]"
+                        style="font-family: &quot;Playfair Display&quot;, serif"
+                    >
+                        Add New Address
+                    </h3>
+                    <button
+                        onclick="closeModal()"
+                        class="text-[#8b7355] hover:text-[#c17c5f] transition-colors"
+                    >
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <form id="address-form" onsubmit="saveAddress(event)">
+                        <div class="space-y-4">
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Address Label</label
+                                >
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Home, Studio, Warehouse"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Street Address</label
+                                >
+                                <input
+                                    type="text"
+                                    placeholder="Building number, Road number"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-[#5c4a3d] font-semibold mb-2"
+                                        >City</label
+                                    >
+                                    <input
+                                        type="text"
+                                        placeholder="Manama"
+                                        class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-[#5c4a3d] font-semibold mb-2"
+                                        >ZIP Code</label
+                                    >
+                                    <input
+                                        type="text"
+                                        placeholder="12345"
+                                        class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[#5c4a3d] font-semibold mb-2"
+                                    >Country</label
+                                >
+                                <select
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                    required
+                                >
+                                    <option value="">Select Country</option>
+                                    <option value="BH" selected>Bahrain</option>
+                                    <option value="AE">
+                                        United Arab Emirates
+                                    </option>
+                                    <option value="SA">Saudi Arabia</option>
+                                    <option value="KW">Kuwait</option>
+                                    <option value="QA">Qatar</option>
+                                    <option value="OM">Oman</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        class="w-5 h-5 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f]"
+                                    />
+                                    <span class="ml-3 text-sm text-[#8b7355]"
+                                        >Set as Default Address</span
+                                    >
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Modal Footer -->
+                <div
+                    class="flex items-center justify-end gap-3 p-6 border-t border-[#e5e0d8] sticky bottom-0 bg-white rounded-b-2xl"
+                >
+                    <button
+                        type="button"
+                        onclick="closeModal()"
+                        class="px-6 py-3 border-2 border-[#e5e0d8] text-[#8b7355] hover:text-[#5c4a3d] hover:border-[#c17c5f] rounded-xl font-medium transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        form="address-form"
+                        class="px-6 py-3 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-xl font-semibold transition-colors shadow-lg"
+                    >
+                        Save Address
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Sidebar navigation active state handling
+            document.querySelectorAll(".sidebar-link").forEach((link) => {
+                link.addEventListener("click", function (e) {
+                    // Remove active class from all links
+                    document.querySelectorAll(".sidebar-link").forEach((l) => {
+                        l.classList.remove("active");
+                        l.classList.add("text-[#d4c5b5]");
+                    });
+
+                    // Add active class to clicked link
+                    this.classList.add("active");
+                    this.classList.remove("text-[#d4c5b5]");
+                });
+            });
+
+            // Modal functions
+            function openModal() {
+                const modal = document.getElementById("address-modal");
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            }
+
+            function closeModal() {
+                const modal = document.getElementById("address-modal");
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+                document.getElementById("address-form").reset();
+            }
+
+            // Save address
+            function saveAddress(event) {
+                event.preventDefault();
+                // In a real application, you would submit the form data to a server
+                showNotification("Address saved successfully!");
+                closeModal();
+            }
+
+            // Show notification
+            function showNotification(message) {
+                const notification = document.createElement("div");
+                notification.className =
+                    "fixed bottom-4 right-4 bg-[#5c4a3d] text-white px-6 py-3 rounded-xl shadow-lg z-50";
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.opacity = "0";
+                    notification.style.transition = "opacity 0.3s ease";
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 2000);
+            }
+
+            // Close modal when clicking outside
+            document
+                .getElementById("address-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+        </script>
+    </body>
+</html>
