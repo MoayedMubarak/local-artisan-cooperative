@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.mindrot.jbcrypt.BCrypt;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,7 +29,7 @@ public class AuthController {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (user.getPassword().equals(password)) {
+            if (BCrypt.checkpw(password, user.getPassword())) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("user", user);
@@ -44,6 +45,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "message", "Email already exists"));
         }
         customer.setRole("CUSTOMER");
+        customer.setPassword(BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt()));
         userRepository.save(customer);
         return ResponseEntity.ok(Map.of("success", true, "user", customer));
     }
@@ -54,6 +56,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "message", "Email already exists"));
         }
         artisan.setRole("ARTISAN");
+        artisan.setPassword(BCrypt.hashpw(artisan.getPassword(), BCrypt.gensalt()));
         userRepository.save(artisan);
         return ResponseEntity.ok(Map.of("success", true, "user", artisan));
     }

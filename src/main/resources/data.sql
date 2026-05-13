@@ -20,13 +20,13 @@ INSERT INTO product_categories (category_id, name) OVERRIDING SYSTEM VALUE VALUE
 -- Artisans: IDs 2-4
 -- Customers: IDs 5-7
 INSERT INTO users (user_id, name, email, password, role) OVERRIDING SYSTEM VALUE VALUES
-  (1,  'Alice Admin',   'alice@artsyvibe.com',   'admin123',    'ADMIN'),
-  (2,  'Elena Craft',   'elena@artsyvibe.com',   'password123', 'ARTISAN'),
-  (3,  'Marco Pottery', 'marco@artsyvibe.com',   'password123', 'ARTISAN'),
-  (4,  'Zara Weaves',   'zara@artsyvibe.com',    'password123', 'ARTISAN'),
-  (5,  'John Doe',      'john@example.com',      'customer123', 'CUSTOMER'),
-  (6,  'Sarah Miller',  'sarah@example.com',     'customer123', 'CUSTOMER'),
-  (7,  'Tom Brown',     'tom@example.com',       'customer123', 'CUSTOMER');
+  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ADMIN'),
+  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
+  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
+  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
+  (5,  'John Doe',      'john@example.com',      '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
+  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
+  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER');
 
 -- ── 3. Admins (joined subtable) ──────────────────────────────
 INSERT INTO admins (user_id) OVERRIDING SYSTEM VALUE VALUES (1);
