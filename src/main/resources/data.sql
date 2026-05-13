@@ -28,6 +28,7 @@ INSERT INTO users (user_id, name, email, password, role) OVERRIDING SYSTEM VALUE
   (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
   (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER');
 
+
 -- ── 3. Admins (joined subtable) ──────────────────────────────
 INSERT INTO admins (user_id) OVERRIDING SYSTEM VALUE VALUES (1);
 
