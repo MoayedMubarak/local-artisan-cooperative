@@ -138,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const unreadCount = document.querySelectorAll('.notification-card[data-read="false"]').length;
         const badge = document.getElementById('notification-badge');
         
+        sessionStorage.setItem('notificationCount', unreadCount.toString());
+        
         if (unreadCount > 0) {
             badge.textContent = unreadCount;
             badge.style.display = 'flex';
