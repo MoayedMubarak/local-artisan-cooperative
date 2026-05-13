@@ -14,6 +14,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceRange = document.getElementById('priceRange');
     const priceValue = document.getElementById('priceValue');
 
+    // Login state elements
+    const loginButtonWrapper = document.getElementById('login-button-wrapper');
+    const userSection = document.getElementById('user-section');
+    const navUserName = document.getElementById('nav-user-name');
+    const navUserEmail = document.getElementById('nav-user-email');
+    const notificationBadge = document.getElementById('notification-badge');
+    const cartBadge = document.getElementById('cart-badge');
+
+    function updateLoginState() {
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+        if (loggedIn) {
+            loginButtonWrapper?.classList.add('hidden');
+            userSection?.classList.remove('hidden');
+
+            const userName = sessionStorage.getItem('userName') || 'John Doe';
+            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
+            if (navUserName) navUserName.textContent = userName;
+            if (navUserEmail) navUserEmail.textContent = userEmail;
+
+            updateNotificationBadge();
+        } else {
+            loginButtonWrapper?.classList.remove('hidden');
+            userSection?.classList.add('hidden');
+        }
+
+        updateCartBadge();
+    }
+
     priceRange?.addEventListener('input', function () {
         priceValue.textContent = this.value + ' BD';
         applyFilters();
@@ -228,7 +256,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial render — apply default filters
     applyFilters();
+    updateLoginState();
 });
+
+// ============================================================
+// Utility helpers (shared across pages via global scope)
+// ============================================================
+
+/**
+ * Read the notification count from sessionStorage and update any badge on the page.
+ */
+function updateNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    if (!badge) return;
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+/**
+ * Read cart item count from sessionStorage and update any cart badge on the page.
+ */
+function updateCartBadge() {
+    document.querySelectorAll('.fa-shopping-cart')
+        .forEach(icon => {
+            const badge = icon.parentElement?.querySelector('span');
+            if (!badge) return;
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            badge.textContent = count;
+        });
+}
 
 // ============================================================
 // Navigate to Product Detail Page

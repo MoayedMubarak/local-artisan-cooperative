@@ -4,6 +4,34 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Login state elements
+    const loginButtonWrapper = document.getElementById('login-button-wrapper');
+    const userSection = document.getElementById('user-section');
+    const navUserName = document.getElementById('nav-user-name');
+    const navUserEmail = document.getElementById('nav-user-email');
+    const notificationBadge = document.getElementById('notification-badge');
+    const cartBadge = document.getElementById('cart-badge');
+
+    function updateLoginState() {
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+        if (loggedIn) {
+            loginButtonWrapper?.classList.add('hidden');
+            userSection?.classList.remove('hidden');
+
+            const userName = sessionStorage.getItem('userName') || 'John Doe';
+            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
+            if (navUserName) navUserName.textContent = userName;
+            if (navUserEmail) navUserEmail.textContent = userEmail;
+
+            updateNotificationBadge();
+        } else {
+            loginButtonWrapper?.classList.remove('hidden');
+            userSection?.classList.add('hidden');
+        }
+
+        updateCartBadge();
+    }
+
     // ----------------------------------------------------------
     // 1. Filter pills
     // ----------------------------------------------------------
@@ -41,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     updateNotificationBadge();
     updateCartBadge();
+    updateLoginState();
 });
 
 // ============================================================
