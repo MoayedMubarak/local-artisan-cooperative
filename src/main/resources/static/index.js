@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loginButtonWrapper = document.getElementById('login-button-wrapper');
     const userSection = document.getElementById('user-section');
-    const signOutButton = document.getElementById('sign-out-button');
     const navUserName = document.getElementById('nav-user-name');
     const navUserEmail = document.getElementById('nav-user-email');
     const notificationBadge = document.getElementById('notification-badge');
@@ -45,16 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateCartBadge();
     }
-
-    signOutButton?.addEventListener('click', () => {
-        sessionStorage.removeItem('isLoggedIn');
-        sessionStorage.removeItem('userName');
-        sessionStorage.removeItem('userEmail');
-        sessionStorage.removeItem('notificationCount');
-        sessionStorage.removeItem('cartCount');
-        updateLoginState();
-        showToast('You have logged out.', 'info');
-    });
 
     searchButton?.addEventListener('click', handleSearch);
 

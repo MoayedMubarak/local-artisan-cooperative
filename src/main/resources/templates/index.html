@@ -78,18 +78,6 @@
             animation: pulse 2s infinite;
         }
         
-        .user-signout-bar {
-            opacity: 0;
-            transform: translateY(6px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            pointer-events: none;
-        }
-        .group:hover .user-signout-bar {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-        
         @keyframes pulse {
             0%, 100% {
                 opacity: 1;
@@ -135,25 +123,15 @@
                 </div>
 
                 <div id="user-section" class="hidden items-center space-x-4">
-                    <div class="relative group">
-                        <a href="/profile" id="user-menu-button" class="group flex items-center gap-2 transition-colors">
-                            <div class="relative">
-                                <i class="fas fa-user-circle text-2xl text-[#8b7355] group-hover:text-[#c17c5f] transition-colors"></i>
-                                <span class="absolute -top-1 -right-1 bg-[#c17c5f] border-2 border-white text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                                    !
-                                </span>
+                    <a href="/profile" id="user-menu-button" class="flex items-center gap-2 transition-colors text-[#8b7355] hover:text-[#c17c5f]">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                        <div class="hidden md:flex items-center space-x-2 text-sm">
+                            <div>
+                                <p id="nav-user-name" class="font-semibold text-[#5c4a3d] transition-colors">John Doe</p>
+                                <p id="nav-user-email" class="text-[#8b7355] transition-colors">john@example.com</p>
                             </div>
-                            <div class="hidden md:flex items-center space-x-2 text-sm">
-                                <div>
-                                    <p id="nav-user-name" class="font-semibold text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">John Doe</p>
-                                    <p id="nav-user-email" class="text-[#8b7355] group-hover:text-[#c17c5f] transition-colors">john@example.com</p>
-                                </div>
-                            </div>
-                        </a>
-                        <div class="user-signout-bar absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-full bg-white border border-[#e5e0d8] px-4 py-2 shadow-lg text-sm text-[#5c4a3d] font-medium">
-                            <button id="sign-out-button" class="hover:text-[#c17c5f]">Sign Out</button>
                         </div>
-                    </div>
+                    </a>
 
                     <a id="notifications-link" href="/notifications" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
                         <i class="fas fa-bell text-xl"></i>
