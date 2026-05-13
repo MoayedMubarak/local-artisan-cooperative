@@ -35,7 +35,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 1. Role — toggle artisan section
     // ----------------------------------------------------------
-    setRole('customer'); // change to 'artisan' to show shop section
+    const userProfileStr = sessionStorage.getItem('userProfile');
+    let userRole = 'CUSTOMER';
+    if (userProfileStr) {
+        try {
+            const userProfile = JSON.parse(userProfileStr);
+            userRole = userProfile.role || 'CUSTOMER';
+            
+            // Update sidebar info
+            const sidebarName = document.querySelector('aside h2');
+            const sidebarEmail = document.querySelector('aside p');
+            const sidebarRoleBadge = document.getElementById('role-badge');
+            
+            if (sidebarName) sidebarName.textContent = userProfile.name || 'John Doe';
+            if (sidebarEmail) sidebarEmail.textContent = userProfile.email || 'john@example.com';
+            if (sidebarRoleBadge) sidebarRoleBadge.textContent = userRole === 'ARTISAN' ? 'Artisan' : 'Customer';
+            
+            // Update form inputs
+            const personalInfoSection = document.querySelector('section:first-of-type');
+            if (personalInfoSection) {
+                const nameInput = personalInfoSection.querySelector('input[type="text"]');
+                const emailInput = personalInfoSection.querySelector('input[type="email"]');
+                const phoneInput = personalInfoSection.querySelector('input[type="tel"]');
+                
+                if (nameInput) nameInput.value = userProfile.name || '';
+                if (emailInput) emailInput.value = userProfile.email || '';
+                if (phoneInput) phoneInput.value = userProfile.phone || '';
+            }
+            
+            // Update shop info if artisan
+            if (userRole === 'ARTISAN') {
+                const artisanSection = document.getElementById('artisan-section');
+                if (artisanSection) {
+                    const shopNameInput = artisanSection.querySelector('input[type="text"]');
+                    const bioTextarea = artisanSection.querySelector('textarea');
+                    
+                    if (shopNameInput) shopNameInput.value = userProfile.shopName || '';
+                    if (bioTextarea) bioTextarea.value = userProfile.biography || '';
+                }
+            }
+        } catch (e) {
+            console.error("Failed to parse user profile", e);
+        }
+    }
+    
+    setRole(userRole.toLowerCase());
 
     // ----------------------------------------------------------
     // 2. Custom checkboxes (modals)

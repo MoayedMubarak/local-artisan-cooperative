@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('userName', data.user.name);
                 sessionStorage.setItem('userRole', data.user.role);
                 sessionStorage.setItem('userId', data.user.userId);
+                sessionStorage.setItem('userProfile', JSON.stringify(data.user));
 
                 // Redirect back to the originally requested page (if any)
                 const url = new URL(window.location.href);
@@ -211,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('userName', data.user.name);
                     sessionStorage.setItem('userRole', data.user.role);
                     sessionStorage.setItem('userId', data.user.userId);
+                    sessionStorage.setItem('userProfile', JSON.stringify(data.user));
                     
                     showToast('Account created! Welcome to ArtsyVibe.', 'success');
 
