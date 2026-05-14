@@ -139,7 +139,7 @@ function showToast(message, type = 'info') {
 function updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
@@ -152,7 +152,7 @@ function updateCartBadge() {
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
             badge.textContent = count;
         });
 }

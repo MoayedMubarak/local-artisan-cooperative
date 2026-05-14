@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. Delivery Toggle (Ship vs Pickup) ---
     window.selectDelivery = function(mode) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to change delivery options.')) return;
         isShipping = (mode === 'ship');
 
         const shipCard = document.getElementById('card-ship');
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. Quantity Update ---
     window.updateQuantity = function(button, change) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to update item quantities.')) return;
         const cartItem = button.closest('.cart-item');
         const quantitySpan = cartItem.querySelector('.quantity-value');
         const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent; // Matches the BD price
@@ -90,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. Remove Item ---
     window.removeItem = function(button) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to remove items from your cart.')) return;
         const cartItem = button.closest('.cart-item');
 
         // Animation
@@ -100,15 +103,36 @@ document.addEventListener('DOMContentLoaded', () => {
             cartItem.remove();
             updateCartTotal();
 
-            // Check if empty
-            if (!document.querySelectorAll('.cart-item').length) {
-                alert('Your cart is empty!'); // Fallback or could show empty state div
-            }
+            checkCartEmpty();
         }, 300);
     };
 
+    function checkCartEmpty() {
+        const container = document.getElementById('cart-items-container');
+        const emptyMsg = document.getElementById('empty-cart-msg');
+        const summary = document.querySelector('.mt-4.pt-4.border-t-2'); // Order summary div
+        const confirmBtn = document.getElementById('confirm-btn');
+
+        if (container && !container.querySelectorAll('.cart-item').length) {
+            emptyMsg?.classList.remove('hidden');
+            if (summary) summary.style.display = 'none';
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        } else {
+            emptyMsg?.classList.add('hidden');
+            if (summary) summary.style.display = 'block';
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    }
+
     // --- 4. Payment Method Selection ---
     window.selectPayment = function(card) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to change payment method.')) return;
         document.querySelectorAll('.payment-card').forEach(c => {
             c.classList.remove('selected');
             const radio = c.querySelector('input[type="radio"]');
@@ -187,6 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load addresses from DB
     loadCartAddresses();
 
+    // Check if empty on load
+    checkCartEmpty();
+
     // Initialize Calculation on load
     updateCartTotal();
     updateLoginState();
@@ -260,7 +287,7 @@ function escapeHtml(str) {
 function updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
@@ -273,7 +300,7 @@ function updateCartBadge() {
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
             badge.textContent = count;
         });
 }
