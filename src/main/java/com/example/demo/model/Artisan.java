@@ -12,5 +12,4 @@ public class Artisan extends User {
     private String shopName;
     private String biography;
     private String profilePicture;
-    private boolean isApproved = false;
 }
