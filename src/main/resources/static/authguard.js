@@ -148,7 +148,18 @@
             sessionStorage.setItem('userName', data.user.name);
             applyNavState(data.user);
             updateNotificationBadge();
-            updateCartBadge();
+            
+            // Sync cart count from database
+            fetch(`/api/cart?email=${encodeURIComponent(storedEmail)}`)
+              .then(r => r.json())
+              .then(cartData => {
+                if (cartData.success) {
+                  sessionStorage.setItem('cartCount', cartData.items.length);
+                  updateCartBadge();
+                }
+              })
+              .catch(err => console.error("Cart sync failed", err));
+
             // Also update any other profile images on the page (e.g. sidebar)
             document.querySelectorAll('img[alt="' + data.user.name + '"], aside img.w-14.h-14').forEach(img => {
                 img.src = data.user.profilePicture;

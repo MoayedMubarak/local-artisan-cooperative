@@ -204,7 +204,7 @@
             </nav>
 
             <!-- Product Detail Section -->
-            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow mb-8">
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow mb-8" th:attr="data-product-id=${product != null ? product.id : 1}">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Left: Product Images -->
                     <div>
