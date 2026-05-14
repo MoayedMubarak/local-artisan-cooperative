@@ -137,4 +137,9 @@ public class MainController {
         }
         return "ProductDetailsStandard";
     }
+
+    @GetMapping("/admin")
+    public String adminDashboard() {
+        return "admindashboard";
+    }
 }

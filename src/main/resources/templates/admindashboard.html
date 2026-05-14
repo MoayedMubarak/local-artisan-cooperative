@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard — ArtsyVibe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+        body { background: #faf9f6; color: #5c4a3d; }
+
+        .card-shadow { box-shadow: 0 2px 12px rgba(92,74,61,0.08); }
+
+        /* Sidebar */
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 16px; border-radius: 10px; cursor: pointer;
+            color: #8b7355; font-size: 0.875rem; font-weight: 500;
+            transition: background 0.15s, color 0.15s;
+            position: relative;
+        }
+        .sidebar-link:hover { background: #f5ebe0; color: #5c4a3d; }
+        .sidebar-active { background: #fdf0ea !important; color: #c17c5f !important; font-weight: 600; }
+        .sidebar-active i { color: #c17c5f; }
+
+        /* KPI cards */
+        .kpi-card { border-radius: 14px; padding: 22px 20px; transition: transform 0.15s; }
+        .kpi-card:hover { transform: translateY(-2px); }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f5ebe0; color: #8b7355; font-size: 0.75rem; font-weight: 600;
+             text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 20px; text-align: left; }
+        th:first-child { border-radius: 10px 0 0 10px; }
+        th:last-child { border-radius: 0 10px 10px 0; }
+
+        /* Review filter buttons */
+        .filter-active { background: #c17c5f; color: #fff; border-color: #c17c5f; }
+        .filter-inactive { background: #fff; color: #8b7355; border-color: #e5e0d8; }
+
+        /* Badge */
+        .nav-badge {
+            min-width: 18px; height: 18px; border-radius: 9px;
+            background: #c17c5f; color: #fff; font-size: 0.65rem;
+            font-weight: 700; display: inline-flex; align-items: center;
+            justify-content: center; padding: 0 4px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            z-index: 9000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #fff; border-radius: 18px; padding: 32px;
+            width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f5ebe0; }
+        ::-webkit-scrollbar-thumb { background: #c17c5f; border-radius: 3px; }
+
+        /* line-clamp */
+        .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ═══════════════════════════════════════════════════════ NAVBAR ═══ -->
+<nav class="bg-white border-b border-[#e5e0d8] px-6 py-3 flex items-center justify-between sticky top-0 z-50 card-shadow">
+    <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2 text-[#5c4a3d] hover:text-[#c17c5f] transition-colors">
+            <img src="/Logo.png" alt="ArtsyVibe" class="h-8 w-8 object-contain" onerror="this.style.display='none'" />
+            <span style="font-family:'Playfair Display',serif" class="text-lg font-bold">ArtsyVibe</span>
+        </a>
+        <span class="ml-2 px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-bold tracking-wide">ADMIN</span>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="text-sm text-[#8b7355]">Welcome, <strong id="admin-name" class="text-[#5c4a3d]">Admin</strong></span>
+        <button onclick="handleLogout()"
+            class="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#e5e0d8] text-sm font-medium text-[#8b7355] hover:bg-[#f5ebe0] hover:text-[#c17c5f] transition-colors">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ LAYOUT ═══ -->
+<div class="flex flex-1">
+
+    <!-- ─── Sidebar ─────────────────────────────────────────────────── -->
+    <aside class="w-60 bg-white border-r border-[#e5e0d8] flex flex-col py-6 px-3 gap-1 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto">
+        <p class="text-[10px] font-bold text-[#b8a99a] uppercase tracking-widest px-4 mb-2">Dashboard</p>
+
+        <div class="sidebar-link sidebar-active" data-section="overview" onclick="showSection('overview')">
+            <i class="fas fa-chart-pie w-4 text-center"></i>
+            <span>Overview</span>
+        </div>
+
+        <p class="text-[10px] font-bold text-[#b8a99a] uppercase tracking-widest px-4 mt-4 mb-2">Management</p>
+
+        <div class="sidebar-link" data-section="users" onclick="showSection('users')">
+            <i class="fas fa-users w-4 text-center"></i>
+            <span class="flex-1">User Accounts</span>
+        </div>
+
+        <div class="sidebar-link" data-section="artisans" onclick="showSection('artisans')">
+            <i class="fas fa-user-check w-4 text-center"></i>
+            <span class="flex-1">Artisan Approvals</span>
+            <span id="badge-artisans" class="nav-badge hidden">0</span>
+        </div>
+
+        <p class="text-[10px] font-bold text-[#b8a99a] uppercase tracking-widest px-4 mt-4 mb-2">Moderation</p>
+
+        <div class="sidebar-link" data-section="reviews" onclick="showSection('reviews')">
+            <i class="fas fa-flag w-4 text-center"></i>
+            <span class="flex-1">Content Moderation</span>
+            <span id="badge-reviews" class="nav-badge hidden">0</span>
+        </div>
+
+        <div class="sidebar-link" data-section="disputes" onclick="showSection('disputes')">
+            <i class="fas fa-balance-scale w-4 text-center"></i>
+            <span class="flex-1">Disputes</span>
+            <span id="badge-disputes" class="nav-badge hidden">0</span>
+        </div>
+    </aside>
+
+    <!-- ─── Main Content ─────────────────────────────────────────────── -->
+    <main class="flex-1 p-8 overflow-auto">
+
+        <!-- ══════════════════════════ OVERVIEW ══════════════════════════ -->
+        <div id="section-overview" class="admin-section">
+            <div class="mb-7">
+                <h1 class="text-2xl font-bold text-[#5c4a3d]">Dashboard Overview</h1>
+                <p class="text-sm text-[#8b7355] mt-1">Platform health and key metrics at a glance.</p>
+            </div>
+
+            <!-- KPI Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+
+                <div class="kpi-card bg-white border border-[#e5e0d8] card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#f5ebe0] flex items-center justify-center">
+                            <i class="fas fa-users text-[#c17c5f]"></i>
+                        </div>
+                        <span class="text-xs text-[#8b7355] font-medium">Total</span>
+                    </div>
+                    <p id="stat-total-users" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Registered Users</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-[#e5e0d8] card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+                            <i class="fas fa-box-open text-green-600"></i>
+                        </div>
+                        <span class="text-xs text-[#8b7355] font-medium">Active</span>
+                    </div>
+                    <p id="stat-products" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Listed Products</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-[#e5e0d8] card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#fdf0ea] flex items-center justify-center">
+                            <i class="fas fa-gavel text-[#c17c5f]"></i>
+                        </div>
+                        <span class="text-xs text-[#8b7355] font-medium">Live</span>
+                    </div>
+                    <p id="stat-auctions" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Open Auctions</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-[#e5e0d8] card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-600"></i>
+                        </div>
+                        <span class="text-xs text-[#8b7355] font-medium">7 days</span>
+                    </div>
+                    <p id="stat-weekly-sales" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Weekly Sales</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-[#e5e0d8] card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                            <i class="fas fa-shopping-bag text-blue-600"></i>
+                        </div>
+                        <span class="text-xs text-[#8b7355] font-medium">All time</span>
+                    </div>
+                    <p id="stat-orders" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Total Orders</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-yellow-200 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center">
+                            <i class="fas fa-user-clock text-yellow-600"></i>
+                        </div>
+                        <span class="text-xs text-yellow-600 font-medium">Pending</span>
+                    </div>
+                    <p id="stat-pending" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Artisan Approvals</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-red-100 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                            <i class="fas fa-flag text-red-500"></i>
+                        </div>
+                        <span class="text-xs text-red-500 font-medium">Needs review</span>
+                    </div>
+                    <p id="stat-flagged" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Flagged Reviews</p>
+                </div>
+
+                <div class="kpi-card bg-white border border-orange-100 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
+                            <i class="fas fa-balance-scale text-orange-500"></i>
+                        </div>
+                        <span class="text-xs text-orange-500 font-medium">Open</span>
+                    </div>
+                    <p id="stat-disputes" class="text-3xl font-bold text-[#5c4a3d]">—</p>
+                    <p class="text-sm text-[#8b7355] mt-1">Active Disputes</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Shortcuts -->
+            <div class="bg-white rounded-2xl border border-[#e5e0d8] card-shadow p-6">
+                <h3 class="text-base font-semibold text-[#5c4a3d] mb-4">Quick Actions</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button onclick="showSection('artisans')"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[#e5e0d8] hover:bg-[#fdf0ea] hover:border-[#c17c5f] transition-colors group">
+                        <i class="fas fa-user-check text-xl text-[#8b7355] group-hover:text-[#c17c5f]"></i>
+                        <span class="text-xs font-medium text-[#8b7355] group-hover:text-[#c17c5f]">Review Artisans</span>
+                    </button>
+                    <button onclick="showSection('users')"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[#e5e0d8] hover:bg-[#fdf0ea] hover:border-[#c17c5f] transition-colors group">
+                        <i class="fas fa-users text-xl text-[#8b7355] group-hover:text-[#c17c5f]"></i>
+                        <span class="text-xs font-medium text-[#8b7355] group-hover:text-[#c17c5f]">Manage Users</span>
+                    </button>
+                    <button onclick="showSection('reviews'); loadReviews('flagged')"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[#e5e0d8] hover:bg-[#fdf0ea] hover:border-[#c17c5f] transition-colors group">
+                        <i class="fas fa-flag text-xl text-[#8b7355] group-hover:text-[#c17c5f]"></i>
+                        <span class="text-xs font-medium text-[#8b7355] group-hover:text-[#c17c5f]">Flagged Reviews</span>
+                    </button>
+                    <button onclick="showSection('disputes')"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[#e5e0d8] hover:bg-[#fdf0ea] hover:border-[#c17c5f] transition-colors group">
+                        <i class="fas fa-balance-scale text-xl text-[#8b7355] group-hover:text-[#c17c5f]"></i>
+                        <span class="text-xs font-medium text-[#8b7355] group-hover:text-[#c17c5f]">Disputes</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════ USER MANAGEMENT ══════════════════════ -->
+        <div id="section-users" class="admin-section hidden">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-[#5c4a3d]">User Accounts</h1>
+                    <p class="text-sm text-[#8b7355] mt-1">View, suspend, or remove any user account.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-[#e5e0d8] card-shadow overflow-hidden">
+                <!-- Filters -->
+                <div class="flex flex-wrap items-center gap-3 p-5 border-b border-[#e5e0d8]">
+                    <div class="relative flex-1 min-w-[200px]">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#b8a99a] text-sm"></i>
+                        <input id="user-search" type="text" placeholder="Search by name or email…"
+                            oninput="onUserSearch()"
+                            class="w-full pl-9 pr-4 py-2 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6]" />
+                    </div>
+                    <select id="user-role-filter" onchange="onUserRoleFilter()"
+                        class="px-4 py-2 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6] text-[#5c4a3d] font-medium">
+                        <option value="ALL">All Roles</option>
+                        <option value="CUSTOMER">Customers</option>
+                        <option value="ARTISAN">Artisans</option>
+                        <option value="ADMIN">Admins</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="5" class="px-5 py-10 text-center text-[#8b7355]">
+                                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════ ARTISAN APPROVALS ══════════════════════ -->
+        <div id="section-artisans" class="admin-section hidden">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-[#5c4a3d]">Artisan Approvals</h1>
+                <p class="text-sm text-[#8b7355] mt-1">Approve or reject new artisan accounts before they can list products.</p>
+            </div>
+            <div id="artisan-approvals-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div class="col-span-3 text-center py-10 text-[#8b7355]">
+                    <i class="fas fa-spinner fa-spin text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════ CONTENT MODERATION ════════════════════ -->
+        <div id="section-reviews" class="admin-section hidden">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-[#5c4a3d]">Content Moderation</h1>
+                    <p class="text-sm text-[#8b7355] mt-1">Manage product reviews — flag or delete content that violates guidelines.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-[#e5e0d8] card-shadow overflow-hidden">
+                <!-- Filter tabs -->
+                <div class="flex gap-2 p-5 border-b border-[#e5e0d8]">
+                    <button class="review-filter-btn filter-active px-4 py-2 rounded-xl text-sm font-semibold border transition-colors" data-filter="all" onclick="loadReviews('all')">
+                        All Reviews
+                    </button>
+                    <button class="review-filter-btn filter-inactive px-4 py-2 rounded-xl text-sm font-semibold border transition-colors" data-filter="flagged" onclick="loadReviews('flagged')">
+                        <i class="fas fa-flag mr-1"></i>Flagged Only
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviews-table-body">
+                            <tr>
+                                <td colspan="7" class="px-4 py-10 text-center text-[#8b7355]">
+                                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════ DISPUTES ══════════════════════════════ -->
+        <div id="section-disputes" class="admin-section hidden">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-[#5c4a3d]">Dispute Resolution</h1>
+                    <p class="text-sm text-[#8b7355] mt-1">Log, track, and resolve disputes between Customers and Artisans.</p>
+                </div>
+                <button onclick="openCreateDisputeModal()"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-xl text-sm font-semibold transition-colors">
+                    <i class="fas fa-plus"></i> Log Dispute
+                </button>
+            </div>
+            <div id="disputes-list">
+                <div class="text-center py-10 text-[#8b7355]">
+                    <i class="fas fa-spinner fa-spin text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CREATE DISPUTE MODAL ═══ -->
+<div id="create-dispute-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-[#5c4a3d]">Log a Dispute</h3>
+            <button onclick="closeCreateDisputeModal()" class="text-[#8b7355] hover:text-[#5c4a3d] text-xl transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="create-dispute-form" onsubmit="saveNewDispute(event)">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#5c4a3d] mb-1.5">Dispute Title <span class="text-red-500">*</span></label>
+                    <input id="dispute-title" type="text" required placeholder="Brief description of the issue"
+                        class="w-full px-4 py-2.5 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-[#5c4a3d] mb-1.5">Description <span class="text-red-500">*</span></label>
+                    <textarea id="dispute-description" required rows="3" placeholder="Detailed explanation of the dispute…"
+                        class="w-full px-4 py-2.5 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6] resize-none"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-[#5c4a3d] mb-1.5">Customer</label>
+                        <input id="dispute-customer" type="text" placeholder="Customer name or email"
+                            class="w-full px-4 py-2.5 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6]" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-[#5c4a3d] mb-1.5">Artisan</label>
+                        <input id="dispute-artisan" type="text" placeholder="Artisan name or shop"
+                            class="w-full px-4 py-2.5 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6]" />
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="button" onclick="closeCreateDisputeModal()"
+                    class="flex-1 py-2.5 border border-[#e5e0d8] rounded-xl text-sm font-semibold text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="flex-1 py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-xl text-sm font-semibold transition-colors">
+                    <i class="fas fa-save mr-1"></i> Log Dispute
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ RESOLVE MODAL ═════════ -->
+<div id="resolve-dispute-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-[#5c4a3d]">Resolve Dispute</h3>
+            <button onclick="closeResolveModal()" class="text-[#8b7355] hover:text-[#5c4a3d] text-xl transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <p class="text-sm text-[#8b7355] mb-4">Describe the resolution. Both parties will be notified.</p>
+        <textarea id="resolution-text" rows="4" placeholder="Describe how this dispute was resolved…"
+            class="w-full px-4 py-3 border border-[#e5e0d8] rounded-xl text-sm focus:outline-none focus:border-[#c17c5f] bg-[#faf9f6] resize-none mb-5"></textarea>
+        <div class="flex gap-3">
+            <button onclick="closeResolveModal()"
+                class="flex-1 py-2.5 border border-[#e5e0d8] rounded-xl text-sm font-semibold text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">
+                Cancel
+            </button>
+            <button onclick="submitResolution()"
+                class="flex-1 py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-xl text-sm font-semibold transition-colors">
+                <i class="fas fa-gavel mr-1"></i> Mark Resolved
+            </button>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/admindashboard.js}"></script>
+</body>
+</html>

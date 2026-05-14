@@ -16,6 +16,8 @@ public class Review {
     private String comment;
     private LocalDate date;
 
+    private boolean flagged;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
