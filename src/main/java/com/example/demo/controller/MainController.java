@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @Controller
 public class MainController {
@@ -16,6 +17,12 @@ public class MainController {
 
     @Autowired
     private AuctionRepository auctionRepository;
+
+    @Autowired
+    private ArtisanRepository artisanRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
     private AuctionService auctionService;
@@ -73,6 +80,50 @@ public class MainController {
     @GetMapping("/notifications")
     public String notifications() {
         return "notifications";
+    }
+
+    @GetMapping("/artisan-products")
+    public String artisanProducts(@RequestParam(required = false) Long id, Model model) {
+        // Fallback for demonstration if no ID is provided (e.g., Artisan Elena)
+        Long artisanId = (id != null) ? id : 2L; 
+        
+        artisanRepository.findById(artisanId).ifPresent(artisan -> {
+            model.addAttribute("artisan", artisan);
+            model.addAttribute("products", productRepository.findByArtisanUserId(artisanId));
+        });
+        
+        return "artisanProducts";
+    }
+
+    @GetMapping("/artisan-dashboard")
+    public String artisanDashboard(@RequestParam(required = false) Long id, Model model) {
+        // Fallback for demonstration if no ID is provided (e.g., Artisan Elena)
+        Long artisanId = (id != null) ? id : 2L; 
+        
+        artisanRepository.findById(artisanId).ifPresent(artisan -> {
+            model.addAttribute("artisan", artisan);
+            
+            // KPI Stats
+            long productsCount = productRepository.countByArtisanUserId(artisanId);
+            long activeAuctions = auctionRepository.countByProductArtisanUserIdAndStatus(artisanId, "active");
+            
+            List<com.example.demo.model.OrderItem> orderItems = orderItemRepository.findByProductArtisanUserId(artisanId);
+            long pendingOrders = orderItems.stream()
+                .filter(item -> "pending".equalsIgnoreCase(item.getOrder().getStatus()))
+                .count();
+                
+            double totalRevenue = orderItems.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+            
+            model.addAttribute("productsCount", productsCount);
+            model.addAttribute("activeAuctions", activeAuctions);
+            model.addAttribute("pendingOrders", pendingOrders);
+            model.addAttribute("totalRevenue", totalRevenue);
+            model.addAttribute("recentOrders", orderItems);
+        });
+        
+        return "artisanDashboard";
     }
 
     @GetMapping("/forgot-password")
