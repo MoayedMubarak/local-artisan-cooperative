@@ -273,7 +273,7 @@
                         
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button class="flex-1 bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg flex items-center justify-center">
+                            <button th:attr="data-product-id=${product != null ? product.id : '1'}" class="flex-1 bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg flex items-center justify-center add-to-cart-btn">
                                 <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
                             </button>
                             <button class="flex-1 bg-white hover:bg-[#f5ebe0] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">

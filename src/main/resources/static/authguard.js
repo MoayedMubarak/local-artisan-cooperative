@@ -202,7 +202,22 @@
     badge.style.display = count > 0 ? 'flex' : 'none';
   };
 
-  window.updateCartBadge = function updateCartBadge() {
+  window.updateCartBadge = async function updateCartBadge() {
+    const userEmail = sessionStorage.getItem('userEmail');
+    if (userEmail) {
+      try {
+        const response = await fetch(`/api/cart/count`, {
+          headers: { 'X-User-Email': userEmail }
+        });
+        if (response.ok) {
+          const count = await response.json();
+          sessionStorage.setItem('cartCount', count);
+        }
+      } catch (e) {
+        console.error("Failed to fetch cart count", e);
+      }
+    }
+
     document.querySelectorAll('.fa-shopping-cart').forEach(icon => {
       const badge = icon.parentElement?.querySelector('span');
       if (!badge) return;

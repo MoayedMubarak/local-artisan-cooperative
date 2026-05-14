@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const navUserEmail = document.getElementById('nav-user-email');
     const notificationBadge = document.getElementById('notification-badge');
     const cartBadge = document.getElementById('cart-badge');
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const emptyCartMsg = document.getElementById('empty-cart-msg');
+    const orderSummary = document.querySelector('.mt-4.pt-4.border-t-2');
+    const confirmBtn = document.getElementById('confirm-btn');
 
     function updateLoginState() {
         const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
@@ -72,39 +76,65 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- 2. Quantity Update ---
-    window.updateQuantity = function(button, change) {
+    window.updateQuantity = async function(button, change) {
         if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to update item quantities.')) return;
         const cartItem = button.closest('.cart-item');
+        const itemId = cartItem.dataset.itemId;
         const quantitySpan = cartItem.querySelector('.quantity-value');
-        const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent; // Matches the BD price
+        const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent;
         const price = parseFloat(priceText.replace(' BD', ''));
         const subtotalEl = cartItem.querySelector('.item-subtotal');
 
         let qty = parseInt(quantitySpan.textContent) + change;
-        if (qty < 1) qty = 1; // Prevent zero/negative
+        if (qty < 1) return;
 
-        // Update UI
-        quantitySpan.textContent = qty;
-        subtotalEl.textContent = (price * qty).toFixed(2) + ' BD';
+        try {
+            const response = await fetch(`/api/cart/update/${itemId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Email': sessionStorage.getItem('userEmail')
+                },
+                body: JSON.stringify({ quantity: qty })
+            });
 
-        updateCartTotal();
+            if (response.ok) {
+                quantitySpan.textContent = qty;
+                subtotalEl.textContent = (price * qty).toFixed(2) + ' BD';
+                updateCartTotal();
+                updateCartBadge();
+            }
+        } catch (e) {
+            console.error('Update quantity failed', e);
+        }
     };
 
     // --- 3. Remove Item ---
-    window.removeItem = function(button) {
+    window.removeItem = async function(button) {
         if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to remove items from your cart.')) return;
         const cartItem = button.closest('.cart-item');
+        const itemId = cartItem.dataset.itemId;
 
-        // Animation
-        cartItem.style.opacity = '0';
-        cartItem.style.transform = 'translateX(-20px)';
+        try {
+            const response = await fetch(`/api/cart/remove/${itemId}`, {
+                method: 'DELETE',
+                headers: { 'X-User-Email': sessionStorage.getItem('userEmail') }
+            });
 
-        setTimeout(() => {
-            cartItem.remove();
-            updateCartTotal();
+            if (response.ok) {
+                cartItem.style.opacity = '0';
+                cartItem.style.transform = 'translateX(-20px)';
 
-            checkCartEmpty();
-        }, 300);
+                setTimeout(() => {
+                    cartItem.remove();
+                    updateCartTotal();
+                    checkCartEmpty();
+                    updateCartBadge();
+                }, 300);
+            }
+        } catch (e) {
+            console.error('Remove item failed', e);
+        }
     };
 
     function checkCartEmpty() {
@@ -217,7 +247,64 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Calculation on load
     updateCartTotal();
     updateLoginState();
+    loadCartItems();
 });
+
+async function loadCartItems() {
+    const userEmail = sessionStorage.getItem('userEmail');
+    if (!userEmail) return;
+
+    const container = document.getElementById('cart-items-container');
+    if (!container) return;
+
+    try {
+        const response = await fetch('/api/cart', {
+            headers: { 'X-User-Email': userEmail }
+        });
+        const items = await response.json();
+
+        container.innerHTML = '';
+        if (items.length === 0) {
+            checkCartEmpty();
+            return;
+        }
+
+        items.forEach(item => {
+            const html = `
+                <div class="cart-item flex items-center gap-4" data-item-id="${item.id}">
+                    <img src="${item.product.imageUrl}" alt="${item.product.title}" class="cart-item-img">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-[#5c4a3d] truncate">${item.product.title}</h3>
+                        <p class="text-sm text-[#8b7355]">by ${item.product.artisanName}</p>
+                        <p class="text-[#c17c5f] font-bold mt-1">${item.product.price.toFixed(2)} BD</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                        <div class="flex items-center border border-[#e5e0d8] rounded-lg">
+                            <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, -1)">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="px-3 py-1 text-[#5c4a3d] font-medium quantity-value">${item.quantity}</span>
+                            <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, 1)">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <p class="font-bold text-[#5c4a3d] item-subtotal">${(item.product.price * item.quantity).toFixed(2)} BD</p>
+                            <button class="text-[#8b7355] hover:text-red-500 transition-colors" onclick="removeItem(this)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+
+        checkCartEmpty();
+        updateCartTotal();
+    } catch (error) {
+        console.error('Failed to load cart items', error);
+    }
+}
 
 function loadCartAddresses() {
     const email = sessionStorage.getItem('userEmail') || '';
