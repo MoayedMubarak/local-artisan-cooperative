@@ -4,7 +4,7 @@ import com.example.demo.model.Customer;
 import com.example.demo.model.Product;
 import com.example.demo.model.Wishlist;
 import com.example.demo.model.WishlistItem;
-import com.example.demo.repository.CustomerRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.WishlistItemRepository;
 import com.example.demo.repository.WishlistRepository;
@@ -28,7 +28,7 @@ public class WishlistController {
     private WishlistItemRepository wishlistItemRepository;
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -47,20 +47,21 @@ public class WishlistController {
 
     @PostMapping("/add/{productId}")
     public ResponseEntity<?> addToWishlist(@RequestHeader("X-User-Email") String email, @PathVariable Long productId) {
-        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
-        if (customerOpt.isEmpty()) {
+        Optional<com.example.demo.model.User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty() || !(userOpt.get() instanceof Customer)) {
             return ResponseEntity.badRequest().body("Customer not found");
         }
+        Customer customer = (Customer) userOpt.get();
 
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Product not found");
         }
 
-        Wishlist wishlist = wishlistRepository.findByCustomer(customerOpt.get())
+        Wishlist wishlist = wishlistRepository.findByCustomer(customer)
                 .orElseGet(() -> {
                     Wishlist newWishlist = new Wishlist();
-                    newWishlist.setCustomer(customerOpt.get());
+                    newWishlist.setCustomer(customer);
                     newWishlist.setDateCreated(LocalDate.now());
                     return wishlistRepository.save(newWishlist);
                 });
@@ -74,7 +75,14 @@ public class WishlistController {
         item.setWishlist(wishlist);
         item.setProduct(productOpt.get());
         item.setDateAdded(LocalDate.now());
+        
+        if (wishlist.getWishlistItems() == null) {
+            wishlist.setWishlistItems(new java.util.ArrayList<>());
+        }
+        wishlist.getWishlistItems().add(item);
+
         wishlistItemRepository.save(item);
+        wishlistRepository.save(wishlist);
 
         return ResponseEntity.ok("Item added to wishlist");
     }
@@ -85,8 +93,19 @@ public class WishlistController {
         if (wishlistOpt.isPresent()) {
             Optional<Product> productOpt = productRepository.findById(productId);
             if (productOpt.isPresent()) {
-                wishlistItemRepository.deleteByWishlistAndProduct(wishlistOpt.get(), productOpt.get());
-                return ResponseEntity.ok("Item removed from wishlist");
+                Wishlist wishlist = wishlistOpt.get();
+                Optional<WishlistItem> itemOpt = wishlistItemRepository.findByWishlistAndProduct(wishlist, productOpt.get());
+                if (itemOpt.isPresent()) {
+                    WishlistItem item = itemOpt.get();
+                    if (wishlist.getWishlistItems() != null) {
+                        wishlist.getWishlistItems().remove(item);
+                    }
+                    wishlistItemRepository.delete(item);
+                    wishlistRepository.save(wishlist);
+                    return ResponseEntity.ok("Item removed from wishlist");
+                } else {
+                    return ResponseEntity.badRequest().body("Item not in wishlist");
+                }
             }
         }
         return ResponseEntity.badRequest().body("Wishlist or product not found");
