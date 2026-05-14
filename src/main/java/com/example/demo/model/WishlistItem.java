@@ -16,6 +16,8 @@ public class WishlistItem {
 
     @ManyToOne
     @JoinColumn(name = "wishlist_id")
+    @lombok.EqualsAndHashCode.Exclude
+    @lombok.ToString.Exclude
     private Wishlist wishlist;
 
     @ManyToOne

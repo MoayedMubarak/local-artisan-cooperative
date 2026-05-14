@@ -19,6 +19,8 @@ public class Wishlist {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @lombok.EqualsAndHashCode.Exclude
+    @lombok.ToString.Exclude
     private List<WishlistItem> wishlistItems;
 }
