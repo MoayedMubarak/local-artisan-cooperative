@@ -2,10 +2,14 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "cart_items")
+@NoArgsConstructor
+@AllArgsConstructor
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,6 +17,7 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
 
     @ManyToOne
