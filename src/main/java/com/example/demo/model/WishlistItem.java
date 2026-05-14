@@ -1,11 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
 import java.time.LocalDate;
 
 @Data
@@ -20,8 +16,8 @@ public class WishlistItem {
 
     @ManyToOne
     @JoinColumn(name = "wishlist_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
+    @lombok.ToString.Exclude
     private Wishlist wishlist;
 
     @ManyToOne
