@@ -39,25 +39,45 @@ document.addEventListener('DOMContentLoaded', () => {
         thumbnail.classList.add('active');
     };
 
-    // --- 2. Add to Cart ---
+    // --- 2. Add to Cart (persisted to database via /api/cart/add) ---
     const addToCartBtns = document.querySelectorAll('button:has(.fa-shopping-cart)');
     addToCartBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Visual feedback
+        btn.addEventListener('click', async function() {
+            if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to add items to your cart.')) {
+                return;
+            }
+            const meta = document.getElementById('product-page-meta');
+            const fromUrl = new URLSearchParams(window.location.search).get('id');
+            const productId = meta?.dataset?.productId || fromUrl;
+            if (!productId) {
+                showToast('Product not available.', 'error');
+                return;
+            }
+            if (meta?.dataset?.auction === 'true') {
+                showToast('Auction items cannot be added to the cart.', 'info');
+                return;
+            }
             const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-check mr-2"></i>Added!';
-            this.classList.remove('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
-            this.classList.add('bg-green-600');
             this.disabled = true;
-
-            // Simulate network request delay
-            setTimeout(() => {
+            try {
+                if (!window.addProductToCart) {
+                    throw new Error('Cart is unavailable. Refresh the page.');
+                }
+                await window.addProductToCart(productId, 1);
+                this.innerHTML = '<i class="fas fa-check mr-2"></i>Added!';
+                this.classList.remove('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
+                this.classList.add('bg-green-600');
                 showToast('Added to Cart!', 'success');
-                this.innerHTML = originalText;
-                this.classList.add('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
-                this.classList.remove('bg-green-600');
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.classList.add('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
+                    this.classList.remove('bg-green-600');
+                    this.disabled = false;
+                }, 900);
+            } catch (err) {
+                showToast(err.message || 'Could not add to cart', 'error');
                 this.disabled = false;
-            }, 800);
+            }
         });
     });
 
@@ -89,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .toast { padding: 12px 24px; border-radius: 8px; color: white; font-family: 'Inter', sans-serif; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease-out; display: flex; align-items: center; gap: 10px; min-width: 250px; }
                 .toast.success { background-color: #10b981; border-left: 5px solid #059669; }
                 .toast.info { background-color: #2563eb; border-left: 5px solid #1d4ed8; }
+                .toast.error { background-color: #dc2626; border-left: 5px solid #b91c1c; }
                 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
             `;
             document.head.appendChild(style);
@@ -98,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const container = document.querySelector('.toast-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i> <span>${message}</span>`;
+        toast.className = `toast ${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'}`;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> <span>${message}</span>`;
         container.appendChild(toast);
         setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     }

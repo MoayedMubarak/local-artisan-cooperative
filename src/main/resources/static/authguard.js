@@ -212,10 +212,71 @@
     });
   };
 
+  /**
+   * Sync cart item count from the database (open cart order). Safe to call when logged out (no-op).
+   */
+  window.syncCartCountFromServer = async function syncCartCountFromServer() {
+    try {
+      const email = sessionStorage.getItem('userEmail');
+      const loggedIn = sessionStorage.getItem('loggedIn') === 'true' || sessionStorage.getItem('isLoggedIn') === 'true';
+      if (!email || !loggedIn) {
+        sessionStorage.setItem('cartCount', '0');
+        window.updateCartBadge();
+        return 0;
+      }
+      const res = await fetch('/api/cart', {
+        headers: { 'X-User-Email': email }
+      });
+      if (!res.ok) {
+        sessionStorage.setItem('cartCount', '0');
+        window.updateCartBadge();
+        return 0;
+      }
+      const data = await res.json();
+      const n = typeof data.itemCount === 'number' ? data.itemCount : 0;
+      sessionStorage.setItem('cartCount', String(n));
+      window.updateCartBadge();
+      return n;
+    } catch (e) {
+      console.warn('syncCartCountFromServer failed', e);
+      return parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
+    }
+  };
+
+  /**
+   * Add a standard (non-auction) product to the customer's cart via POST /api/cart/add.
+   */
+  window.addProductToCart = async function addProductToCart(productId, quantity) {
+    const email = sessionStorage.getItem('userEmail');
+    if (!email) {
+      throw new Error('Not logged in');
+    }
+    const res = await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Email': email
+      },
+      body: JSON.stringify({
+        productId: Number(productId),
+        quantity: quantity != null ? Number(quantity) : 1
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Could not add to cart');
+    }
+    const n = typeof data.itemCount === 'number' ? data.itemCount : 0;
+    sessionStorage.setItem('cartCount', String(n));
+    window.updateCartBadge();
+    return data;
+  };
+
   document.addEventListener('DOMContentLoaded', function () {
     window.updateNavAuthState();
     window.updateNotificationBadge();
     window.updateCartBadge();
+    window.syncCartCountFromServer();
   });
 })();
 

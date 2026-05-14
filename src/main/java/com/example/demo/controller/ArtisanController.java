@@ -36,7 +36,9 @@ public class ArtisanController {
             model.addAttribute("productsCount", productRepository.countByArtisanUserId(artisanId));
             model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(artisanId, "active"));
             
-            List<OrderItem> orders = orderItemRepository.findByProductArtisanUserId(artisanId);
+            List<OrderItem> orders = orderItemRepository.findByProductArtisanUserId(artisanId).stream()
+                    .filter(o -> !"cart".equalsIgnoreCase(o.getOrder().getStatus()))
+                    .toList();
             model.addAttribute("pendingOrders", orders.stream().filter(o -> "pending".equalsIgnoreCase(o.getOrder().getStatus())).count());
             model.addAttribute("totalRevenue", orders.stream().mapToDouble(o -> o.getPrice() * o.getQuantity()).sum());
             model.addAttribute("recentOrders", orders);

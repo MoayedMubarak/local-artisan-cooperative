@@ -95,6 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('userId', data.user.userId);
                 sessionStorage.setItem('userProfile', JSON.stringify(data.user));
 
+                if (typeof window.syncCartCountFromServer === 'function') {
+                    await window.syncCartCountFromServer();
+                }
+
                 // Redirect back to the originally requested page (if any)
                 const url = new URL(window.location.href);
                 const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');

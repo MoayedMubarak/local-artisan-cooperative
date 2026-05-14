@@ -185,7 +185,7 @@
 
                 <a id="cart-link" href="/cart" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
                     <i class="fas fa-shopping-cart text-xl"></i>
-                    <span class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="display: none;">0</span>
                 </a>
             </div>
         </div>
@@ -310,9 +310,14 @@
                     <div class="p-5">
                         <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1" th:text="${product.title}">Product Title</h3>
                         <p class="text-[#8b7355] text-sm mb-3" th:text="'by ' + ${product.artisanName}">by Artisan Name</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' BD'">0.00 BD</span>
-                            <a th:href="@{/ProductDetailsStandard(id=${product.id})}" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                        <div class="flex flex-col gap-2 items-stretch sm:items-end">
+                            <div class="flex items-center justify-between gap-2 w-full">
+                                <span class="text-xl font-bold text-[#c17c5f]" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' BD'">0.00 BD</span>
+                                <button type="button" class="add-to-cart-quick-btn shrink-0 w-10 h-10 rounded-lg bg-[#c17c5f] hover:bg-[#a5664d] text-white flex items-center justify-center transition-colors shadow-sm" th:attr="data-product-id=${product.id}" title="Add to cart">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                            <a th:href="@{/ProductDetailsStandard(id=${product.id})}" class="bg-[#faf9f6] hover:bg-[#f5ebe0] text-[#c17c5f] border border-[#e5e0d8] text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                 View Details
                             </a>
                         </div>

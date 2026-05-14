@@ -313,6 +313,7 @@ window.logout = function () {
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('userEmail');
     sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('cartCount');
     sessionStorage.removeItem('postLoginNext');
     showToast('You have been logged out.', 'success');
     setTimeout(() => window.location.href = '/login', 1000);

@@ -139,6 +139,8 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+    <div th:if="${product != null}" id="product-page-meta" class="hidden"
+         th:attr="data-product-id=${product.id},data-stock=${product.stockQuantity},data-auction=${product.isAuctionItem}"></div>
     <!-- Navigation Bar -->
     <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -246,7 +248,7 @@
                         
                         <!-- Stock Count -->
                         <p class="text-green-600 mb-6">
-                            <i class="fas fa-check-circle mr-2"></i><span th:text="${product != null ? '12' : '12'}">12</span> in stock
+                            <i class="fas fa-check-circle mr-2"></i><span th:text="${product != null ? product.stockQuantity : 0}">0</span> in stock
                         </p>
                         
                         <!-- Star Rating -->

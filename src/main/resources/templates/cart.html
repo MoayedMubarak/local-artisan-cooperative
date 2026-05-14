@@ -144,6 +144,7 @@
 
                 <a id="cart-link" href="/cart" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative">
                     <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 items-center justify-center" style="display: none;">0</span>
                 </a>
             </div>
         </div>
@@ -186,7 +187,7 @@
                     <div class="mt-4 pt-4 border-t-2 border-[#e5e0d8] space-y-2">
                         <div class="flex justify-between text-[#8b7355]">
                             <span>Subtotal</span>
-                            <span id="items-subtotal">259.00 BD</span>
+                            <span id="items-subtotal">0.00 BD</span>
                         </div>
                         <div class="flex justify-between text-[#8b7355]" id="shipping-cost-row">
                             <span id="shipping-label">Shipping</span>
@@ -194,7 +195,7 @@
                         </div>
                         <div class="flex justify-between items-center pt-2 border-t border-[#e5e0d8]">
                             <span class="text-lg font-semibold text-[#5c4a3d]">Total</span>
-                            <span class="text-2xl font-bold text-[#c17c5f]" id="cart-total">261.00 BD</span>
+                            <span class="text-2xl font-bold text-[#c17c5f]" id="cart-total">2.00 BD</span>
                         </div>
                         <a href="/products" class="inline-flex items-center text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium mt-2">
                             <i class="fas fa-arrow-left mr-2"></i>Back to Shopping
@@ -338,7 +339,7 @@
                     <!-- Confirm Button -->
                     <button id="confirm-btn"
                         class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center">
-                        <i class="fas fa-check-circle mr-3"></i>Confirm Order (261.00 BD)
+                        <i class="fas fa-check-circle mr-3"></i>Confirm Order (2.00 BD)
                     </button>
 
                     <p class="text-center text-sm text-[#8b7355]">
