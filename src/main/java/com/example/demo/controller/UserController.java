@@ -33,10 +33,8 @@ public class UserController {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            System.out.println("Updating profile picture for " + email + ". Length: " + imageUrl.length());
             user.setProfilePicture(imageUrl);
             userRepository.save(user);
-            System.out.println("Profile picture saved successfully for " + email);
             return ResponseEntity.ok(Map.of("success", true, "user", user));
         }
         return ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found"));
