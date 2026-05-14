@@ -366,7 +366,7 @@
                         />
                         
                         <!-- Status Badge -->
-                        <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE' or #strings.toUpperCase(auction.status) == 'ACTIVE'}" 
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
                               class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                             LIVE
@@ -375,7 +375,7 @@
                               class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                             UPCOMING
                         </span>
-                        <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED' or #strings.toUpperCase(auction.status) == 'SOLD'}" 
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
                               class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                             ENDED
                         </span>
@@ -392,7 +392,7 @@
                                 <p class="text-xs text-[#8b7355] uppercase tracking-wide" 
                                    th:text="${#strings.toUpperCase(auction.status) == 'UPCOMING' ? 'Starting Bid' : 'Current Bid'}">Current Bid</p>
                                 <p class="text-xl font-bold" 
-                                   th:classappend="${#strings.toUpperCase(auction.status) == 'ENDED' or #strings.toUpperCase(auction.status) == 'SOLD' ? 'text-gray-500' : 'text-[#c17c5f]'}"
+                                   th:classappend="${#strings.toLowerCase(auction.status) == 'ended' ? 'text-gray-500' : 'text-[#c17c5f]'}"
                                    th:text="${#numbers.formatDecimal(auction.currentHighestBid, 1, 3)} + ' BD'">53.690 BD</p>
                             </div>
                         </div>
@@ -400,7 +400,7 @@
                         <!-- Time/Status Info -->
                         <div class="flex items-center justify-between mb-4">
                             <!-- Countdown for Live -->
-                            <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE' or #strings.toUpperCase(auction.status) == 'ACTIVE'}" 
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
                                   class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
                                 <i class="far fa-clock mr-1.5"></i>
                                 <span class="countdown" 
@@ -420,7 +420,7 @@
                             </span>
                             
                             <!-- Sold for Ended -->
-                            <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED' or #strings.toUpperCase(auction.status) == 'SOLD'}" 
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
                                   class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm font-semibold rounded-full">
                                 <i class="fas fa-check mr-1.5"></i>
                                 Sold
@@ -430,7 +430,7 @@
                         </div>
                         
                         <!-- Action Buttons -->
-                        <button th:if="${#strings.toUpperCase(auction.status) == 'LIVE' or #strings.toUpperCase(auction.status) == 'ACTIVE'}" 
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
                                 class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
                             Place Bid
                         </button>
@@ -438,7 +438,7 @@
                                 class="w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors">
                             Notify Me
                         </button>
-                        <button th:if="${#strings.toUpperCase(auction.status) == 'ENDED' or #strings.toUpperCase(auction.status) == 'SOLD'}" 
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
                                 class="w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed" disabled>
                             Auction Ended
                         </button>
