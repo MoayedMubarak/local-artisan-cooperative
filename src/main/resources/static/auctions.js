@@ -22,25 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationBadge = document.getElementById('notification-badge');
     const cartBadge = document.getElementById('cart-badge');
 
-    function updateLoginState() {
-        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
-        if (loggedIn) {
-            loginButtonWrapper?.classList.add('hidden');
-            userSection?.classList.remove('hidden');
-
-            const userName = sessionStorage.getItem('userName') || 'John Doe';
-            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
-            if (navUserName) navUserName.textContent = userName;
-            if (navUserEmail) navUserEmail.textContent = userEmail;
-
-            updateNotificationBadge();
-        } else {
-            loginButtonWrapper?.classList.remove('hidden');
-            userSection?.classList.add('hidden');
-        }
-
-        updateCartBadge();
-    }
+    // Removed redundant updateLoginState - handled globally by authguard.js
 
     priceRange?.addEventListener('input', function () {
         priceValue.textContent = this.value + ' BD';
@@ -256,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial render — apply default filters
     applyFilters();
-    updateLoginState();
 });
 
 // ============================================================

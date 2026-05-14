@@ -134,7 +134,7 @@
     const userSection = document.getElementById('user-section');
     const userName = document.getElementById('nav-user-name');
     const userEmail = document.getElementById('nav-user-email');
-    const userMenuBtn = document.getElementById('user-menu-button') || document.querySelector('a[href="/profile"]');
+    const userMenuBtn = document.getElementById('user-menu-button') || document.getElementById('userMenuButton') || document.querySelector('a[href="/profile"]');
     const loggedIn = getLoggedIn();
     const storedEmail = sessionStorage.getItem('userEmail');
 
@@ -147,6 +147,10 @@
             sessionStorage.setItem('userProfile', JSON.stringify(data.user));
             sessionStorage.setItem('userName', data.user.name);
             applyNavState(data.user);
+            // Also update any other profile images on the page (e.g. sidebar)
+            document.querySelectorAll('img[alt="' + data.user.name + '"], aside img.w-14.h-14').forEach(img => {
+                img.src = data.user.profilePicture;
+            });
           }
         })
         .catch(err => console.error("Nav sync failed", err));
@@ -179,6 +183,10 @@
           profileIcon.replaceWith(img);
         } else if (profileImg) {
           profileImg.src = profilePicture;
+        } else {
+            // Check if the button itself is an image or contains one
+            const innerImg = userMenuBtn.querySelector('img');
+            if (innerImg) innerImg.src = profilePicture;
         }
       }
     }
