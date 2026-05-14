@@ -240,33 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilters();
 });
 
-// ============================================================
-// Utility helpers (shared across pages via global scope)
-// ============================================================
-
-/**
- * Read the notification count from sessionStorage and update any badge on the page.
- */
-function updateNotificationBadge() {
-    const badge = document.getElementById('notification-badge');
-    if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'flex' : 'none';
-}
-
-/**
- * Read cart item count from sessionStorage and update any cart badge on the page.
- */
-function updateCartBadge() {
-    document.querySelectorAll('.fa-shopping-cart')
-        .forEach(icon => {
-            const badge = icon.parentElement?.querySelector('span');
-            if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
-            badge.textContent = count;
-        });
-}
+// Badge updates are handled globally by authguard.js
 
 // ============================================================
 // Navigate to Product Detail Page
