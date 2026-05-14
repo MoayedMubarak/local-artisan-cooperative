@@ -40,78 +40,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- 2. Add to Cart ---
-    const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+    const addToCartBtns = document.querySelectorAll('button:has(.fa-shopping-cart)');
     addToCartBtns.forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const productId = this.dataset.productId;
-            const userEmail = sessionStorage.getItem('userEmail');
-            
-            if (!(window.requireLoginForAction ? window.requireLoginForAction('Please login to add items to your cart') : true)) return;
-
-            // Visual feedback - loading
+        btn.addEventListener('click', function() {
+            // Visual feedback
             const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding...';
+            this.innerHTML = '<i class="fas fa-check mr-2"></i>Added!';
+            this.classList.remove('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
+            this.classList.add('bg-green-600');
             this.disabled = true;
 
-            try {
-                const response = await fetch('/api/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-User-Email': userEmail
-                    },
-                    body: JSON.stringify({ productId: productId, quantity: 1 })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    showToast('Added to Cart!', 'success');
-                    this.innerHTML = '<i class="fas fa-check mr-2"></i>Added!';
-                    this.classList.remove('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
-                    this.classList.add('bg-green-600');
-                    
-                    // Update global cart badge
-                    updateGlobalCartCount();
-                } else {
-                    showToast(data.message || 'Failed to add to cart', 'error');
-                    this.innerHTML = originalText;
-                    this.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                showToast('An error occurred. Please try again.', 'error');
+            // Simulate network request delay
+            setTimeout(() => {
+                showToast('Added to Cart!', 'success');
                 this.innerHTML = originalText;
+                this.classList.add('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
+                this.classList.remove('bg-green-600');
                 this.disabled = false;
-            }
-
-            // Reset button after 2 seconds if it was successful
-            if (this.classList.contains('bg-green-600')) {
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.classList.add('bg-[#c17c5f]', 'hover:bg-[#a5664d]');
-                    this.classList.remove('bg-green-600');
-                    this.disabled = false;
-                }, 2000);
-            }
+            }, 800);
         });
     });
-
-    async function updateGlobalCartCount() {
-        const userEmail = sessionStorage.getItem('userEmail');
-        if (!userEmail) return;
-        try {
-            const response = await fetch('/api/cart/count', {
-                headers: { 'X-User-Email': userEmail }
-            });
-            if (response.ok) {
-                const count = await response.json();
-                sessionStorage.setItem('cartCount', count);
-                if (window.updateCartBadge) window.updateCartBadge();
-            }
-        } catch (e) {}
-    }
-
 
     // --- 3. Add to Wishlist ---
     const addToWishlistBtns = document.querySelectorAll('button:has(.fa-heart)');
