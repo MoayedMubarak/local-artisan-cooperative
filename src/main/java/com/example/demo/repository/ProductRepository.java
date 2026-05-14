@@ -8,6 +8,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryIgnoreCase(String category);
     List<Product> findByIsAuctionItem(boolean isAuctionItem);
     List<Product> findByProductCategory_NameIgnoreCase(String categoryName);
-    List<Product> findByArtisanUserId(Long artisanId);
-    long countByArtisanUserId(Long artisanId);
 }

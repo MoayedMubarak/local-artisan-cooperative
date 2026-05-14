@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoApplication {
 
 	public static void main(String[] args) {
-		java.util.Locale.setDefault(java.util.Locale.ENGLISH);
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
