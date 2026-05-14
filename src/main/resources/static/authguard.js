@@ -136,26 +136,41 @@
     const userEmail = document.getElementById('nav-user-email');
     const userMenuBtn = document.getElementById('user-menu-button') || document.querySelector('a[href="/profile"]');
     const loggedIn = getLoggedIn();
+    const storedEmail = sessionStorage.getItem('userEmail');
 
-    if (loggedIn) {
+    if (loggedIn && storedEmail) {
+      // Sync with server in background
+      fetch(`/api/user/me?email=${encodeURIComponent(storedEmail)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+            sessionStorage.setItem('userName', data.user.name);
+            applyNavState(data.user);
+          }
+        })
+        .catch(err => console.error("Nav sync failed", err));
+
+      // Initial apply from session storage
+      const userProfileStr = sessionStorage.getItem('userProfile');
+      if (userProfileStr) {
+        try { applyNavState(JSON.parse(userProfileStr)); } catch(e) {}
+      }
+    } else {
+      if (loginWrapper) loginWrapper.classList.remove('hidden');
+      if (userSection) userSection.classList.add('hidden');
+    }
+
+    function applyNavState(profile) {
       if (loginWrapper) loginWrapper.classList.add('hidden');
       if (userSection) userSection.classList.remove('hidden');
-      if (userName) userName.textContent = sessionStorage.getItem('userName') || 'Profile';
-      if (userEmail) userEmail.textContent = sessionStorage.getItem('userEmail') || '';
+      if (userName) userName.textContent = profile.name || 'Profile';
+      if (userEmail) userEmail.textContent = profile.email || '';
       
-      // Update profile picture in nav
       if (userMenuBtn) {
         const profileIcon = userMenuBtn.querySelector('i.fas.fa-user-circle');
         let profileImg = userMenuBtn.querySelector('img.nav-profile-img');
-        
-        const userProfileStr = sessionStorage.getItem('userProfile');
-        let profilePicture = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'; // Default guest image
-        if (userProfileStr) {
-          try {
-            const profile = JSON.parse(userProfileStr);
-            if (profile.profilePicture) profilePicture = profile.profilePicture;
-          } catch(e) {}
-        }
+        const profilePicture = profile.profilePicture || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
         if (profileIcon) {
           const img = document.createElement('img');
@@ -166,9 +181,6 @@
           profileImg.src = profilePicture;
         }
       }
-    } else {
-      if (loginWrapper) loginWrapper.classList.remove('hidden');
-      if (userSection) userSection.classList.add('hidden');
     }
   };
 

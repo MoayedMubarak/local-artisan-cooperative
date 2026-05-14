@@ -36,56 +36,70 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Role — toggle artisan section
     // ----------------------------------------------------------
     const userProfileStr = sessionStorage.getItem('userProfile');
-    let userRole = 'CUSTOMER';
+    const userEmail = sessionStorage.getItem('userEmail');
+    if (userEmail) {
+        fetch(`/api/user/me?email=${encodeURIComponent(userEmail)}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+                    sessionStorage.setItem('userName', data.user.name);
+                    // Refresh the UI with latest data
+                    renderProfileData(data.user);
+                }
+            })
+            .catch(err => console.error("Failed to sync profile data", err));
+    }
+
+    function renderProfileData(userProfile) {
+        const userRole = userProfile.role || 'CUSTOMER';
+        
+        // Update sidebar info
+        const sidebarName = document.querySelector('aside h2');
+        const sidebarEmail = document.querySelector('aside p');
+        const sidebarRoleBadge = document.getElementById('role-badge');
+        const profileImg = document.querySelector('aside img.w-40.h-40');
+        
+        if (sidebarName) sidebarName.textContent = userProfile.name || 'John Doe';
+        if (sidebarEmail) sidebarEmail.textContent = userProfile.email || 'john@example.com';
+        if (sidebarRoleBadge) sidebarRoleBadge.textContent = userRole === 'ARTISAN' ? 'Artisan' : 'Customer';
+        if (profileImg) {
+            profileImg.src = userProfile.profilePicture || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+        }
+        
+        // Update form inputs
+        const personalInfoSection = document.querySelector('section:first-of-type');
+        if (personalInfoSection) {
+            const nameInput = personalInfoSection.querySelector('input[type="text"]');
+            const emailInput = personalInfoSection.querySelector('input[type="email"]');
+            const phoneInput = personalInfoSection.querySelector('input[type="tel"]');
+            
+            if (nameInput) nameInput.value = userProfile.name || '';
+            if (emailInput) emailInput.value = userProfile.email || '';
+            if (phoneInput) phoneInput.value = userProfile.phone || '';
+        }
+        
+        // Update shop info if artisan
+        if (userRole === 'ARTISAN') {
+            const artisanSection = document.getElementById('artisan-section');
+            if (artisanSection) {
+                artisanSection.classList.remove('hidden');
+                const shopNameInput = artisanSection.querySelector('input[type="text"]');
+                const bioTextarea = artisanSection.querySelector('textarea');
+                
+                if (shopNameInput) shopNameInput.value = userProfile.shopName || '';
+                if (bioTextarea) bioTextarea.value = userProfile.biography || '';
+            }
+        }
+        setRole(userRole.toLowerCase());
+    }
+
+    // Initial render from session storage if available
     if (userProfileStr) {
         try {
-            const userProfile = JSON.parse(userProfileStr);
-            userRole = userProfile.role || 'CUSTOMER';
-            
-            // Update sidebar info
-            const sidebarName = document.querySelector('aside h2');
-            const sidebarEmail = document.querySelector('aside p');
-            const sidebarRoleBadge = document.getElementById('role-badge');
-            
-            if (sidebarName) sidebarName.textContent = userProfile.name || 'John Doe';
-            if (sidebarEmail) sidebarEmail.textContent = userProfile.email || 'john@example.com';
-            if (sidebarRoleBadge) sidebarRoleBadge.textContent = userRole === 'ARTISAN' ? 'Artisan' : 'Customer';
-            
-            // Update profile image
-            const profileImg = document.querySelector('aside img.w-40.h-40');
-            if (profileImg) {
-                profileImg.src = userProfile.profilePicture || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            }
-            
-            // Update form inputs
-            const personalInfoSection = document.querySelector('section:first-of-type');
-            if (personalInfoSection) {
-                const nameInput = personalInfoSection.querySelector('input[type="text"]');
-                const emailInput = personalInfoSection.querySelector('input[type="email"]');
-                const phoneInput = personalInfoSection.querySelector('input[type="tel"]');
-                
-                if (nameInput) nameInput.value = userProfile.name || '';
-                if (emailInput) emailInput.value = userProfile.email || '';
-                if (phoneInput) phoneInput.value = userProfile.phone || '';
-            }
-            
-            // Update shop info if artisan
-            if (userRole === 'ARTISAN') {
-                const artisanSection = document.getElementById('artisan-section');
-                if (artisanSection) {
-                    const shopNameInput = artisanSection.querySelector('input[type="text"]');
-                    const bioTextarea = artisanSection.querySelector('textarea');
-                    
-                    if (shopNameInput) shopNameInput.value = userProfile.shopName || '';
-                    if (bioTextarea) bioTextarea.value = userProfile.biography || '';
-                }
-            }
-        } catch (e) {
-            console.error("Failed to parse user profile", e);
-        }
+            renderProfileData(JSON.parse(userProfileStr));
+        } catch (e) {}
     }
-    
-    setRole(userRole.toLowerCase());
 
     // ----------------------------------------------------------
     // 2. Custom checkboxes (modals)
@@ -118,10 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.success) {
                         showToast('Profile picture updated permanently!', 'success');
-                        // Update session storage
-                        const profile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
-                        profile.profilePicture = imageUrl;
-                        sessionStorage.setItem('userProfile', JSON.stringify(profile));
+                        // Update session storage and UI
+                        sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+                        renderProfileData(data.user);
+                        if (window.updateNavAuthState) window.updateNavAuthState();
                     }
                 })
                 .catch(err => {
