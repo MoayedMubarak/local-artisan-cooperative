@@ -19,24 +19,26 @@ INSERT INTO product_categories (category_id, name) OVERRIDING SYSTEM VALUE VALUE
 -- Admins: IDs 1
 -- Artisans: IDs 2-4
 -- Customers: IDs 5-7
-INSERT INTO users (user_id, name, email, password, role) OVERRIDING SYSTEM VALUE VALUES
-  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ADMIN'),
-  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
-  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
-  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
-  (5,  'John Doe',      'john@example.com',      '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
-  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
-  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER');
+INSERT INTO users (user_id, name, email, password, role, is_suspended) OVERRIDING SYSTEM VALUE VALUES
+  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ADMIN', false),
+  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', false),
+  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', false),
+  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', false),
+  (5,  'John Doe',      'john@example.com',      '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', false),
+  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', true),
+  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', false),
+  (8,  'Hassan Pending','hassan@artsyvibe.com',  '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', false);
 
 
 -- ── 3. Admins (joined subtable) ──────────────────────────────
 INSERT INTO admins (user_id) OVERRIDING SYSTEM VALUE VALUES (1);
 
 -- ── 4. Artisans (joined subtable) ───────────────────────────
-INSERT INTO artisans (user_id, shop_name, biography, profile_picture) OVERRIDING SYSTEM VALUE VALUES
-  (2, 'Elena''s Clay Studio',  'Elena has been shaping ceramics and glasswork for over a decade, inspired by Mediterranean craftsmanship.',  '/images/artisan-elena.jpg'),
-  (3, 'Marco''s Pottery House','Marco brings Italian heritage to every wheel-thrown piece, specializing in functional stoneware.',              '/images/artisan-marco.jpg'),
-  (4, 'Zara Textile Co.',      'Zara hand-weaves natural fibers into vibrant tapestries and wearable art rooted in West African tradition.',  '/images/artisan-zara.jpg');
+INSERT INTO artisans (user_id, shop_name, biography, profile_picture, is_approved) OVERRIDING SYSTEM VALUE VALUES
+  (2, 'Elena''s Clay Studio',  'Elena has been shaping ceramics and glasswork for over a decade, inspired by Mediterranean craftsmanship.',  '/images/artisan-elena.jpg', true),
+  (3, 'Marco''s Pottery House','Marco brings Italian heritage to every wheel-thrown piece, specializing in functional stoneware.',              '/images/artisan-marco.jpg', true),
+  (4, 'Zara Textile Co.',      'Zara hand-weaves natural fibers into vibrant tapestries and wearable art rooted in West African tradition.',  '/images/artisan-zara.jpg', true),
+  (8, 'Hassan Handmades',      'Hassan specializes in traditional wood carving techniques.',                                                 '/images/artisan-hassan.jpg', false);
 
 -- ── 5. Customers (joined subtable) ───────────────────────────
 INSERT INTO customers (user_id, address, phone) OVERRIDING SYSTEM VALUE VALUES
@@ -124,13 +126,13 @@ INSERT INTO payments (payment_id, transaction_details, date, status, amount, pay
   (5, 'TXN-20250501-005', '2025-05-01', 'pending',   113.00, 'Credit Card', 5);
 
 -- ── 13. Reviews ───────────────────────────────────────────────
-INSERT INTO reviews (review_id, rating, comment, date, customer_id, product_id) OVERRIDING SYSTEM VALUE VALUES
-  (1, 5, 'Absolutely stunning bowl! The glaze is gorgeous and it feels solid in hand.',                '2025-03-18', 5, 1),
-  (2, 5, 'Perfect ring, exactly as described. Arrived beautifully packaged.',                          '2025-03-20', 5, 2),
-  (3, 4, 'The tapestry is even more beautiful in person. Delivery was quick.',                         '2025-04-02', 5, 3),
-  (4, 5, 'My new favourite serving board. The grain is beautiful and it wipes clean easily.',          '2025-04-25', 7, 10),
-  (5, 4, 'Great mug set, the smoke glaze is really unique. One mug had a tiny chip on the base.',     '2025-04-10', 6, 6),
-  (6, 5, 'The linen runner is exactly what I wanted — natural, elegant, and good quality.',            '2025-05-03', 6, 9);
+INSERT INTO reviews (review_id, rating, comment, date, customer_id, product_id, is_flagged, is_hidden) OVERRIDING SYSTEM VALUE VALUES
+  (1, 5, 'Absolutely stunning bowl! The glaze is gorgeous and it feels solid in hand.',                '2025-03-18', 5, 1, false, false),
+  (2, 5, 'Perfect ring, exactly as described. Arrived beautifully packaged.',                          '2025-03-20', 5, 2, false, false),
+  (3, 4, 'The tapestry is even more beautiful in person. Delivery was quick.',                         '2025-04-02', 5, 3, true, false),
+  (4, 5, 'My new favourite serving board. The grain is beautiful and it wipes clean easily.',          '2025-04-25', 7, 10, false, false),
+  (5, 4, 'Great mug set, the smoke glaze is really unique. One mug had a tiny chip on the base.',     '2025-04-10', 6, 6, false, false),
+  (6, 5, 'The linen runner is exactly what I wanted — natural, elegant, and good quality.',            '2025-05-03', 6, 9, false, false);
 
 -- ── 14. Wishlists ─────────────────────────────────────────────
 INSERT INTO wishlists (wishlist_id, date_created, customer_id) OVERRIDING SYSTEM VALUE VALUES

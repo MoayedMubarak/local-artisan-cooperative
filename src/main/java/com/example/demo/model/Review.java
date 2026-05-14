@@ -23,4 +23,7 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    private boolean isFlagged = false;
+    private boolean isHidden = false;
 }

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .status-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-approved { background-color: #d1fae5; color: #065f46; }
+        .status-suspended { background-color: #fee2e2; color: #991b1b; }
+        .status-active { background-color: #dcfce7; color: #166534; }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar w-72 text-white fixed h-full z-50">
+        <div class="p-8 border-b border-slate-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-xl text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight">Admin Console</h2>
+                    <p class="text-xs text-slate-400">Marketplace Management</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="p-6 mt-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="flex items-center gap-4 px-4 py-3 bg-indigo-600 rounded-xl transition-all shadow-lg shadow-indigo-500/20">
+                        <i class="fas fa-chart-pie w-5"></i>
+                        <span class="font-medium">Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#artisan-requests" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
+                        <i class="fas fa-user-plus w-5"></i>
+                        <span class="font-medium">Artisan Requests</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#user-management" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="font-medium">User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#review-moderation" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
+                        <i class="fas fa-comment-slash w-5"></i>
+                        <span class="font-medium">Review Moderation</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="absolute bottom-0 w-full p-6 border-t border-slate-700">
+            <div class="flex items-center gap-4">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" class="w-10 h-10 rounded-full border-2 border-indigo-500" />
+                <div>
+                    <p class="text-sm font-semibold">Admin User</p>
+                    <a href="/" class="text-xs text-slate-400 hover:text-white">View Site</a>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-72 p-10 bg-slate-50">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10 animate-fade-in">
+            <div>
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Marketplace Overview</h1>
+                <p class="text-slate-500">Real-time statistics and moderation tools.</p>
+            </div>
+            <div class="flex gap-4">
+                <button class="px-6 py-3 bg-white text-slate-700 rounded-xl font-semibold border border-slate-200 shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                    <i class="fas fa-download"></i>
+                    Export Report
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 animate-fade-in" style="animation-delay: 0.1s">
+            <div class="stat-card glass-card rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <span class="text-green-500 text-sm font-bold flex items-center">
+                        <i class="fas fa-caret-up mr-1"></i> +8.2%
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 mb-1" th:text="${totalUsers}">1,284</h3>
+                <p class="text-slate-500 text-sm font-medium">Total Users</p>
+            </div>
+
+            <div class="stat-card glass-card rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-box-open text-xl"></i>
+                    </div>
+                    <span class="text-green-500 text-sm font-bold flex items-center">
+                        <i class="fas fa-caret-up mr-1"></i> +12.4%
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 mb-1" th:text="${activeProducts}">452</h3>
+                <p class="text-slate-500 text-sm font-medium">Active Products</p>
+            </div>
+
+            <div class="stat-card glass-card rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-gavel text-xl"></i>
+                    </div>
+                    <span class="text-amber-500 text-sm font-bold flex items-center">
+                        <i class="fas fa-circle text-[8px] mr-2"></i> Live Now
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 mb-1" th:text="${openAuctions}">18</h3>
+                <p class="text-slate-500 text-sm font-medium">Open Auctions</p>
+            </div>
+
+            <div class="stat-card glass-card rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </div>
+                    <span class="text-red-500 text-sm font-bold flex items-center">
+                        <i class="fas fa-caret-down mr-1"></i> -2.4%
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 mb-1" th:text="${weeklyOrders}">84</h3>
+                <p class="text-slate-500 text-sm font-medium">Weekly Orders</p>
+            </div>
+        </div>
+
+        <!-- Section: Artisan Approval Requests -->
+        <section id="artisan-requests" class="mb-12 animate-fade-in" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-slate-900">Artisan Approval Requests</h2>
+                <span class="px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full" th:text="${pendingArtisans.size() + ' PENDING'}">3 PENDING</span>
+            </div>
+            <div class="glass-card rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Artisan Name</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Shop Name</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Email</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr th:each="artisan : ${pendingArtisans}" class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-semibold text-slate-700" th:text="${artisan.name}">Elena Martinez</td>
+                            <td class="px-6 py-4 text-slate-600" th:text="${artisan.shopName}">Ceramics by Elena</td>
+                            <td class="px-6 py-4 text-slate-500 text-sm" th:text="${artisan.email}">elena@artisan.com</td>
+                            <td class="px-6 py-4 text-right">
+                                <form th:action="@{'/admin/approve-artisan/' + ${artisan.userId}}" method="post" class="inline">
+                                    <button type="submit" class="text-emerald-600 hover:text-emerald-700 font-bold text-sm px-4 py-2 bg-emerald-50 rounded-lg transition-all mr-2">
+                                        Approve
+                                    </button>
+                                </form>
+                                <button class="text-red-600 hover:text-red-700 font-bold text-sm px-4 py-2 bg-red-50 rounded-lg transition-all">
+                                    Reject
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${pendingArtisans.empty}">
+                            <td colspan="4" class="px-6 py-10 text-center text-slate-400 italic">No pending artisan requests.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section: User Management -->
+        <section id="user-management" class="mb-12 animate-fade-in" style="animation-delay: 0.3s">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">User Management</h2>
+            <div class="glass-card rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">User</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Role</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr th:each="user : ${allUsers}" class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <img th:src="'https://ui-avatars.com/api/?name=' + ${user.name} + '&background=random'" class="w-8 h-8 rounded-full" />
+                                    <div>
+                                        <p class="font-semibold text-slate-700" th:text="${user.name}">John Doe</p>
+                                        <p class="text-xs text-slate-400" th:text="${user.email}">john@example.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-[10px] font-bold uppercase" th:text="${user.role}">Customer</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span th:if="${!user.isSuspended}" class="status-pill status-active">Active</span>
+                                <span th:if="${user.isSuspended}" class="status-pill status-suspended">Suspended</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <form th:action="@{'/admin/suspend-user/' + ${user.userId}}" method="post" class="inline">
+                                    <button type="submit" class="text-slate-600 hover:text-amber-600 p-2" th:title="${user.isSuspended ? 'Unsuspend' : 'Suspend'}">
+                                        <i class="fas" th:classappend="${user.isSuspended ? 'fa-user-check' : 'fa-user-slash'}"></i>
+                                    </button>
+                                </form>
+                                <form th:action="@{'/admin/delete-user/' + ${user.userId}}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                    <button type="submit" class="text-slate-600 hover:text-red-600 p-2" title="Delete User">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section: Review Moderation -->
+        <section id="review-moderation" class="animate-fade-in" style="animation-delay: 0.4s">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Review Moderation</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div th:each="review : ${flaggedReviews}" class="glass-card rounded-2xl p-6 border-l-4 border-red-500 shadow-sm relative group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=User" class="w-10 h-10 rounded-full" />
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm" th:text="${review.customer.name}">Customer Name</p>
+                                <p class="text-xs text-slate-400" th:text="'on ' + ${review.product.title}">on Product Name</p>
+                            </div>
+                        </div>
+                        <div class="flex text-amber-400 text-xs">
+                            <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 text-sm italic mb-4" th:text="'&quot;' + ${review.comment} + '&quot;'">&quot;This product was offensive and inappropriate...&quot;</p>
+                    <div class="flex justify-end gap-3">
+                        <button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-100 rounded-lg transition-all">Keep</button>
+                        <form th:action="@{'/admin/delete-review/' + ${review.reviewId}}" method="post">
+                            <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all shadow-lg shadow-red-200">Delete Content</button>
+                        </form>
+                    </div>
+                    <div class="absolute top-2 right-2 text-red-500 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                </div>
+                <div th:if="${flaggedReviews.empty}" class="col-span-2 glass-card rounded-2xl p-10 text-center text-slate-400 italic">
+                    No reviews flagged for moderation.
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
