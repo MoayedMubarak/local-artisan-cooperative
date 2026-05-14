@@ -21,6 +21,9 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.example.demo.repository.WishlistRepository wishlistRepository;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
@@ -47,6 +50,12 @@ public class AuthController {
         customer.setRole("CUSTOMER");
         customer.setPassword(BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt()));
         userRepository.save(customer);
+        
+        com.example.demo.model.Wishlist wishlist = new com.example.demo.model.Wishlist();
+        wishlist.setCustomer(customer);
+        wishlist.setDateCreated(java.time.LocalDate.now());
+        wishlistRepository.save(wishlist);
+        
         return ResponseEntity.ok(Map.of("success", true, "user", customer));
     }
 
