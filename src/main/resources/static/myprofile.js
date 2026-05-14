@@ -140,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateLoginState();
+    loadAddresses();
 });
 
 // ============================================================
@@ -272,8 +273,54 @@ window.logout = function () {
 };
 
 // ============================================================
-// Address Management
+// Address Management — DB-backed
 // ============================================================
+
+function getUserEmail() {
+    return sessionStorage.getItem('userEmail') || '';
+}
+
+function addressCardHtml(addr) {
+    const defBadge = addr.default
+        ? '<span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Default</span>'
+        : '';
+    return `
+        <div class="address-card bg-[#faf9f6] rounded-xl p-5 border border-[#e5e0d8] relative" data-id="${addr.id}">
+            <div class="absolute top-4 right-4 flex gap-2">
+                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors text-sm font-medium" onclick="editAddress(this)">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-[#8b7355] hover:text-red-500 transition-colors text-sm font-medium" onclick="deleteAddress(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="flex items-start gap-3 mb-3">
+                <i class="fas fa-map-marker-alt text-[#c17c5f] text-lg mt-0.5"></i>
+                <div>
+                    <span class="font-semibold text-[#5c4a3d]">${escapeHtml(addr.label)}</span>${defBadge}
+                </div>
+            </div>
+            <p class="text-[#8b7355] text-sm leading-relaxed">${escapeHtml(addr.street)}<br>${escapeHtml(addr.city)}, ${escapeHtml(addr.zip)}<br>${escapeHtml(addr.country)}</p>
+        </div>
+    `;
+}
+
+function loadAddresses() {
+    const email = getUserEmail();
+    if (!email) return;
+    fetch(`/api/addresses?email=${encodeURIComponent(email)}`)
+        .then(r => r.json())
+        .then(addresses => {
+            const grid = document.getElementById('addresses-grid');
+            if (!grid) return;
+            const addCard = grid.querySelector('.fa-plus')?.closest('.address-card');
+            grid.querySelectorAll('.address-card[data-id]').forEach(c => c.remove());
+            addresses.forEach(addr => {
+                addCard?.insertAdjacentHTML('beforebegin', addressCardHtml(addr));
+            });
+        })
+        .catch(err => console.error('Failed to load addresses', err));
+}
 
 window.openAddAddressModal = function () {
     const modal = document.getElementById('add-address-modal');
@@ -296,11 +343,11 @@ window.saveNewAddress = function (event) {
     const select  = form.querySelector('select');
     const cbInput = form.querySelector('input[type="checkbox"]');
 
-    const label   = inputs[0]?.value.trim();
-    const street  = inputs[1]?.value.trim();
-    const city    = inputs[2]?.value.trim();
-    const zip     = inputs[3]?.value.trim();
-    const country = select?.options[select.selectedIndex]?.text ?? '';
+    const label     = inputs[0]?.value.trim();
+    const street    = inputs[1]?.value.trim();
+    const city      = inputs[2]?.value.trim();
+    const zip       = inputs[3]?.value.trim();
+    const country   = select?.options[select.selectedIndex]?.text ?? '';
     const isDefault = cbInput?.checked ?? false;
 
     if (!label || !street || !city || !zip || !country || country.startsWith('Select')) {
@@ -308,38 +355,29 @@ window.saveNewAddress = function (event) {
         return;
     }
 
-    const grid     = document.getElementById('addresses-grid');
-    const addCard  = grid?.querySelector('.fa-plus')?.closest('.address-card');
-    const defBadge = isDefault ? '<span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Default</span>' : '';
+    const payload = {
+        userEmail: getUserEmail(),
+        label, street, city, zip, country,
+        default: isDefault
+    };
 
-    if (isDefault) removeAllDefaultBadges();
-
-    const html = `
-        <div class="address-card bg-[#faf9f6] rounded-xl p-5 border border-[#e5e0d8] relative">
-            <div class="absolute top-4 right-4 flex gap-2">
-                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors text-sm font-medium" onclick="editAddress(this)">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="text-[#8b7355] hover:text-red-500 transition-colors text-sm font-medium" onclick="deleteAddress(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="flex items-start gap-3 mb-3">
-                <i class="fas fa-map-marker-alt text-[#c17c5f] text-lg mt-0.5"></i>
-                <div>
-                    <span class="font-semibold text-[#5c4a3d]">${escapeHtml(label)}</span>${defBadge}
-                </div>
-            </div>
-            <p class="text-[#8b7355] text-sm leading-relaxed">${escapeHtml(street)}<br>${escapeHtml(city)}, ${escapeHtml(zip)}<br>${escapeHtml(country)}</p>
-        </div>
-    `;
-    addCard?.insertAdjacentHTML('beforebegin', html);
-    closeAddAddressModal();
-    showToast('Address added successfully!', 'success');
+    fetch('/api/addresses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(() => {
+        closeAddAddressModal();
+        loadAddresses();
+        showToast('Address added successfully!', 'success');
+    })
+    .catch(() => showToast('Failed to save address.', 'error'));
 };
 
 window.editAddress = function (button) {
     const card      = button.closest('.address-card');
+    const id        = card.dataset.id;
     const label     = card.querySelector('.font-semibold')?.textContent.trim() ?? '';
     const addrLines = card.querySelector('p')?.innerHTML.split('<br>') ?? [];
     const street    = addrLines[0]?.trim() ?? '';
@@ -371,6 +409,7 @@ window.editAddress = function (button) {
     }
 
     window.currentEditCard = card;
+    window.currentEditId   = id;
 
     const modal = document.getElementById('edit-address-modal');
     modal?.classList.remove('hidden');
@@ -382,6 +421,7 @@ window.closeEditAddressModal = function () {
     modal?.classList.add('hidden');
     modal?.classList.remove('flex');
     window.currentEditCard = null;
+    window.currentEditId   = null;
 };
 
 window.saveEditedAddress = function (event) {
@@ -399,38 +439,39 @@ window.saveEditedAddress = function (event) {
         return;
     }
 
-    if (isDefault) removeAllDefaultBadges();
-    const defBadge = isDefault ? '<span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Default</span>' : '';
+    const id = window.currentEditId;
+    if (!id) return;
 
-    if (window.currentEditCard) {
-        window.currentEditCard.innerHTML = `
-            <div class="absolute top-4 right-4 flex gap-2">
-                <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors text-sm font-medium" onclick="editAddress(this)">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="text-[#8b7355] hover:text-red-500 transition-colors text-sm font-medium" onclick="deleteAddress(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="flex items-start gap-3 mb-3">
-                <i class="fas fa-map-marker-alt text-[#c17c5f] text-lg mt-0.5"></i>
-                <div>
-                    <span class="font-semibold text-[#5c4a3d]">${escapeHtml(label)}</span>${defBadge}
-                </div>
-            </div>
-            <p class="text-[#8b7355] text-sm leading-relaxed">${escapeHtml(street)}<br>${escapeHtml(city)}, ${escapeHtml(zip)}<br>${escapeHtml(country)}</p>
-        `;
-    }
+    const payload = {
+        userEmail: getUserEmail(),
+        label, street, city, zip, country,
+        default: isDefault
+    };
 
-    closeEditAddressModal();
-    showToast('Address updated successfully!', 'success');
+    fetch(`/api/addresses/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(() => {
+        closeEditAddressModal();
+        loadAddresses();
+        showToast('Address updated successfully!', 'success');
+    })
+    .catch(() => showToast('Failed to update address.', 'error'));
 };
 
 window.deleteAddress = function (button) {
-    if (confirm('Are you sure you want to delete this address?')) {
-        button.closest('.address-card').remove();
-        showToast('Address deleted.', 'info');
-    }
+    if (!confirm('Are you sure you want to delete this address?')) return;
+    const card = button.closest('.address-card');
+    const id   = card.dataset.id;
+    fetch(`/api/addresses/${id}`, { method: 'DELETE' })
+        .then(() => {
+            card.remove();
+            showToast('Address deleted.', 'info');
+        })
+        .catch(() => showToast('Failed to delete address.', 'error'));
 };
 
 // ============================================================

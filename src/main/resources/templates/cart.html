@@ -326,47 +326,11 @@
                             </a>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            
-                            <!-- Default address — auto-selected -->
-                            <label class="relative cursor-pointer group">
-                                <input type="radio" name="selected_address" value="home" class="peer sr-only" checked>
-                                <div class="h-full p-4 rounded-xl border-2 border-[#f8f5f0] bg-[#fcfaf7] transition-all 
-                                            peer-checked:border-[#c17c5f] peer-checked:bg-white hover:border-[#e5e0d8]">
-                                    
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-map-marker-alt text-[#c17c5f] mr-2"></i>
-                                        <span class="font-bold text-[#5c4a3d]">Home</span>
-                                        <span class="ml-2 px-2 py-0.5 text-[10px] bg-green-100 text-green-700 rounded-full uppercase font-bold">Default</span>
-                                    </div>
-                                    
-                                    <div class="text-sm text-[#8a7a6d] leading-relaxed">
-                                        Block 123, 123 Main Street<br>
-                                        Manama<br>
-                                        Bahrain
-                                    </div>
-                                </div>
-                            </label>
-
-                            <!-- Work address -->
-                            <label class="relative cursor-pointer group">
-                                <input type="radio" name="selected_address" value="work" class="peer sr-only">
-                                <div class="h-full p-4 rounded-xl border-2 border-[#f8f5f0] bg-[#fcfaf7] transition-all 
-                                            peer-checked:border-[#c17c5f] peer-checked:bg-white hover:border-[#e5e0d8]">
-                                    
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-briefcase text-[#8b7355] mr-2"></i>
-                                        <span class="font-bold text-[#5c4a3d]">Work</span>
-                                    </div>
-                                    
-                                    <div class="text-sm text-[#8a7a6d] leading-relaxed">
-                                        Block 128, 456 Business Ave<br>
-                                        Manama<br>
-                                        Bahrain
-                                    </div>
-                                </div>
-                            </label>
-
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="cart-addresses-grid">
+                            <!-- Addresses loaded dynamically from DB -->
+                            <p id="cart-no-addresses" class="text-[#8b7355] text-sm col-span-2 hidden">
+                                No saved addresses yet. <a href="/profile" class="text-[#c17c5f] underline">Add one in your profile</a>.
+                            </p>
                         </div>
                     </div>
 
