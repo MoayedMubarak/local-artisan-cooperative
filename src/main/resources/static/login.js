@@ -100,11 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
                 sessionStorage.removeItem('postLoginNext');
 
-                if (data.user.role === 'ADMIN') {
-                    window.location.href = '/admin';
-                } else {
-                    window.location.href = next || '/index';
-                }
+                window.location.href = next || '/index';
             } else {
                 showFormError(form, data.message || 'Invalid email or password');
                 resetButtonLoading(form.querySelector('button[type="submit"]'), 'Login');
