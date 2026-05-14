@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error loading wishlist:', error);
+            checkEmptyState();
         }
     }
 
