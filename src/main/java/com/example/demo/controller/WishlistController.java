@@ -4,13 +4,14 @@ import com.example.demo.model.Customer;
 import com.example.demo.model.Product;
 import com.example.demo.model.Wishlist;
 import com.example.demo.model.WishlistItem;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.CustomerRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.WishlistItemRepository;
 import com.example.demo.repository.WishlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/wishlist")
+@Transactional
 public class WishlistController {
 
     @Autowired
@@ -28,7 +30,7 @@ public class WishlistController {
     private WishlistItemRepository wishlistItemRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private CustomerRepository customerRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -47,11 +49,11 @@ public class WishlistController {
 
     @PostMapping("/add/{productId}")
     public ResponseEntity<?> addToWishlist(@RequestHeader("X-User-Email") String email, @PathVariable Long productId) {
-        Optional<com.example.demo.model.User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty() || !(userOpt.get() instanceof Customer)) {
+        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
+        if (customerOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Customer not found");
         }
-        Customer customer = (Customer) userOpt.get();
+        Customer customer = customerOpt.get();
 
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isEmpty()) {
