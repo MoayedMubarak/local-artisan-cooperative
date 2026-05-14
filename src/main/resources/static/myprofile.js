@@ -51,6 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sidebarEmail) sidebarEmail.textContent = userProfile.email || 'john@example.com';
             if (sidebarRoleBadge) sidebarRoleBadge.textContent = userRole === 'ARTISAN' ? 'Artisan' : 'Customer';
             
+            // Update profile image
+            const profileImg = document.querySelector('aside img.w-40.h-40');
+            if (profileImg) {
+                profileImg.src = userProfile.profilePicture || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+            }
+            
             // Update form inputs
             const personalInfoSection = document.querySelector('section:first-of-type');
             if (personalInfoSection) {
@@ -93,12 +99,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const cameraBtn = document.querySelector('label .fa-camera')?.closest('label');
     cameraBtn?.querySelector('input[type="file"]')?.addEventListener('change', function () {
         if (!this.files.length) return;
+        const file = this.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
+            const imageUrl = e.target.result;
             const img = document.querySelector('.w-40.h-40.rounded-full');
-            if (img) img.src = e.target.result;
+            if (img) img.src = imageUrl;
+
+            // Save to database permanently
+            const userEmail = sessionStorage.getItem('userEmail');
+            if (userEmail) {
+                fetch('/api/user/update-profile-picture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, imageUrl: imageUrl })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Profile picture updated permanently!', 'success');
+                        // Update session storage
+                        const profile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
+                        profile.profilePicture = imageUrl;
+                        sessionStorage.setItem('userProfile', JSON.stringify(profile));
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to update profile picture', err);
+                    showToast('Failed to save profile picture to server.', 'error');
+                });
+            }
         };
-        reader.readAsDataURL(this.files[0]);
+        reader.readAsDataURL(file);
     });
 
     // ----------------------------------------------------------

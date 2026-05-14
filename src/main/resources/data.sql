@@ -19,24 +19,24 @@ INSERT INTO product_categories (category_id, name) OVERRIDING SYSTEM VALUE VALUE
 -- Admins: IDs 1
 -- Artisans: IDs 2-4
 -- Customers: IDs 5-7
-INSERT INTO users (user_id, name, email, password, role) OVERRIDING SYSTEM VALUE VALUES
-  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ADMIN'),
-  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
-  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
-  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN'),
-  (5,  'John Doe',      'john@example.com',      '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
-  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER'),
-  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER');
+INSERT INTO users (user_id, name, email, password, role, profile_picture) OVERRIDING SYSTEM VALUE VALUES
+  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ADMIN', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'),
+  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'),
+  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'),
+  (5,  'John Doe',      'john@example.com',      '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png');
 
 
 -- ── 3. Admins (joined subtable) ──────────────────────────────
 INSERT INTO admins (user_id) OVERRIDING SYSTEM VALUE VALUES (1);
 
 -- ── 4. Artisans (joined subtable) ───────────────────────────
-INSERT INTO artisans (user_id, shop_name, biography, profile_picture) OVERRIDING SYSTEM VALUE VALUES
-  (2, 'Elena''s Clay Studio',  'Elena has been shaping ceramics and glasswork for over a decade, inspired by Mediterranean craftsmanship.',  '/images/artisan-elena.jpg'),
-  (3, 'Marco''s Pottery House','Marco brings Italian heritage to every wheel-thrown piece, specializing in functional stoneware.',              '/images/artisan-marco.jpg'),
-  (4, 'Zara Textile Co.',      'Zara hand-weaves natural fibers into vibrant tapestries and wearable art rooted in West African tradition.',  '/images/artisan-zara.jpg');
+INSERT INTO artisans (user_id, shop_name, biography) OVERRIDING SYSTEM VALUE VALUES
+  (2, 'Elena''s Clay Studio',  'Elena has been shaping ceramics and glasswork for over a decade, inspired by Mediterranean craftsmanship.'),
+  (3, 'Marco''s Pottery House','Marco brings Italian heritage to every wheel-thrown piece, specializing in functional stoneware.'),
+  (4, 'Zara Textile Co.',      'Zara hand-weaves natural fibers into vibrant tapestries and wearable art rooted in West African tradition.');
 
 -- ── 5. Customers (joined subtable) ───────────────────────────
 INSERT INTO customers (user_id, address, phone) OVERRIDING SYSTEM VALUE VALUES

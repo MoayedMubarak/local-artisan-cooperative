@@ -134,6 +134,7 @@
     const userSection = document.getElementById('user-section');
     const userName = document.getElementById('nav-user-name');
     const userEmail = document.getElementById('nav-user-email');
+    const userMenuBtn = document.getElementById('user-menu-button') || document.querySelector('a[href="/profile"]');
     const loggedIn = getLoggedIn();
 
     if (loggedIn) {
@@ -141,6 +142,30 @@
       if (userSection) userSection.classList.remove('hidden');
       if (userName) userName.textContent = sessionStorage.getItem('userName') || 'Profile';
       if (userEmail) userEmail.textContent = sessionStorage.getItem('userEmail') || '';
+      
+      // Update profile picture in nav
+      if (userMenuBtn) {
+        const profileIcon = userMenuBtn.querySelector('i.fas.fa-user-circle');
+        let profileImg = userMenuBtn.querySelector('img.nav-profile-img');
+        
+        const userProfileStr = sessionStorage.getItem('userProfile');
+        let profilePicture = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'; // Default guest image
+        if (userProfileStr) {
+          try {
+            const profile = JSON.parse(userProfileStr);
+            if (profile.profilePicture) profilePicture = profile.profilePicture;
+          } catch(e) {}
+        }
+
+        if (profileIcon) {
+          const img = document.createElement('img');
+          img.src = profilePicture;
+          img.className = 'w-8 h-8 rounded-full object-cover border border-[#c17c5f] nav-profile-img';
+          profileIcon.replaceWith(img);
+        } else if (profileImg) {
+          profileImg.src = profilePicture;
+        }
+      }
     } else {
       if (loginWrapper) loginWrapper.classList.remove('hidden');
       if (userSection) userSection.classList.add('hidden');
