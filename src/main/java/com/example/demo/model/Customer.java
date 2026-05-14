@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "customers")
 public class Customer extends User {
+
     private String address;
     private String phone;
 }

@@ -8,13 +8,16 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "products")
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
+
     @Column(length = 1000)
     private String description;
+
     private double price;
     private String category;
     private String imageUrl;

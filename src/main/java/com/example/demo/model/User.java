@@ -8,13 +8,18 @@ import lombok.Data;
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     private String name;
     private String email;
     private String password;
     private String role;
-    @Column(columnDefinition = "LONGTEXT")
+
+    // Added: shared profile picture for all user types.
+    // Default is a generic avatar icon.
+    @Column(columnDefinition = "TEXT")
     private String profilePicture = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 }

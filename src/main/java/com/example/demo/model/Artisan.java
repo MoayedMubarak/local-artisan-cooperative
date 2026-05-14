@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "artisans")
 public class Artisan extends User {
+
     private String shopName;
     private String biography;
+    // profilePicture removed — it now lives on the base User class
 }
