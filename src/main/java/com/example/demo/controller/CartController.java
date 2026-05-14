@@ -31,8 +31,12 @@ public class CartController {
 
     @GetMapping
     public ResponseEntity<?> getCart(@RequestHeader("X-User-Email") String email) {
-        List<CartItem> items = cartItemRepository.findByUser_Email(email);
-        return ResponseEntity.ok(items);
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            List<CartItem> items = cartItemRepository.findByUser(userOpt.get());
+            return ResponseEntity.ok(items);
+        }
+        return ResponseEntity.ok(List.of());
     }
 
     @PostMapping("/add")
@@ -40,23 +44,25 @@ public class CartController {
         Long productId = Long.valueOf(payload.get("productId").toString());
         int quantity = payload.get("quantity") != null ? Integer.parseInt(payload.get("quantity").toString()) : 1;
 
-        Optional<CartItem> existingItemOpt = cartItemRepository.findByUser_EmailAndProduct_Id(email, productId);
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return ResponseEntity.badRequest().body("User not found");
+
+        Optional<Product> productOpt = productRepository.findById(productId);
+        if (productOpt.isEmpty()) return ResponseEntity.badRequest().body("Product not found");
+
+        User user = userOpt.get();
+        Product product = productOpt.get();
+
+        Optional<CartItem> existingItemOpt = cartItemRepository.findByUserAndProductId(user, productId);
         if (existingItemOpt.isPresent()) {
             CartItem item = existingItemOpt.get();
             item.setQuantity(item.getQuantity() + quantity);
             cartItemRepository.save(item);
             return ResponseEntity.ok(Map.of("success", true, "message", "Quantity updated in cart"));
         } else {
-            Optional<User> userOpt = userRepository.findByEmail(email);
-            Optional<Product> productOpt = productRepository.findById(productId);
-            
-            if (userOpt.isEmpty() || productOpt.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "User or Product not found"));
-            }
-
             CartItem item = new CartItem();
-            item.setUser(userOpt.get());
-            item.setProduct(productOpt.get());
+            item.setUser(user);
+            item.setProduct(product);
             item.setQuantity(quantity);
             cartItemRepository.save(item);
             return ResponseEntity.ok(Map.of("success", true, "message", "Item added to cart"));
@@ -65,9 +71,7 @@ public class CartController {
 
     @PutMapping("/update/{itemId}")
     public ResponseEntity<?> updateQuantity(@RequestHeader("X-User-Email") String email, @PathVariable Long itemId, @RequestBody Map<String, Integer> payload) {
-        Integer quantity = payload.get("quantity");
-        if (quantity == null) return ResponseEntity.badRequest().body("Quantity is required");
-
+        int quantity = payload.get("quantity");
         Optional<CartItem> itemOpt = cartItemRepository.findById(itemId);
         if (itemOpt.isPresent()) {
             CartItem item = itemOpt.get();
@@ -93,14 +97,22 @@ public class CartController {
 
     @DeleteMapping("/clear")
     public ResponseEntity<?> clearCart(@RequestHeader("X-User-Email") String email) {
-        cartItemRepository.deleteByUser_Email(email);
-        return ResponseEntity.ok(Map.of("success", true, "message", "Cart cleared"));
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            cartItemRepository.deleteByUser(userOpt.get());
+            return ResponseEntity.ok(Map.of("success", true, "message", "Cart cleared"));
+        }
+        return ResponseEntity.badRequest().body("User not found");
     }
 
     @GetMapping("/count")
     public ResponseEntity<?> getCartCount(@RequestHeader("X-User-Email") String email) {
-        List<CartItem> items = cartItemRepository.findByUser_Email(email);
-        int totalCount = items.stream().mapToInt(CartItem::getQuantity).sum();
-        return ResponseEntity.ok(totalCount);
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            List<CartItem> items = cartItemRepository.findByUser(userOpt.get());
+            int totalCount = items.stream().mapToInt(CartItem::getQuantity).sum();
+            return ResponseEntity.ok(totalCount);
+        }
+        return ResponseEntity.ok(0);
     }
 }
