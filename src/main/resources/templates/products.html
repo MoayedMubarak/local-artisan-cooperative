@@ -293,249 +293,28 @@
             </div>
 
             <!-- Product Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Product Card 1 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="ceramics" data-price="85" data-id="1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="product-grid">
+                <!-- Dynamic Product Card -->
+                <div th:each="product : ${products}" 
+                     class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" 
+                     th:attr="data-category=${#strings.toLowerCase(product.category)}, data-price=${product.price}, data-id=${product.id}">
+                    
                     <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
                         <i class="far fa-heart text-lg"></i>
                     </button>
+                    
                     <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&amp;h=300&amp;fit=crop" alt="Handmade Ceramic Vase" class="w-full h-56 object-cover">
+                        <img th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-56 object-cover">
                     </div>
+                    
                     <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Handmade Ceramic Vase</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Elena Rodriguez</p>
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1" th:text="${product.title}">Product Title</h3>
+                        <p class="text-[#8b7355] text-sm mb-3" th:text="'by ' + ${product.artisanName}">by Artisan Name</p>
                         <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">85.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                            <span class="text-xl font-bold text-[#c17c5f]" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' BD'">0.00 BD</span>
+                            <a th:href="@{/ProductDetailsStandard(id=${product.id})}" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                 View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 2 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="jewelry" data-price="120" data-id="2">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&amp;h=300&amp;fit=crop" alt="Silver Moonstone Necklace" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Silver Moonstone Necklace</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Marcus Chen</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xl font-bold text-[#c17c5f]">120.00 BD</span>
-                            </div>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 3 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="paintings" data-price="350" data-id="3">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&amp;h=300&amp;fit=crop" alt="Abstract Oil Painting" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Abstract Oil Painting</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Sarah Mitchell</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">350.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 4 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="textiles" data-price="195" data-id="4">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=400&amp;h=300&amp;fit=crop" alt="Woven Wool Blanket" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Woven Wool Blanket</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Anna Kowalski</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">195.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 5-->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="woodwork" data-price="65" data-id="5">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1666013942797-9daa4b8b3b4f?q=80&amp;w=1667&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Oak Wood Cutting Board" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Oak Wood Cutting Board</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by James Thompson</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xl font-bold text-[#c17c5f]">65.00 BD</span>
-                            </div>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 6 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="ceramics" data-price="48" data-id="6">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1733046889345-25938f38c8e7?q=80&amp;w=1180&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Artisan Coffee Mug Set" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Artisan Coffee Mug Set</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Elena Rodriguez</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">48.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 7 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="jewelry" data-price="95" data-id="7">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1693213085235-ea6deadf8cee?q=80&amp;w=1064&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gold Leaf Earrings" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Gold Leaf Earrings</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Maria Santos</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">95.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 8 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="paintings" data-price="220" data-id="8">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1719339285335-23a8caa24aea?q=80&amp;w=1667&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Landscape Watercolor" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Landscape Watercolor</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by David Park</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">220.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 9 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="textiles" data-price="78" data-id="9">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1609803384069-19f3e5a70e75?q=80&amp;w=1035&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Handwoven Scarf" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Handwoven Scarf</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Lisa Anderson</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">78.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 10-->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="woodwork" data-price="145" data-id="10">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1609081144307-8dbd166b011c?q=80&amp;w=987&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Carved Wooden Bowl" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Carved Wooden Bowl</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Robert Hayes</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xl font-bold text-[#c17c5f]">145.00 BD</span>
-                            </div>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 11 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="ceramics" data-price="62" data-id="11">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1714744918583-d37c8291183a?q=80&amp;w=1065&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Ceramic Planter Set" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Ceramic Planter Set</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Emma Wilson</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">62.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 12 -->
-                <div class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" data-category="textiles" data-price="135" data-id="12">
-                    <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
-                        <i class="far fa-heart text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1661034494973-ed878468e23f?q=80&amp;w=1770&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Embroidered Wall Hanging" class="w-full h-56 object-cover">
-                    </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1">Embroidered Wall Hanging</h3>
-                        <p class="text-[#8b7355] text-sm mb-3">by Sophie Turner</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-[#c17c5f]">135.00 BD</span>
-                            <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

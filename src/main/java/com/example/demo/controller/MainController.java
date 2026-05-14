@@ -22,6 +22,7 @@ public class MainController {
 
     @GetMapping("/")
     public String index(Model model) {
+        model.addAttribute("featuredProducts", productRepository.findAll().stream().limit(6).collect(java.util.stream.Collectors.toList()));
         return "index";
     }
 
@@ -130,7 +131,10 @@ public class MainController {
     }
 
     @GetMapping("/ProductDetailsStandard")
-    public String productDetailsStandard() {
+    public String productDetailsStandard(@RequestParam(required = false) Long id, Model model) {
+        if (id != null) {
+            productRepository.findById(id).ifPresent(product -> model.addAttribute("product", product));
+        }
         return "ProductDetailsStandard";
     }
 }
