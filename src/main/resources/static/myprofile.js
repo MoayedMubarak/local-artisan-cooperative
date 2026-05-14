@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Profile picture upload
     // ----------------------------------------------------------
     const cameraBtn = document.querySelector('label .fa-camera')?.closest('label');
-    cameraBtn?.querySelector('input[type="file"]')?.addEventListener('change', function () {
+    cameraBtn?.querySelector('input[type="file"]')?.addEventListener('change', async function () {
         if (!this.files.length) return;
         const file = this.files[0];
         const reader = new FileReader();
@@ -123,10 +123,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save to database permanently
             const userEmail = sessionStorage.getItem('userEmail');
             if (userEmail) {
+                // Downscale image before sending
+                const compressedUrl = await downscaleImage(imageUrl, 400, 400);
+                
                 fetch('/api/user/update-profile-picture', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: userEmail, imageUrl: imageUrl })
+                    body: JSON.stringify({ email: userEmail, imageUrl: compressedUrl })
                 })
                 .then(r => r.json())
                 .then(data => {
@@ -571,6 +574,36 @@ function getCountryCode(countryName) {
 function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, c =>
         ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function downscaleImage(dataUrl, maxWidth, maxHeight) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = dataUrl;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); // Compress as JPEG with 0.8 quality
+        };
+    });
 }
 
 function showToast(message, type = 'info') {
