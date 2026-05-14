@@ -224,16 +224,38 @@ window.saveShopInfo = function () {
 
 window.deleteAccount = function () {
     const message = 'Are you sure you want to delete your account? This action cannot be undone.';
+    const userEmail = sessionStorage.getItem('userEmail');
+
+    if (!userEmail) {
+        showToast('User email not found. Please log in again.', 'error');
+        return;
+    }
+
     if (confirm(message)) {
-        showToast('Account deletion confirmed. You will be logged out shortly.', 'info');
-        setTimeout(() => {
-            sessionStorage.removeItem('loggedIn');
-            sessionStorage.removeItem('isLoggedIn');
-            sessionStorage.removeItem('userEmail');
-            sessionStorage.removeItem('userName');
-            sessionStorage.removeItem('postLoginNext');
-            window.location.href = '/login';
-        }, 2500);
+        fetch(`/api/auth/delete-account?email=${encodeURIComponent(userEmail)}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Account deleted successfully. You will be logged out shortly.', 'success');
+                setTimeout(() => {
+                    sessionStorage.removeItem('loggedIn');
+                    sessionStorage.removeItem('isLoggedIn');
+                    sessionStorage.removeItem('userEmail');
+                    sessionStorage.removeItem('userName');
+                    sessionStorage.removeItem('userProfile');
+                    sessionStorage.removeItem('postLoginNext');
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                showToast(data.message || 'Failed to delete account.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting account:', error);
+            showToast('An error occurred while deleting your account.', 'error');
+        });
     } else {
         showToast('Account deletion cancelled.', 'info');
     }
