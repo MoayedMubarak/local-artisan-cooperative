@@ -12,7 +12,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationBadge = document.getElementById('notification-badge');
     const cartBadge = document.getElementById('cart-badge');
 
-    // Removed redundant updateLoginState - handled globally by authguard.js
+    function updateLoginState() {
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
+        if (loggedIn) {
+            loginButtonWrapper?.classList.add('hidden');
+            userSection?.classList.remove('hidden');
+
+            const userName = sessionStorage.getItem('userName') || 'John Doe';
+            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
+            if (navUserName) navUserName.textContent = userName;
+            if (navUserEmail) navUserEmail.textContent = userEmail;
+
+            updateNotificationBadge();
+        } else {
+            loginButtonWrapper?.classList.remove('hidden');
+            userSection?.classList.add('hidden');
+        }
+
+        updateCartBadge();
+    }
 
     // --- 1. Delivery Toggle (Ship vs Pickup) ---
     window.selectDelivery = function(mode) {
@@ -52,149 +70,41 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartTotal();
     };
 
-    // --- 2. Load Cart Items ---
-    async function loadCartItems() {
-        const email = sessionStorage.getItem('userEmail');
-        const container = document.getElementById('cart-items-container');
-        if (!container) return;
-
-        if (!email) {
-            container.innerHTML = '<div class="py-12 text-center text-[#8b7355]"><i class="fas fa-shopping-cart text-4xl mb-4 block opacity-20"></i><p class="text-lg font-medium">Please login to view your cart</p></div>';
-            updateCartTotal();
-            return;
-        }
-
-        try {
-            const response = await fetch(`/api/cart?email=${encodeURIComponent(email)}`);
-            const data = await response.json();
-
-            if (data.success && data.items.length > 0) {
-                container.innerHTML = '';
-                data.items.forEach(item => {
-                    const itemHtml = `
-                        <div class="cart-item flex items-center gap-4" data-product-id="${item.product.id}">
-                            <img src="${item.product.imageUrl}" alt="${item.product.title}" class="cart-item-img">
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-semibold text-[#5c4a3d] truncate">${item.product.title}</h3>
-                                <p class="text-sm text-[#8b7355]">by ${item.product.artisanName}</p>
-                                <p class="text-[#c17c5f] font-bold mt-1">${item.product.price.toFixed(2)} BD</p>
-                            </div>
-                            <div class="flex flex-col items-end gap-2 flex-shrink-0">
-                                <div class="flex items-center border border-[#e5e0d8] rounded-lg">
-                                    <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, -1)">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="px-3 py-1 text-[#5c4a3d] font-medium quantity-value">${item.quantity}</span>
-                                    <button class="quantity-btn px-3 py-1 text-[#8b7355]" onclick="updateQuantity(this, 1)">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <p class="font-bold text-[#5c4a3d] item-subtotal">${(item.product.price * item.quantity).toFixed(2)} BD</p>
-                                    <button class="text-[#8b7355] hover:text-red-500 transition-colors" onclick="removeItem(this)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', itemHtml);
-                });
-                
-                // Update global count
-                sessionStorage.setItem('cartCount', data.items.length);
-                if (window.updateCartBadge) window.updateCartBadge();
-            } else {
-                container.innerHTML = '<div class="py-12 text-center text-[#8b7355]"><i class="fas fa-shopping-cart text-4xl mb-4 block opacity-20"></i><p class="text-lg font-medium">Your cart is empty</p><a href="/products" class="text-[#c17c5f] underline mt-2 inline-block">Start Shopping</a></div>';
-                sessionStorage.setItem('cartCount', 0);
-                if (window.updateCartBadge) window.updateCartBadge();
-            }
-        } catch (err) {
-            console.error("Failed to load cart", err);
-            container.innerHTML = '<div class="py-12 text-center text-red-500"><p>Error loading cart. Please try again.</p></div>';
-        }
-
-        updateCartTotal();
-    }
-
-    // --- 3. Quantity Update ---
-    window.updateQuantity = async function(button, change) {
+    // --- 2. Quantity Update ---
+    window.updateQuantity = function(button, change) {
         const cartItem = button.closest('.cart-item');
-        const productId = cartItem.dataset.productId;
-        const userEmail = sessionStorage.getItem('userEmail');
-        
         const quantitySpan = cartItem.querySelector('.quantity-value');
-        let currentQty = parseInt(quantitySpan.textContent);
-        let newQty = currentQty + change;
-        
-        if (newQty < 1) return;
-
-        // Visual update first (optimistic)
-        quantitySpan.textContent = newQty;
-        const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent;
+        const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent; // Matches the BD price
         const price = parseFloat(priceText.replace(' BD', ''));
-        cartItem.querySelector('.item-subtotal').textContent = (price * newQty).toFixed(2) + ' BD';
-        updateCartTotal();
+        const subtotalEl = cartItem.querySelector('.item-subtotal');
 
-        try {
-            // We use the /add endpoint with change as quantity (it adds to existing)
-            const response = await fetch('/api/cart/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, productId: productId, quantity: change })
-            });
-            const data = await response.json();
-            if (!data.success) {
-                // Revert on failure
-                quantitySpan.textContent = currentQty;
-                cartItem.querySelector('.item-subtotal').textContent = (price * currentQty).toFixed(2) + ' BD';
-                updateCartTotal();
-                alert(data.message || "Failed to update quantity");
-            }
-        } catch (err) {
-            console.error("Quantity update failed", err);
-            quantitySpan.textContent = currentQty;
-            updateCartTotal();
-        }
+        let qty = parseInt(quantitySpan.textContent) + change;
+        if (qty < 1) qty = 1; // Prevent zero/negative
+
+        // Update UI
+        quantitySpan.textContent = qty;
+        subtotalEl.textContent = (price * qty).toFixed(2) + ' BD';
+
+        updateCartTotal();
     };
 
-    // --- 4. Remove Item ---
-    window.removeItem = async function(button) {
+    // --- 3. Remove Item ---
+    window.removeItem = function(button) {
         const cartItem = button.closest('.cart-item');
-        const productId = cartItem.dataset.productId;
-        const userEmail = sessionStorage.getItem('userEmail');
 
-        try {
-            const response = await fetch(`/api/cart/remove/${productId}?email=${encodeURIComponent(userEmail)}`, {
-                method: 'DELETE'
-            });
-            const data = await response.json();
-            
-            if (data.success) {
-                // Animation
-                cartItem.style.opacity = '0';
-                cartItem.style.transform = 'translateX(-20px)';
+        // Animation
+        cartItem.style.opacity = '0';
+        cartItem.style.transform = 'translateX(-20px)';
 
-                setTimeout(() => {
-                    cartItem.remove();
-                    updateCartTotal();
+        setTimeout(() => {
+            cartItem.remove();
+            updateCartTotal();
 
-                    // Update global count
-                    const currentCount = parseInt(sessionStorage.getItem('cartCount') || '0');
-                    sessionStorage.setItem('cartCount', Math.max(0, currentCount - 1));
-                    if (window.updateCartBadge) window.updateCartBadge();
-
-                    // Check if empty
-                    if (!document.querySelectorAll('.cart-item').length) {
-                        document.getElementById('cart-items-container').innerHTML = '<div class="py-12 text-center text-[#8b7355]"><i class="fas fa-shopping-cart text-4xl mb-4 block opacity-20"></i><p class="text-lg font-medium">Your cart is empty</p></div>';
-                    }
-                }, 300);
-            } else {
-                alert(data.message || "Failed to remove item");
+            // Check if empty
+            if (!document.querySelectorAll('.cart-item').length) {
+                alert('Your cart is empty!'); // Fallback or could show empty state div
             }
-        } catch (err) {
-            console.error("Removal failed", err);
-        }
+        }, 300);
     };
 
     // --- 4. Payment Method Selection ---
@@ -274,11 +184,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Load items from DB
-    loadCartItems();
-    
     // Load addresses from DB
     loadCartAddresses();
+
+    // Initialize Calculation on load
+    updateCartTotal();
+    updateLoginState();
 });
 
 function loadCartAddresses() {
@@ -339,5 +250,30 @@ function escapeHtml(str) {
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-    // Handled globally
-});
+// ============================================================
+// Utility helpers (shared across pages via global scope)
+// ============================================================
+
+/**
+ * Read the notification count from sessionStorage and update any badge on the page.
+ */
+function updateNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    if (!badge) return;
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+/**
+ * Read cart item count from sessionStorage and update any cart badge on the page.
+ */
+function updateCartBadge() {
+    document.querySelectorAll('.fa-shopping-cart')
+        .forEach(icon => {
+            const badge = icon.parentElement?.querySelector('span');
+            if (!badge) return;
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            badge.textContent = count;
+        });
+}
