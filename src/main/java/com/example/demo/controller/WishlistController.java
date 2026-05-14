@@ -37,15 +37,12 @@ public class WishlistController {
 
     @GetMapping
     public ResponseEntity<?> getWishlist(@RequestHeader("X-User-Email") String email) {
-        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
-        if (customerOpt.isPresent()) {
-            Optional<Wishlist> wishlistOpt = wishlistRepository.findByCustomer(customerOpt.get());
-            if (wishlistOpt.isPresent()) {
-                List<Product> products = wishlistOpt.get().getWishlistItems().stream()
-                        .map(WishlistItem::getProduct)
-                        .collect(Collectors.toList());
-                return ResponseEntity.ok(products);
-            }
+        Optional<Wishlist> wishlistOpt = wishlistRepository.findByCustomer_Email(email);
+        if (wishlistOpt.isPresent()) {
+            List<Product> products = wishlistOpt.get().getWishlistItems().stream()
+                    .map(WishlistItem::getProduct)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(products);
         }
         return ResponseEntity.ok(List.of());
     }
@@ -94,12 +91,7 @@ public class WishlistController {
 
     @DeleteMapping("/remove/{productId}")
     public ResponseEntity<?> removeFromWishlist(@RequestHeader("X-User-Email") String email, @PathVariable Long productId) {
-        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
-        if (customerOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Customer not found");
-        }
-        
-        Optional<Wishlist> wishlistOpt = wishlistRepository.findByCustomer(customerOpt.get());
+        Optional<Wishlist> wishlistOpt = wishlistRepository.findByCustomer_Email(email);
         if (wishlistOpt.isPresent()) {
             Optional<Product> productOpt = productRepository.findById(productId);
             if (productOpt.isPresent()) {
@@ -123,12 +115,9 @@ public class WishlistController {
     
     @GetMapping("/count")
     public ResponseEntity<?> getWishlistCount(@RequestHeader("X-User-Email") String email) {
-        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
-        if (customerOpt.isPresent()) {
-            Optional<Wishlist> wishlistOpt = wishlistRepository.findByCustomer(customerOpt.get());
-            if (wishlistOpt.isPresent()) {
-                return ResponseEntity.ok(wishlistOpt.get().getWishlistItems().size());
-            }
+        Optional<Wishlist> wishlistOpt = wishlistRepository.findByCustomer_Email(email);
+        if (wishlistOpt.isPresent()) {
+            return ResponseEntity.ok(wishlistOpt.get().getWishlistItems().size());
         }
         return ResponseEntity.ok(0);
     }

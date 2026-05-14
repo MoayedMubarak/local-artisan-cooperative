@@ -153,10 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
             row.innerHTML = `
                 <td class="py-4 px-6">
                     <div class="flex items-center gap-3">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" alt="${product.title || 'Product'}" class="w-16 h-16 object-cover rounded-lg">
+                        <img src="${product.imageUrl}" alt="${product.title}" class="w-16 h-16 object-cover rounded-lg">
                         <div>
-                            <p class="font-semibold text-[#5c4a3d]">${product.title || 'Untitled'}</p>
-                            <p class="text-sm text-[#8b7355]">${(product.description || '').substring(0, 50)}...</p>
+                            <p class="font-semibold text-[#5c4a3d]">${product.title}</p>
+                            <p class="text-sm text-[#8b7355]">${product.description.substring(0, 50)}...</p>
                         </div>
                     </div>
                 </td>
