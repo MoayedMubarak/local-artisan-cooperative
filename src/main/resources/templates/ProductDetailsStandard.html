@@ -199,7 +199,7 @@
                     <li><span>/</span></li>
                     <li><a href="/products" class="hover:text-[#c17c5f] transition-colors">Ceramics</a></li>
                     <li><span>/</span></li>
-                    <li class="text-[#5c4a3d] font-medium">Handmade Ceramic Vase</li>
+                    <li class="text-[#5c4a3d] font-medium" th:text="${product != null ? product.title : 'Product Details'}">Handmade Ceramic Vase</li>
                 </ol>
             </nav>
 
@@ -210,7 +210,7 @@
                     <div>
                         <!-- Main Image -->
                         <div class="mb-4">
-                            <img id="mainImage" src="https://images.unsplash.com/photo-1631125914037-b5657e20fa82?q=80&amp;w=987&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dp" alt="Handmade Ceramic Vase" class="w-full h-96 object-cover rounded-xl">
+                            <img id="mainImage" th:src="${product != null ? product.imageUrl : 'https://images.unsplash.com/photo-1631125914037-b5657e20fa82?q=80&amp;w=987&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dp'}" th:alt="${product != null ? product.title : 'Product Image'}" class="w-full h-96 object-cover rounded-xl">
                         </div>
                         
                         <!-- Thumbnails -->
@@ -225,24 +225,28 @@
                     <!-- Right: Product Info -->
                     <div>
                         <!-- Category Badge -->
-                        <span class="inline-block bg-[#f5ebe0] text-[#c17c5f] px-3 py-1 rounded-full text-sm font-medium mb-4">
+                        <span class="inline-block bg-[#f5ebe0] text-[#c17c5f] px-3 py-1 rounded-full text-sm font-medium mb-4"
+                              th:text="${product != null ? product.category : 'Ceramics'}">
                             Ceramics
                         </span>
                         
                         <!-- Product Name -->
-                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2">Handmade Ceramic Vase</h1>
+                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2"
+                            th:text="${product != null ? product.title : 'Handmade Ceramic Vase'}">Handmade Ceramic Vase</h1>
                         
                         <!-- Artisan Name -->
-                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block">
+                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block"
+                           th:text="${product != null ? 'by ' + product.artisanName : 'by Elena Rodriguez'}">
                             by Elena Rodriguez
                         </a>
                         
                         <!-- Price -->
-                        <div class="text-3xl font-bold text-[#c17c5f] mb-3">85.00 BD</div>
+                        <div class="text-3xl font-bold text-[#c17c5f] mb-3"
+                             th:text="${product != null ? #numbers.formatDecimal(product.price, 1, 2) + ' BD' : '85.00 BD'}">85.00 BD</div>
                         
                         <!-- Stock Count -->
                         <p class="text-green-600 mb-6">
-                            <i class="fas fa-check-circle mr-2"></i>12 in stock
+                            <i class="fas fa-check-circle mr-2"></i><span th:text="${product != null ? '12' : '12'}">12</span> in stock
                         </p>
                         
                         <!-- Star Rating -->
@@ -261,11 +265,9 @@
                         <!-- Description -->
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold text-[#5c4a3d] mb-2">Description</h3>
-                            <p class="text-[#8b7355] leading-relaxed">
+                            <p class="text-[#8b7355] leading-relaxed"
+                               th:text="${product != null ? product.description : 'This beautiful handmade ceramic vase is crafted with care...'}">
                                 This beautiful handmade ceramic vase is crafted with care by skilled artisan Elena Rodriguez. Each piece is unique, featuring a smooth glazed finish in warm earth tones that complement any home decor. Perfect for displaying fresh or dried flowers, this vase adds a touch of organic elegance to your living space.
-                            </p>
-                            <p class="text-[#8b7355] leading-relaxed mt-3">
-                                Dimensions: 12" height × 5" diameter. Made from high-quality stoneware clay and fired at high temperatures for durability. Food-safe glaze. Hand wash recommended.
                             </p>
                         </div>
                         

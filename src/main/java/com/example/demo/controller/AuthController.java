@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,6 +21,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private com.example.demo.repository.WishlistRepository wishlistRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
@@ -47,6 +51,12 @@ public class AuthController {
         customer.setRole("CUSTOMER");
         customer.setPassword(BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt()));
         userRepository.save(customer);
+        
+        com.example.demo.model.Wishlist wishlist = new com.example.demo.model.Wishlist();
+        wishlist.setCustomer(customer);
+        wishlist.setDateCreated(java.time.LocalDate.now());
+        wishlistRepository.save(wishlist);
+        
         return ResponseEntity.ok(Map.of("success", true, "user", customer));
     }
 
@@ -59,5 +69,22 @@ public class AuthController {
         artisan.setPassword(BCrypt.hashpw(artisan.getPassword(), BCrypt.gensalt()));
         userRepository.save(artisan);
         return ResponseEntity.ok(Map.of("success", true, "user", artisan));
+    }
+
+    @DeleteMapping("/delete-account")
+    @Transactional
+    public ResponseEntity<?> deleteAccount(@RequestParam String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user instanceof Customer) {
+                Optional<com.example.demo.model.Wishlist> wishlistOpt = wishlistRepository.findByCustomer((Customer) user);
+                wishlistOpt.ifPresent(wishlist -> wishlistRepository.delete(wishlist));
+            }
+            // Add similar logic for Artisan products if needed, or just let JPA handle it if configured
+            userRepository.delete(user);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Account deleted successfully"));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "User not found"));
     }
 }

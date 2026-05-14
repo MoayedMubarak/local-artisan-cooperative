@@ -22,25 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationBadge = document.getElementById('notification-badge');
     const cartBadge = document.getElementById('cart-badge');
 
-    function updateLoginState() {
-        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
-        if (loggedIn) {
-            loginButtonWrapper?.classList.add('hidden');
-            userSection?.classList.remove('hidden');
-
-            const userName = sessionStorage.getItem('userName') || 'John Doe';
-            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
-            if (navUserName) navUserName.textContent = userName;
-            if (navUserEmail) navUserEmail.textContent = userEmail;
-
-            updateNotificationBadge();
-        } else {
-            loginButtonWrapper?.classList.remove('hidden');
-            userSection?.classList.add('hidden');
-        }
-
-        updateCartBadge();
-    }
+    // Removed redundant updateLoginState - handled globally by authguard.js
 
     priceRange?.addEventListener('input', function () {
         priceValue.textContent = this.value + ' BD';
@@ -256,36 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial render — apply default filters
     applyFilters();
-    updateLoginState();
 });
 
-// ============================================================
-// Utility helpers (shared across pages via global scope)
-// ============================================================
-
-/**
- * Read the notification count from sessionStorage and update any badge on the page.
- */
-function updateNotificationBadge() {
-    const badge = document.getElementById('notification-badge');
-    if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'flex' : 'none';
-}
-
-/**
- * Read cart item count from sessionStorage and update any cart badge on the page.
- */
-function updateCartBadge() {
-    document.querySelectorAll('.fa-shopping-cart')
-        .forEach(icon => {
-            const badge = icon.parentElement?.querySelector('span');
-            if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
-            badge.textContent = count;
-        });
-}
+// Badge updates are handled globally by authguard.js
 
 // ============================================================
 // Navigate to Product Detail Page

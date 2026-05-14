@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. Delivery Toggle (Ship vs Pickup) ---
     window.selectDelivery = function(mode) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to change delivery options.')) return;
         isShipping = (mode === 'ship');
 
         const shipCard = document.getElementById('card-ship');
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. Quantity Update ---
     window.updateQuantity = function(button, change) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to update item quantities.')) return;
         const cartItem = button.closest('.cart-item');
         const quantitySpan = cartItem.querySelector('.quantity-value');
         const priceText = cartItem.querySelector('.text-\\[\\#c17c5f\\]').textContent; // Matches the BD price
@@ -90,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. Remove Item ---
     window.removeItem = function(button) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to remove items from your cart.')) return;
         const cartItem = button.closest('.cart-item');
 
         // Animation
@@ -100,15 +103,36 @@ document.addEventListener('DOMContentLoaded', () => {
             cartItem.remove();
             updateCartTotal();
 
-            // Check if empty
-            if (!document.querySelectorAll('.cart-item').length) {
-                alert('Your cart is empty!'); // Fallback or could show empty state div
-            }
+            checkCartEmpty();
         }, 300);
     };
 
+    function checkCartEmpty() {
+        const container = document.getElementById('cart-items-container');
+        const emptyMsg = document.getElementById('empty-cart-msg');
+        const summary = document.querySelector('.mt-4.pt-4.border-t-2'); // Order summary div
+        const confirmBtn = document.getElementById('confirm-btn');
+
+        if (container && !container.querySelectorAll('.cart-item').length) {
+            emptyMsg?.classList.remove('hidden');
+            if (summary) summary.style.display = 'none';
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        } else {
+            emptyMsg?.classList.add('hidden');
+            if (summary) summary.style.display = 'block';
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    }
+
     // --- 4. Payment Method Selection ---
     window.selectPayment = function(card) {
+        if (window.requireLoginForAction && !window.requireLoginForAction('Login/Register first to change payment method.')) return;
         document.querySelectorAll('.payment-card').forEach(c => {
             c.classList.remove('selected');
             const radio = c.querySelector('input[type="radio"]');
@@ -184,10 +208,74 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Load addresses from DB
+    loadCartAddresses();
+
+    // Check if empty on load
+    checkCartEmpty();
+
     // Initialize Calculation on load
     updateCartTotal();
     updateLoginState();
 });
+
+function loadCartAddresses() {
+    const email = sessionStorage.getItem('userEmail') || '';
+    const grid = document.getElementById('cart-addresses-grid');
+    const noAddresses = document.getElementById('cart-no-addresses');
+    if (!grid) return;
+
+    if (!email) {
+        if (noAddresses) noAddresses.classList.remove('hidden');
+        return;
+    }
+
+    fetch(`/api/addresses?email=${encodeURIComponent(email)}`)
+        .then(r => r.json())
+        .then(addresses => {
+            // Remove old address labels (keep the no-address message)
+            grid.querySelectorAll('label.cart-address-item').forEach(el => el.remove());
+
+            if (!addresses.length) {
+                if (noAddresses) noAddresses.classList.remove('hidden');
+                return;
+            }
+            if (noAddresses) noAddresses.classList.add('hidden');
+
+            let firstChecked = false;
+            addresses.forEach(addr => {
+                const isFirst = !firstChecked && (addr.default || true);
+                if (!firstChecked) firstChecked = true;
+                const checked = addr.default ? 'checked' : '';
+                const defBadge = addr.default
+                    ? '<span class="ml-2 px-2 py-0.5 text-[10px] bg-green-100 text-green-700 rounded-full uppercase font-bold">Default</span>'
+                    : '';
+                const html = `
+                    <label class="relative cursor-pointer group cart-address-item">
+                        <input type="radio" name="selected_address" value="${addr.id}" class="peer sr-only" ${checked}>
+                        <div class="h-full p-4 rounded-xl border-2 border-[#f8f5f0] bg-[#fcfaf7] transition-all
+                                    peer-checked:border-[#c17c5f] peer-checked:bg-white hover:border-[#e5e0d8]">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-map-marker-alt text-[#c17c5f] mr-2"></i>
+                                <span class="font-bold text-[#5c4a3d]">${escapeHtml(addr.label)}</span>${defBadge}
+                            </div>
+                            <div class="text-sm text-[#8a7a6d] leading-relaxed">
+                                ${escapeHtml(addr.street)}<br>
+                                ${escapeHtml(addr.city)}<br>
+                                ${escapeHtml(addr.country)}
+                            </div>
+                        </div>
+                    </label>`;
+                noAddresses.insertAdjacentHTML('beforebegin', html);
+            });
+        })
+        .catch(err => console.error('Failed to load addresses for cart', err));
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 // ============================================================
 // Utility helpers (shared across pages via global scope)
@@ -199,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
@@ -212,7 +300,7 @@ function updateCartBadge() {
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
             badge.textContent = count;
         });
 }

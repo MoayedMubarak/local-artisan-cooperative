@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (navUserEmail) navUserEmail.textContent = userEmail;
 
             updateNotificationBadge();
+            loadWishlist(); // Load wishlist if logged in
         } else {
             loginButtonWrapper?.classList.remove('hidden');
             userSection?.classList.add('hidden');
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         button.classList.add('active');
 
         document.querySelectorAll('.wishlist-item').forEach(row => {
-            const show = category === 'all' || row.dataset.category === category;
+            const rowCategory = row.dataset.category ? row.dataset.category.toLowerCase() : '';
+            const show = category === 'all' || rowCategory === category.toLowerCase();
             row.style.display = show ? '' : 'none';
         });
     };
@@ -48,19 +50,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 2. Remove from wishlist
     // ----------------------------------------------------------
-    window.removeFromWishlist = function (button) {
+    window.removeFromWishlist = async function (button) {
         const row = button.closest('.wishlist-item');
         if (!row) return;
 
-        row.style.opacity   = '0';
-        row.style.transform = 'translateX(-20px)';
-        row.style.transition = 'all 0.3s ease';
+        const productId = row.dataset.id;
+        const userEmail = sessionStorage.getItem('userEmail');
 
-        setTimeout(() => {
-            row.remove();
-            updateWishlistCount();
-            checkEmptyState();
-        }, 300);
+        if (!userEmail) return;
+
+        try {
+            const response = await fetch(`/api/wishlist/remove/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-User-Email': userEmail
+                }
+            });
+
+            if (response.ok) {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                row.style.transition = 'all 0.3s ease';
+
+                setTimeout(() => {
+                    row.remove();
+                    updateWishlistCount();
+                    checkEmptyState();
+                }, 300);
+                showToast('Item removed from wishlist', 'success');
+            } else {
+                showToast('Failed to remove item', 'error');
+            }
+        } catch (error) {
+            console.error('Error removing from wishlist:', error);
+            showToast('An error occurred', 'error');
+        }
     };
 
     // ----------------------------------------------------------
@@ -89,10 +113,81 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     buildAddAllButton();
 
-    // ----------------------------------------------------------
-    // 5. Initial count
-    // ----------------------------------------------------------
-    updateWishlistCount();
+    async function loadWishlist() {
+        const userEmail = sessionStorage.getItem('userEmail');
+        if (!userEmail) return;
+
+        try {
+            const response = await fetch('/api/wishlist', {
+                headers: {
+                    'X-User-Email': userEmail
+                }
+            });
+
+            if (response.ok) {
+                const products = await response.json();
+                renderWishlist(products);
+            }
+        } catch (error) {
+            console.error('Error loading wishlist:', error);
+            checkEmptyState();
+        }
+    }
+
+    function renderWishlist(products) {
+        const tbody = document.querySelector('tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+        if (products.length === 0) {
+            checkEmptyState();
+            return;
+        }
+
+        products.forEach(product => {
+            const row = document.createElement('tr');
+            row.className = 'wishlist-row border-b border-[#e5e0d8] wishlist-item';
+            row.dataset.category = product.category;
+            row.dataset.id = product.id;
+
+            row.innerHTML = `
+                <td class="py-4 px-6">
+                    <div class="flex items-center gap-3">
+                        <img src="${product.imageUrl}" alt="${product.title}" class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <p class="font-semibold text-[#5c4a3d]">${product.title}</p>
+                            <p class="text-sm text-[#8b7355]">${product.description.substring(0, 50)}...</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-4 px-6">
+                    <p class="text-[#5c4a3d] font-medium">${product.artisanName || 'ArtsyVibe Artisan'}</p>
+                </td>
+                <td class="py-4 px-6">
+                    <span class="text-[#8b7355]">${product.category}</span>
+                </td>
+                <td class="py-4 px-6">
+                    <span class="font-bold text-[#c17c5f]">${product.price.toFixed(3)} BD</span>
+                </td>
+                <td class="py-4 px-6">
+                    <div class="flex items-center gap-2">
+                        <button class="add-to-cart-btn bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors" onclick="addToCart(this)">
+                            <i class="fas fa-shopping-cart mr-1"></i>Add to Cart
+                        </button>
+                        <button class="heart-btn active w-10 h-10 flex items-center justify-center text-[#ef4444]" onclick="removeFromWishlist(this)" title="Remove from wishlist">
+                            <i class="fas fa-heart text-lg"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        updateWishlistCount();
+        checkEmptyState();
+    }
+
+    // Initial load
     updateLoginState();
 });
 
@@ -125,7 +220,7 @@ function checkEmptyState() {
 
 function incrementCartCount() {
     const badges = document.querySelectorAll('.fa-shopping-cart + span, .fa-shopping-cart ~ span');
-    let newCount = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10) + 1;
+    let newCount = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10) + 1;
     sessionStorage.setItem('cartCount', newCount);
 
     document.querySelectorAll('.fa-shopping-cart').forEach(icon => {
@@ -184,7 +279,7 @@ function showToast(message, type = 'info') {
 function updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
@@ -197,7 +292,7 @@ function updateCartBadge() {
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
             badge.textContent = count;
         });
 }

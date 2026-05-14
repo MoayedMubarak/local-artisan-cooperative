@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('userRole', data.user.role);
                     sessionStorage.setItem('userId', data.user.userId);
                     sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+                    sessionStorage.setItem('cartCount', '0');
                     
                     showToast('Account created! Welcome to ArtsyVibe.', 'success');
 

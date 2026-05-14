@@ -15,4 +15,6 @@ public abstract class User {
     private String email;
     private String password;
     private String role;
+    @Column(columnDefinition = "LONGTEXT")
+    private String profilePicture = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 }

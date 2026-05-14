@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .terracotta {
+            color: #c17c5f;
+        }
+        
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+        
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+        
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+        
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+        
+        .text-earth {
+            color: #8b7355;
+        }
+        
+        .bg-earth {
+            background-color: #8b7355;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+        
+        .sidebar-link {
+            transition: background-color 0.2s ease, color 0.2s ease;
+            color: #d4c5b5;
+        }
+        
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+        }
+        
+        .sidebar-link:hover i,
+        .sidebar-link:hover span {
+            color: #ffffff;
+        }
+        
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-left: 3px solid #ffffff;
+            color: #ffffff;
+        }
+        
+        .sidebar-link.active i,
+        .sidebar-link.active span {
+            color: #ffffff;
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-menu-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.5rem);
+            width: 200px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 1rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            display: none;
+            z-index: 50;
+        }
+        
+        .user-menu-dropdown.show {
+            display: block;
+        }
+        
+        .user-menu-item {
+            display: block;
+            padding: 0.85rem 1rem;
+            color: #5c4a3d;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f5ebe0;
+        }
+        
+        .user-menu-item.logout:hover {
+            color: #b91c1c;
+            background-color: #fee2e2;
+        }
+        
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .chevron-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -4px rgba(139, 115, 85, 0.15), 0 6px 10px -4px rgba(139, 115, 85, 0.1);
+        }
+        
+        .quick-action-card {
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -4px rgba(139, 115, 85, 0.15);
+        }
+        
+        .activity-item {
+            transition: all 0.2s ease;
+        }
+        
+        .activity-item:hover {
+            background-color: #f5ebe0;
+        }
+        
+        .bar-chart-column {
+            transition: height 0.5s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+            
+            <!-- Right Side - Notifications and User -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
+                </button>
+                
+                <!-- User Profile -->
+                <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <button id="userMenuButton" type="button" class="flex items-center gap-3 text-left focus:outline-none">
+                        <img 
+                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                            alt="Admin User" 
+                            class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                        />
+                        <div class="hidden md:block">
+                            <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                            <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                        </div>
+                        <i id="chevronIcon" class="chevron-icon fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                    </button>
+                    <div id="userMenuDropdown" class="user-menu-dropdown">
+                        <button id="logoutButton" class="user-menu-item logout w-full text-left">
+                            <i class="fas fa-sign-out-alt mr-3"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Admin Profile -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center gap-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold text-sm">Admin User</h3>
+                        <span class="inline-block bg-[#c17c5f] text-white text-xs px-2 py-1 rounded-full mt-1">Administrator</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="p-4 mt-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="admin-dashboard.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-users w-5"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-user-check w-5"></i>
+                            <span>Artisan Approvals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-undo w-5"></i>
+                            <span>Refunds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-star w-5"></i>
+                            <span>Review Moderation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Systems Log Section -->
+            <div class="p-4 mt-2 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">Administrator Dashboard</h1>
+                <p class="text-[#8b7355]">System overview and key performance indicators.</p>
+            </div>
+
+            <!-- First Row: KPI Stat Cards (6 cards) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+                <!-- Total Users -->
+                <div class="stat-card bg-white rounded-xl p-5 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-users text-xl text-blue-600"></i>
+                        </div>
+                        <span class="text-green-600 text-xs font-semibold flex items-center gap-1">
+                            <i class="fas fa-arrow-up"></i>
+                            8.2%
+                        </span>
+                    </div>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Total Users</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]">3,847</p>
+                    <p class="text-xs text-[#8b7355] mt-2">This month</p>
+                </div>
+
+                <!-- Total Artisans -->
+                <div class="stat-card bg-white rounded-xl p-5 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-palette text-xl text-amber-600"></i>
+                        </div>
+                        <span class="text-green-600 text-xs font-semibold flex items-center gap-1">
+                            <i class="fas fa-arrow-up"></i>
+                            12.5%
+                        </span>
+                    </div>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Total Artisans</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]">428</p>
+                    <p class="text-xs text-[#8b7355] mt-2">This month</p>
+                </div>
+
+                <!-- Active Products -->
+                <div class="stat-card bg-white rounded-xl p-5 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-[#fef3c7] rounded-xl flex items-center justify-center">
+                            <i class="fas fa-box text-xl text-[#c17c5f]"></i>
+                        </div>
+                        <span class="text-green-600 text-xs font-semibold flex items-center gap-1">
+                            <i class="fas fa-arrow-up"></i>
+                            5.3%
+                        </span>
+                    </div>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Active Products</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]">2,156</p>
+                    <p class="text-xs text-[#8b7355] mt-2">This month</p>
+                </div>
+
+                <!-- Open Auctions -->
+                <div class="stat-card bg-white rounded-xl p-5 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-gavel text-xl text-purple-600"></i>
+                        </div>
+                        <span class="text-red-600 text-xs font-semibold flex items-center gap-1">
+                            <i class="fas fa-arrow-down"></i>
+                            2.1%
+                        </span>
+                    </div>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Open Auctions</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]">87</p>
+                    <p class="text-xs text-[#8b7355] mt-2">This month</p>
+                </div>
+
+                <!-- Pending Reviews -->
+                <div class="stat-card bg-white rounded-xl p-5 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-orange-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-star text-xl text-orange-600"></i>
+                        </div>
+                        <span class="text-orange-600 text-xs font-semibold flex items-center gap-1">
+                            <i class="fas fa-exclamation-circle"></i>
+                            23
+                        </span>
+                    </div>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Pending Reviews</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]">156</p>
+                    <p class="text-xs text-[#8b7355] mt-2">This month</p>
+                </div>
+
+                <!-- Pending Refunds -->
+                <div class="stat-card bg-white rounded-xl p-5 card-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-red-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-undo text-xl text-red-600"></i>
+                        </div>
+                        <span class="text-red-600 text-xs font-semibold flex items-center gap-1">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            8
+                        </span>
+                    </div>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Pending Refunds</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]">34</p>
+                    <p class="text-xs text-[#8b7355] mt-2">This month</p>
+                </div>
+            </div>
+
+            <!-- Second Row: Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Orders per Week - Line Chart -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">Orders per Week</h2>
+                    <div class="relative h-64">
+                        <svg class="w-full h-full" viewBox="0 0 600 240" preserveAspectRatio="none">
+                            <!-- Grid Lines -->
+                            <defs>
+                                <linearGradient id="orderLineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#c17c5f;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#c17c5f;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Horizontal Grid Lines -->
+                            <line x1="0" y1="40" x2="600" y2="40" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="0" y1="90" x2="600" y2="90" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="0" y1="140" x2="600" y2="140" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="0" y1="190" x2="600" y2="190" stroke="#e5e0d8" stroke-width="1" />
+                            
+                            <!-- Vertical Grid Lines -->
+                            <line x1="75" y1="0" x2="75" y2="200" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="225" y1="0" x2="225" y2="200" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="375" y1="0" x2="375" y2="200" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="525" y1="0" x2="525" y2="200" stroke="#e5e0d8" stroke-width="1" />
+                            
+                            <!-- Area Fill -->
+                            <path d="M 0,180 L 75,150 L 225,120 L 375,90 L 525,60 L 600,40 L 600,200 L 0,200 Z" fill="url(#orderLineGradient)" />
+                            
+                            <!-- Line -->
+                            <path d="M 0,180 L 75,150 L 225,120 L 375,90 L 525,60 L 600,40" fill="none" stroke="#c17c5f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                            
+                            <!-- Data Points -->
+                            <circle cx="0" cy="180" r="5" fill="#c17c5f" />
+                            <circle cx="75" cy="150" r="5" fill="#c17c5f" />
+                            <circle cx="225" cy="120" r="5" fill="#c17c5f" />
+                            <circle cx="375" cy="90" r="5" fill="#c17c5f" />
+                            <circle cx="525" cy="60" r="5" fill="#c17c5f" />
+                            <circle cx="600" cy="40" r="5" fill="#c17c5f" />
+                        </svg>
+                        
+                        <!-- X-axis Labels -->
+                        <div class="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-[#8b7355] pt-2">
+                            <span>Week 1</span>
+                            <span>Week 2</span>
+                            <span>Week 3</span>
+                            <span>Week 4</span>
+                        </div>
+                        <!-- Y-axis Labels — inside relative so absolute anchors correctly -->
+                        <div class="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-xs text-[#8b7355] text-right pr-1">
+                            <span>300</span>
+                            <span>200</span>
+                            <span>100</span>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Overview - Bar Chart -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">Revenue Overview</h2>
+                    <div class="relative h-64">
+                        <svg class="w-full h-full" viewBox="0 0 640 240" preserveAspectRatio="none">
+                            <!-- Y-axis labels — anchored exactly to grid lines -->
+                            <text x="38" y="44"  text-anchor="end" font-size="11" fill="#8b7355">30K BD</text>
+                            <text x="38" y="94"  text-anchor="end" font-size="11" fill="#8b7355">20K BD</text>
+                            <text x="38" y="144" text-anchor="end" font-size="11" fill="#8b7355">10K BD</text>
+                            <text x="38" y="194" text-anchor="end" font-size="11" fill="#8b7355">0K BD</text>
+
+                            <!-- Grid Lines (start after Y-axis label area) -->
+                            <line x1="42" y1="40"  x2="640" y2="40"  stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="42" y1="90"  x2="640" y2="90"  stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="42" y1="140" x2="640" y2="140" stroke="#e5e0d8" stroke-width="1" />
+                            <line x1="42" y1="190" x2="640" y2="190" stroke="#e5e0d8" stroke-width="1" />
+
+                            <!-- Bars (shifted right to clear Y-axis labels) -->
+                            <!-- July -->
+                            <rect x="60"  y="140" width="55" height="50"  fill="#fbbf24" rx="4" />
+                            <!-- August -->
+                            <rect x="155" y="115" width="55" height="75"  fill="#fbbf24" rx="4" />
+                            <!-- September -->
+                            <rect x="250" y="95"  width="55" height="95"  fill="#fbbf24" rx="4" />
+                            <!-- October -->
+                            <rect x="345" y="75"  width="55" height="115" fill="#fbbf24" rx="4" />
+                            <!-- November -->
+                            <rect x="440" y="55"  width="55" height="135" fill="#fbbf24" rx="4" />
+                            <!-- December -->
+                            <rect x="535" y="40"  width="55" height="150" fill="#fbbf24" rx="4" />
+                        </svg>
+
+                        <!-- X-axis Labels -->
+                        <div class="absolute bottom-0 left-10 right-0 flex justify-around text-xs text-[#8b7355]">
+                            <span>Jul</span>
+                            <span>Aug</span>
+                            <span>Sep</span>
+                            <span>Oct</span>
+                            <span>Nov</span>
+                            <span>Dec</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third Row: Quick Action Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Pending Artisan Approvals -->
+                <div class="quick-action-card bg-white rounded-xl p-6 card-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-user-clock text-2xl text-amber-600"></i>
+                        </div>
+                        <span class="bg-amber-500 text-white text-sm font-bold px-3 py-1 rounded-full">12</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-[#5c4a3d] mb-2">Pending Artisan Approvals</h3>
+                    <p class="text-sm text-[#8b7355] mb-4">New artisan applications awaiting your review and approval.</p>
+                    <button class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-semibold transition-colors">
+                        Review Now
+                    </button>
+                </div>
+
+                <!-- Pending Refund Requests -->
+                <div class="quick-action-card bg-white rounded-xl p-6 card-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-undo-alt text-2xl text-red-600"></i>
+                        </div>
+                        <span class="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">8</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-[#5c4a3d] mb-2">Pending Refund Requests</h3>
+                    <p class="text-sm text-[#8b7355] mb-4">Customer refund requests requiring immediate attention.</p>
+                    <button class="w-full bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-lg font-semibold transition-colors">
+                        Review Now
+                    </button>
+                </div>
+
+                <!-- Flagged Reviews -->
+                <div class="quick-action-card bg-white rounded-xl p-6 card-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-orange-50 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-flag text-2xl text-orange-600"></i>
+                        </div>
+                        <span class="bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full">5</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-[#5c4a3d] mb-2">Flagged Reviews</h3>
+                    <p class="text-sm text-[#8b7355] mb-4">Reviews reported by users that need moderation.</p>
+                    <button class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-lg font-semibold transition-colors">
+                        Moderate Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity Feed -->
+            <div class="bg-white rounded-xl card-shadow p-6">
+                <h2 class="text-xl font-bold text-[#5c4a3d] mb-6">Recent Activity</h2>
+                <div class="space-y-4">
+                    <!-- Activity Item 1 -->
+                    <div class="activity-item flex items-start gap-4 p-4 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-plus text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[#5c4a3d] font-medium">New artisan registration: <span class="font-semibold">Maria Santos</span> applied to join the platform</p>
+                            <p class="text-xs text-[#8b7355] mt-1">2 minutes ago</p>
+                        </div>
+                        <a href="#" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm whitespace-nowrap">View</a>
+                    </div>
+
+                    <!-- Activity Item 2 -->
+                    <div class="activity-item flex items-start gap-4 p-4 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-shopping-bag text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[#5c4a3d] font-medium">Large order placed: Order <span class="font-mono font-semibold">#ORD-2024-1547</span> worth $450.00</p>
+                            <p class="text-xs text-[#8b7355] mt-1">15 minutes ago</p>
+                        </div>
+                        <a href="#" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm whitespace-nowrap">View</a>
+                    </div>
+
+                    <!-- Activity Item 3 -->
+                    <div class="activity-item flex items-start gap-4 p-4 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[#5c4a3d] font-medium">Refund request: Customer requested refund for order <span class="font-mono font-semibold">#ORD-2024-1523</span></p>
+                            <p class="text-xs text-[#8b7355] mt-1">1 hour ago</p>
+                        </div>
+                        <a href="#" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm whitespace-nowrap">View</a>
+                    </div>
+
+                    <!-- Activity Item 4 -->
+                    <div class="activity-item flex items-start gap-4 p-4 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-gavel text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[#5c4a3d] font-medium">Auction completed: <span class="font-semibold">Vintage Ceramic Collection</span> sold for $320.00</p>
+                            <p class="text-xs text-[#8b7355] mt-1">3 hours ago</p>
+                        </div>
+                        <a href="#" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm whitespace-nowrap">View</a>
+                    </div>
+
+                    <!-- Activity Item 5 -->
+                    <div class="activity-item flex items-start gap-4 p-4 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-star text-orange-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[#5c4a3d] font-medium">Review flagged: Product review for <span class="font-semibold">Handmade Tea Set</span> reported as inappropriate</p>
+                            <p class="text-xs text-[#8b7355] mt-1">5 hours ago</p>
+                        </div>
+                        <a href="#" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm whitespace-nowrap">View</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active state from all links
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.remove('text-white');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                // Add active state to clicked link
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // User profile logout dropdown
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+        const chevronIcon = document.getElementById('chevronIcon');
+        const logoutButton = document.getElementById('logoutButton');
+        const userMenu = document.querySelector('.user-menu');
+        let hideTimeout;
+
+        const showUserMenu = () => {
+            clearTimeout(hideTimeout);
+            userMenuDropdown.classList.add('show');
+            chevronIcon.classList.add('rotated');
+        };
+
+        const hideUserMenu = () => {
+            hideTimeout = setTimeout(() => {
+                userMenuDropdown.classList.remove('show');
+                chevronIcon.classList.remove('rotated');
+            }, 150);
+        };
+
+        userMenu.addEventListener('mouseenter', showUserMenu);
+        userMenu.addEventListener('mouseleave', hideUserMenu);
+
+        logoutButton.addEventListener('click', () => {
+            const confirmed = window.confirm('Are you sure you want to logout?');
+            if (confirmed) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

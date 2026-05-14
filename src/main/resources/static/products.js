@@ -197,6 +197,108 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = card.dataset.detailPage || '/ProductDetailsStandard';
         window.location.href = target;
     });
+
+    // --- 4. Wishlist Functionality ---
+    document.addEventListener('click', async function(event) {
+        const button = event.target.closest('.wishlist-btn');
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const card = button.closest('.product-card');
+        if (!card) return;
+
+        const productId = card.dataset.id;
+        const userEmail = sessionStorage.getItem('userEmail');
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
+
+        if (!isLoggedIn) {
+            showToast('Please login to add items to your wishlist', 'error');
+            return;
+        }
+
+        const icon = button.querySelector('i');
+        const isAdded = icon.classList.contains('fas'); // fas is solid, far is regular
+
+        if (!isAdded) {
+            try {
+                const response = await fetch(`/api/wishlist/add/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-User-Email': userEmail
+                    }
+                });
+
+                if (response.ok) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    icon.classList.add('text-[#ef4444]');
+                    showToast('Added to wishlist!', 'success');
+                    updateWishlistBadge();
+                } else {
+                    showToast('Failed to add to wishlist', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding to wishlist:', error);
+                showToast('An error occurred', 'error');
+            }
+        } else {
+            try {
+                const response = await fetch(`/api/wishlist/remove/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-User-Email': userEmail
+                    }
+                });
+
+                if (response.ok) {
+                    icon.classList.remove('fas');
+                    icon.classList.remove('text-[#ef4444]');
+                    icon.classList.add('far');
+                    showToast('Removed from wishlist', 'info');
+                    updateWishlistBadge();
+                } else {
+                    showToast('Failed to remove from wishlist', 'error');
+                }
+            } catch (error) {
+                console.error('Error removing from wishlist:', error);
+                showToast('An error occurred', 'error');
+            }
+        }
+    });
+
+    async function updateWishlistBadge() {
+        const userEmail = sessionStorage.getItem('userEmail');
+        if (!userEmail) return;
+
+        try {
+            const response = await fetch('/api/wishlist/count', {
+                headers: {
+                    'X-User-Email': userEmail
+                }
+            });
+            if (response.ok) {
+                const count = await response.json();
+                // Assuming there's a wishlist badge somewhere, or we just update the nav if it exists
+                // For now, let's just make sure it's consistent if we add one later
+            }
+        } catch (error) {
+            console.error('Error updating wishlist badge:', error);
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const colours = { success: 'bg-green-600', error: 'bg-red-500', info: 'bg-[#c17c5f]' };
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-6 right-6 z-50 px-6 py-3 rounded-xl text-white font-medium shadow-lg transition-opacity duration-300 ${colours[type]}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 });
 
 // ============================================================
@@ -209,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
@@ -222,7 +324,7 @@ function updateCartBadge() {
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
             badge.textContent = count;
         });
 }

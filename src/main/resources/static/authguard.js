@@ -134,21 +134,88 @@
     const userSection = document.getElementById('user-section');
     const userName = document.getElementById('nav-user-name');
     const userEmail = document.getElementById('nav-user-email');
+    const userMenuBtn = document.getElementById('user-menu-button') || document.getElementById('userMenuButton') || document.querySelector('a[href="/profile"]');
     const loggedIn = getLoggedIn();
+    const storedEmail = sessionStorage.getItem('userEmail');
 
-    if (loggedIn) {
-      if (loginWrapper) loginWrapper.classList.add('hidden');
-      if (userSection) userSection.classList.remove('hidden');
-      if (userName) userName.textContent = sessionStorage.getItem('userName') || 'Profile';
-      if (userEmail) userEmail.textContent = sessionStorage.getItem('userEmail') || '';
+    if (loggedIn && storedEmail) {
+      // Sync with server in background
+      fetch(`/api/user/me?email=${encodeURIComponent(storedEmail)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+            sessionStorage.setItem('userName', data.user.name);
+            applyNavState(data.user);
+            updateNotificationBadge();
+            updateCartBadge();
+            // Also update any other profile images on the page (e.g. sidebar)
+            document.querySelectorAll('img[alt="' + data.user.name + '"], aside img.w-14.h-14').forEach(img => {
+                img.src = data.user.profilePicture;
+            });
+          }
+        })
+        .catch(err => console.error("Nav sync failed", err));
+
+      // Initial apply from session storage
+      const userProfileStr = sessionStorage.getItem('userProfile');
+      if (userProfileStr) {
+        try { applyNavState(JSON.parse(userProfileStr)); } catch(e) {}
+      }
     } else {
       if (loginWrapper) loginWrapper.classList.remove('hidden');
       if (userSection) userSection.classList.add('hidden');
     }
+
+    function applyNavState(profile) {
+      if (loginWrapper) loginWrapper.classList.add('hidden');
+      if (userSection) userSection.classList.remove('hidden');
+      if (userName) userName.textContent = profile.name || 'Profile';
+      if (userEmail) userEmail.textContent = profile.email || '';
+      
+      if (userMenuBtn) {
+        const profileIcon = userMenuBtn.querySelector('i.fas.fa-user-circle');
+        let profileImg = userMenuBtn.querySelector('img.nav-profile-img');
+        const profilePicture = profile.profilePicture || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+
+        if (profileIcon) {
+          const img = document.createElement('img');
+          img.src = profilePicture;
+          img.className = 'w-8 h-8 rounded-full object-cover border border-[#c17c5f] nav-profile-img';
+          profileIcon.replaceWith(img);
+        } else if (profileImg) {
+          profileImg.src = profilePicture;
+        } else {
+            // Check if the button itself is an image or contains one
+            const innerImg = userMenuBtn.querySelector('img');
+            if (innerImg) innerImg.src = profilePicture;
+        }
+      }
+    }
+  };
+
+  window.updateNotificationBadge = function updateNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    if (!badge) return;
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  };
+
+  window.updateCartBadge = function updateCartBadge() {
+    document.querySelectorAll('.fa-shopping-cart').forEach(icon => {
+      const badge = icon.parentElement?.querySelector('span');
+      if (!badge) return;
+      const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    });
   };
 
   document.addEventListener('DOMContentLoaded', function () {
     window.updateNavAuthState();
+    window.updateNotificationBadge();
+    window.updateCartBadge();
   });
 })();
 

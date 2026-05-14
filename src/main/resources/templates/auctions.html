@@ -352,338 +352,95 @@
 
             <!-- Product Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="auction-grid">
-                <!-- Auction Card 1 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="ceramics" data-product-id="1">
+                <!-- Dynamic Auction Cards -->
+                <div th:each="auction : ${auctions}" 
+                     class="auction-card bg-white rounded-xl card-shadow overflow-hidden" 
+                     th:classappend="${#strings.toLowerCase(auction.status) == 'ended' ? 'ended' : ''}"
+                     th:attr="data-category=${#strings.toLowerCase(auction.product.category)}, data-product-id=${auction.id}">
+                    
                     <div class="relative">
                         <img 
-                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&amp;h=300&amp;fit=crop" 
-                            alt="Ceramic Vase" 
+                            th:src="${auction.product.imageUrl}" 
+                            th:alt="${auction.product.title}" 
                             class="w-full h-48 object-cover cursor-pointer"
                         />
-                        <span class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                        
+                        <!-- Status Badge -->
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
+                              class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                             LIVE
                         </span>
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'UPCOMING'}" 
+                              class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                            UPCOMING
+                        </span>
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
+                              class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                            ENDED
+                        </span>
                     </div>
+                    
                     <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate cursor-pointer hover:text-[#c17c5f] transition-colors">Handcrafted Ceramic Vase</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Elena Martinez</p>
+                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate cursor-pointer hover:text-[#c17c5f] transition-colors"
+                            th:text="${auction.product.title}">Handcrafted Ceramic Vase</h3>
+                        <p class="text-sm text-[#8b7355] mb-3 truncate" 
+                           th:text="'by ' + ${auction.product.artisanName}">by Elena Martinez</p>
                         
                         <div class="flex items-end justify-between mb-3">
                             <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Current Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">53.690 BD</p>
+                                <p class="text-xs text-[#8b7355] uppercase tracking-wide" 
+                                   th:text="${#strings.toUpperCase(auction.status) == 'UPCOMING' ? 'Starting Bid' : 'Current Bid'}">Current Bid</p>
+                                <p class="text-xl font-bold" 
+                                   th:classappend="${#strings.toLowerCase(auction.status) == 'ended' ? 'text-gray-500' : 'text-[#c17c5f]'}"
+                                   th:text="${#numbers.formatDecimal(auction.currentHighestBid, 1, 3)} + ' BD'">53.690 BD</p>
                             </div>
                         </div>
                         
+                        <!-- Time/Status Info -->
                         <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
+                            <!-- Countdown for Live -->
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
+                                  class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
                                 <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" data-hours="2" data-minutes="34" data-seconds="12">2h 34m 12s</span>
+                                <span class="countdown" 
+                                      th:attr="data-hours=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toHours()}, 
+                                               data-minutes=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toMinutesPart()}, 
+                                               data-seconds=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toSecondsPart()}"
+                                      th:text="${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toHours()} + 'h ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toMinutesPart()} + 'm'">
+                                    2h 34m
+                                </span>
                             </span>
+                            
+                            <!-- Starts in for Upcoming -->
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'UPCOMING'}" 
+                                  class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full">
+                                <i class="far fa-calendar mr-1.5"></i>
+                                <span th:text="'Starts in ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + 'd'">Starts in 1d</span>
+                            </span>
+                            
+                            <!-- Sold for Ended -->
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
+                                  class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm font-semibold rounded-full">
+                                <i class="fas fa-check mr-1.5"></i>
+                                Sold
+                            </span>
+                            
                             <span class="text-xs text-[#8b7355]">12 bids</span>
                         </div>
                         
-                        <button class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
+                        <!-- Action Buttons -->
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
+                                class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
                             Place Bid
                         </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 2 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="jewelry" data-product-id="2">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&amp;h=300&amp;fit=crop" 
-                            alt="Silver Necklace" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                            LIVE
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Silver Moonstone Necklace</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Sarah Chen</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Current Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">26.990 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
-                                <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" data-hours="0" data-minutes="45" data-seconds="30">0h 45m 30s</span>
-                            </span>
-                            <span class="text-xs text-[#8b7355]">8 bids</span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
-                            Place Bid
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 3 - UPCOMING -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="paintings" data-product-id="3">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1580136607983-ec9577fd9072?q=80&amp;w=1605&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                            alt="Abstract Painting" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                            UPCOMING
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Abstract Oil Painting</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Marcus Webb</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Starting Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">80.000 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full">
-                                <i class="far fa-calendar mr-1.5"></i>
-                                Starts in 1d 5h
-                            </span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors">
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'UPCOMING'}" 
+                                class="w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors">
                             Notify Me
                         </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 4 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="textiles" data-product-id="4">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1547462515-204fc3a3d805?q=80&amp;w=1035&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                            alt="Woven Textile" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                            LIVE
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Handwoven Wall Tapestry</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Amara Johnson</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Current Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">26.000 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
-                                <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" data-hours="5" data-minutes="12" data-seconds="45">5h 12m 45s</span>
-                            </span>
-                            <span class="text-xs text-[#8b7355]">15 bids</span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
-                            Place Bid
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 5 - ENDED -->
-                <div class="auction-card ended bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork" data-product-id="5">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1544441893-675973e31985?w=400&amp;h=300&amp;fit=crop" 
-                            alt="Wooden Bowl" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                            ENDED
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Carved Walnut Bowl Set</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Thomas Reed</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Final Bid</p>
-                                <p class="text-xl font-bold text-gray-500">55.500 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm font-semibold rounded-full">
-                                <i class="fas fa-check mr-1.5"></i>
-                                Sold
-                            </span>
-                            <span class="text-xs text-[#8b7355]">22 bids</span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed" disabled>
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
+                                class="w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed" disabled>
                             Auction Ended
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 6 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="jewelry" data-product-id="6">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1705326455036-0fab8ecba04d?q=80&amp;w=1770&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                            alt="Gold Ring" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                            LIVE
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Gold Filigree Ring</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Isabella Romano</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Current Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">200.200 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
-                                <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" data-hours="1" data-minutes="15" data-seconds="0">1h 15m 0s</span>
-                            </span>
-                            <span class="text-xs text-[#8b7355]">28 bids</span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
-                            Place Bid
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 7 - UPCOMING -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork" data-product-id="7">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&amp;h=300&amp;fit=crop" 
-                            alt="Wooden Sculpture" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                            UPCOMING
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Oak Tree Sculpture</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by David Park</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Starting Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">36.630 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full">
-                                <i class="far fa-calendar mr-1.5"></i>
-                                Starts in 3d 12h
-                            </span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors">
-                            Notify Me
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 8 - ENDED -->
-                <div class="auction-card ended bg-white rounded-xl card-shadow overflow-hidden" data-category="textiles" data-product-id="8">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1631287383810-40c3bd3fa9ee?q=80&amp;w=1707&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                            alt="Embroidered Pillow" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                            ENDED
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Embroidered Silk Pillow</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Yuki Tanaka</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Final Bid</p>
-                                <p class="text-xl font-bold text-gray-500">16.550 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm font-semibold rounded-full">
-                                <i class="fas fa-check mr-1.5"></i>
-                                Sold
-                            </span>
-                            <span class="text-xs text-[#8b7355]">9 bids</span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed" disabled>
-                            Auction Ended
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Auction Card 9 - LIVE -->
-                <div class="auction-card bg-white rounded-xl card-shadow overflow-hidden" data-category="woodwork" data-product-id="9">
-                    <div class="relative">
-                        <img 
-                            src="https://images.unsplash.com/photo-1645389773319-c8a9f48512e4?q=80&amp;w=987&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                            alt="Leather Bag" 
-                            class="w-full h-48 object-cover"
-                        />
-                        <span class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                            LIVE
-                        </span>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate">Handstitched Leather Tote</h3>
-                        <p class="text-sm text-[#8b7355] mb-3 truncate">by Rachel Green</p>
-                        
-                        <div class="flex items-end justify-between mb-3">
-                            <div>
-                                <p class="text-xs text-[#8b7355] uppercase tracking-wide">Current Bid</p>
-                                <p class="text-xl font-bold text-[#c17c5f]">36.660 BD</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
-                                <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" data-hours="0" data-minutes="22" data-seconds="18">0h 22m 18s</span>
-                            </span>
-                            <span class="text-xs text-[#8b7355]">19 bids</span>
-                        </div>
-                        
-                        <button class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
-                            Place Bid
                         </button>
                     </div>
                 </div>
@@ -698,7 +455,7 @@
         </main>
     </div>
 
-    <script src="/static/authguard.js"></script>
+    <script src="/authguard.js"></script>
     
     <!-- All JS logic is handled by auctions.js -->
     <script src="/auctions.js?v=2"></script>

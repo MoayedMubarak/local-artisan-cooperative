@@ -25,25 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/products?search=${encodeURIComponent(query)}`;
     }
 
-    function updateLoginState() {
-        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
-        if (loggedIn) {
-            loginButtonWrapper?.classList.add('hidden');
-            userSection?.classList.remove('hidden');
-
-            const userName = sessionStorage.getItem('userName') || 'John Doe';
-            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
-            if (navUserName) navUserName.textContent = userName;
-            if (navUserEmail) navUserEmail.textContent = userEmail;
-
-            updateNotificationBadge();
-        } else {
-            loginButtonWrapper?.classList.remove('hidden');
-            userSection?.classList.add('hidden');
-        }
-
-        updateCartBadge();
-    }
+    // Removed redundant updateLoginState - handled globally by authguard.js
 
     searchButton?.addEventListener('click', handleSearch);
 
@@ -104,10 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') newsletterBtn?.click();
     });
 
+    // 5. Badges initialization (Login state handled by authguard.js)
     // ----------------------------------------------------------
-    // 5. Login state and badge initialization
-    // ----------------------------------------------------------
-    updateLoginState();
+    if (window.updateNotificationBadge) updateNotificationBadge();
+    if (window.updateCartBadge) updateCartBadge();
 });
 
 // ============================================================
@@ -157,7 +139,7 @@ function showToast(message, type = 'info') {
 function updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '4', 10);
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
@@ -170,7 +152,7 @@ function updateCartBadge() {
         .forEach(icon => {
             const badge = icon.parentElement?.querySelector('span');
             if (!badge) return;
-            const count = parseInt(sessionStorage.getItem('cartCount') ?? '3', 10);
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
             badge.textContent = count;
         });
 }
