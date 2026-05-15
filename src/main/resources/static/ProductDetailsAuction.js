@@ -1,267 +1,355 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const bidForm = document.querySelector('form');
-    const bidInput = document.getElementById('bidAmount');
-    const bidBtn = document.getElementById('bid-submit-btn');
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
+    // Login state elements
+    const loginButtonWrapper = document.getElementById('login-button-wrapper');
+    const userSection = document.getElementById('user-section');
+    const navUserName = document.getElementById('nav-user-name');
+    const navUserEmail = document.getElementById('nav-user-email');
+    const notificationBadge = document.getElementById('notification-badge');
+    const cartBadge = document.getElementById('cart-badge');
 
-    let auctionId = document.getElementById('auction-id')?.value || null;
-    let auctionStatus = 'LIVE';
-    let totalSeconds = 0;
+    function updateLoginState() {
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('loggedIn') === 'true';
+        if (loggedIn) {
+            loginButtonWrapper?.classList.add('hidden');
+            userSection?.classList.remove('hidden');
 
-    const requireLogin = (msg) =>
-        window.requireLoginForAction ? window.requireLoginForAction(msg) : true;
+            const userName = sessionStorage.getItem('userName') || 'John Doe';
+            const userEmail = sessionStorage.getItem('userEmail') || 'john@example.com';
+            if (navUserName) navUserName.textContent = userName;
+            if (navUserEmail) navUserEmail.textContent = userEmail;
 
-    function hydrateFromServer() {
-        const data = window.__AUCTION_DATA__;
-        if (!data) return false;
-
-        auctionId = String(data.id);
-        auctionStatus = data.status || 'LIVE';
-
-        document.title = `${data.name} - Auction - Artisan Co-op`;
-
-        const nameEl = document.querySelector('h1');
-        if (nameEl) nameEl.textContent = data.name;
-
-        const artistEl = document.querySelector('h1 + p');
-        if (artistEl) artistEl.textContent = data.artist;
-
-        const bidEl = document.getElementById('current-bid-display');
-        if (bidEl) bidEl.textContent = `${Math.round(data.bid)} BD`;
-
-        const highestBidderEl = document.getElementById('highest-bidder-name');
-        if (highestBidderEl) highestBidderEl.textContent = data.highestBidder || 'No bids yet';
-
-        const mainImg = document.getElementById('mainImage');
-        if (mainImg && data.img) {
-            mainImg.src = data.img;
-            mainImg.alt = data.name;
+            updateNotificationBadge();
+        } else {
+            loginButtonWrapper?.classList.remove('hidden');
+            userSection?.classList.add('hidden');
         }
 
-        if (bidInput) {
-            bidInput.min = data.minBid;
-            bidInput.step = 1;
-            bidInput.placeholder = `Min: ${data.minBid} BD`;
-        }
-
-        totalSeconds = Math.max(0, parseInt(data.secondsRemaining, 10) || 0);
-        renderCountdown();
-
-        if (auctionStatus === 'ENDED') handleAuctionEnd();
-        if (auctionStatus === 'UPCOMING') handleUpcoming();
-        return true;
+        updateCartBadge();
     }
 
-    function hydrateFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        if (!params.get('id') && !params.has('name')) return false;
+    // ============================================================
+    // 0. Hydrate page from URL params (passed from auctions.html)
+    //    e.g. /ProductDetailsAuction?id=1&name=...&bid=53.690 BD
+    // ============================================================
+    const params = new URLSearchParams(window.location.search);
 
-        if (params.get('id')) auctionId = params.get('id');
+    if (params.has('name')) {
+        // --- Page title ---
+        document.title = `${params.get('name')} - Auction - Artisan Co-op`;
 
-        if (params.has('name')) {
-            document.title = `${params.get('name')} - Auction - Artisan Co-op`;
-            const nameEl = document.querySelector('h1');
-            if (nameEl) nameEl.textContent = params.get('name');
-        }
+        // --- Product name ---
+        const nameEl = document.querySelector('h1');
+        if (nameEl) nameEl.textContent = params.get('name');
 
+        // --- Artist ---
+        const artistEl = document.querySelector('h1 + p, h1 ~ .text-earth');
+        if (artistEl) artistEl.textContent = params.get('artist') ?? artistEl.textContent;
+
+        // --- Current bid ---
         const bidValue = parseFloat((params.get('bid') ?? '0').replace(/[^0-9.]/g, ''));
-        const bidEl = document.getElementById('current-bid-display');
-        if (bidEl) bidEl.textContent = `${Math.round(bidValue)} BD`;
+        const bidEl = document.querySelector('#current-bid-display');
+        if (bidEl) bidEl.textContent = `${bidValue.toFixed(3)} BD`;
 
-        const minBid = Math.floor(bidValue) + 1;
+        // Set minimum bid input to one step above current
+        const bidInput = document.getElementById('bidAmount');
         if (bidInput) {
-            bidInput.min = minBid;
-            bidInput.step = 1;
-            bidInput.placeholder = `Min: ${minBid} BD`;
+            bidInput.min         = (bidValue + 0.001).toFixed(3);
+            bidInput.placeholder = `Min: ${(bidValue + 0.001).toFixed(3)} BD`;
         }
 
+        // --- Total bids count ---
+        const bidsCountEl = document.getElementById('total-bids-count');
+        if (bidsCountEl) bidsCountEl.textContent = params.get('bids') ?? bidsCountEl.textContent;
+
+        // --- Main image ---
         const imgSrc = params.get('img');
         if (imgSrc) {
             const mainImg = document.getElementById('mainImage');
             if (mainImg) {
                 mainImg.src = imgSrc;
-                mainImg.alt = params.get('name') || 'Auction item';
+                mainImg.alt = params.get('name');
+            }
+            // Also update all thumbnails to use the same image as fallback
+            document.querySelectorAll('.thumbnail').forEach(t => {
+                t.src = imgSrc;
+            });
+        }
+
+        // --- Countdown: override JS initial values with URL params ---
+        window._auctionHours   = parseInt(params.get('hours')   ?? '2',  10);
+        window._auctionMinutes = parseInt(params.get('minutes') ?? '45', 10);
+        window._auctionSeconds = parseInt(params.get('seconds') ?? '0',  10);
+    }
+
+    // ============================================================
+    // 1. Image Gallery Logic
+    // ============================================================
+    window.changeImage = function(thumbnail) {
+        const mainImage = document.getElementById('mainImage');
+
+        mainImage.style.opacity = '0.5';
+        setTimeout(() => {
+            // Use high-res URL if it's an Unsplash image, otherwise use as-is
+            const highResUrl = thumbnail.src.includes('unsplash.com')
+                ? thumbnail.src.replace(/w=\d+&h=\d+/, 'w=600&h=500')
+                : thumbnail.src;
+            mainImage.src = highResUrl;
+            mainImage.style.opacity = '1';
+        }, 150);
+
+        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+        thumbnail.classList.add('active');
+    };
+
+    // ============================================================
+    // 2. Countdown Timer Logic
+    //    Uses values from URL params if available, else falls back to HTML defaults
+    // ============================================================
+    let hours   = window._auctionHours   ?? 2;
+    let minutes = window._auctionMinutes ?? 45;
+    let seconds = window._auctionSeconds ?? 32;
+
+    const hoursEl   = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    // Immediately show correct time (no 1-second delay on first render)
+    if (hoursEl)   hoursEl.textContent   = String(hours).padStart(2, '0');
+    if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+    if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+
+    const countdownInterval = setInterval(() => {
+        if (hours === 0 && minutes === 0 && seconds === 0) {
+            clearInterval(countdownInterval);
+            handleAuctionEnd();
+            return;
+        }
+
+        if (seconds > 0) {
+            seconds--;
+        } else {
+            seconds = 59;
+            if (minutes > 0) {
+                minutes--;
+            } else {
+                minutes = 59;
+                if (hours > 0) hours--;
             }
         }
 
-        const h = parseInt(params.get('hours') ?? '0', 10);
-        const m = parseInt(params.get('minutes') ?? '0', 10);
-        const s = parseInt(params.get('seconds') ?? '0', 10);
-        totalSeconds = h * 3600 + m * 60 + s;
-        renderCountdown();
-        return true;
-    }
+        if (hoursEl)   hoursEl.textContent   = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
 
-    function renderCountdown() {
-        const h = Math.floor(totalSeconds / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        const s = totalSeconds % 60;
-        if (hoursEl) hoursEl.textContent = String(h).padStart(2, '0');
-        if (minutesEl) minutesEl.textContent = String(m).padStart(2, '0');
-        if (secondsEl) secondsEl.textContent = String(s).padStart(2, '0');
-    }
+        // Warning: turn countdown red under 5 minutes
+        const countdownBox = document.getElementById('countdown')?.parentElement;
+        if (countdownBox && hours === 0 && minutes < 5) {
+            countdownBox.style.borderColor = '#ef4444';
+            countdownBox.style.backgroundColor = '#fff5f5';
+        }
 
-    function setCountdown(seconds) {
-        totalSeconds = Math.max(0, parseInt(seconds, 10) || 0);
-        renderCountdown();
-    }
+        // Anti-sniping notice at exactly 30 seconds left
+        if (hours === 0 && minutes === 0 && seconds === 30) {
+            showToast('⏰ Anti-snipe: a bid placed in the last 30s extends the auction by 2 minutes!', 'info');
+        }
+    }, 1000);
 
+    // ============================================================
+    // 3. Auction ended state
+    // ============================================================
     function handleAuctionEnd() {
+        const bidBtn = document.getElementById('bid-submit-btn');
         if (bidBtn) {
             bidBtn.disabled = true;
             bidBtn.textContent = 'Auction Ended';
+            bidBtn.className = bidBtn.className.replace('bg-[#c17c5f]', 'bg-gray-400').replace('hover:bg-[#a5664d]', '');
         }
-        if (bidInput) bidInput.disabled = true;
-    }
-
-    function handleUpcoming() {
-        if (bidBtn) {
-            bidBtn.disabled = true;
-            bidBtn.textContent = 'Not Started Yet';
+        const countdownBox = document.getElementById('countdown')?.parentElement;
+        if (countdownBox) {
+            countdownBox.style.borderColor = '#9ca3af';
+            countdownBox.style.backgroundColor = '#f3f4f6';
         }
-        if (bidInput) bidInput.disabled = true;
+        showToast('This auction has ended.', 'info');
     }
 
-    function getCurrentBid() {
-        const text = document.getElementById('current-bid-display')?.textContent ?? '0';
-        return parseFloat(text.replace(/[^0-9.]/g, '')) || 0;
+    // ============================================================
+    // 4. Bid Form Validation & Submission
+    // ============================================================
+    const bidForm  = document.querySelector('form');
+    const bidInput = document.getElementById('bidAmount');
+
+    // Read current bid value from the displayed element
+    function getCurrentBidValue() {
+        const bidText = document.querySelector('#current-bid-display')?.textContent ?? '0';
+        return parseFloat(bidText.replace(/[^0-9.]/g, '')) || 0;
     }
 
+    // Set the minimum allowed bid = currentBid + 1 BD (whole BDs only, no fils)
     function updateMinBid() {
-        const minBid = Math.floor(getCurrentBid()) + 1;
+        const currentBid = getCurrentBidValue();
+        const minBid     = Math.floor(currentBid) + 1; // Always next whole BD
         if (bidInput) {
-            bidInput.min = minBid;
+            bidInput.min         = minBid;
+            bidInput.step        = 1;                   // Whole BDs only — no fils allowed
             bidInput.placeholder = `Min: ${minBid} BD`;
         }
         return minBid;
     }
 
+    // Validate bidder name: letters and spaces only, no numbers or symbols
     function isValidName(name) {
-        return /^[A-Za-z\u0600-\u06FF\s]{2,50}$/.test(name);
+        return /^[A-Za-z\u0600-\u06FF\s]{2,50}$/.test(name); // Latin + Arabic letters, spaces, 2–50 chars
     }
 
-    if (!hydrateFromServer()) hydrateFromUrl();
+    // Initialize min bid on page load
     updateMinBid();
 
-    setInterval(() => {
-        if (totalSeconds <= 0) {
-            handleAuctionEnd();
-            return;
-        }
-        totalSeconds--;
-        renderCountdown();
-    }, 1000);
-
-    bidForm?.addEventListener('submit', async (e) => {
+    bidForm?.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (!requireLogin('Login/Register first to place a bid.')) return;
 
-        if (!auctionId) {
-            showToast('Open this auction from the auctions page.', 'error');
-            return;
-        }
-        if (auctionStatus === 'ENDED') {
-            showToast('This auction has ended.', 'error');
-            return;
-        }
-        if (auctionStatus === 'UPCOMING') {
-            showToast('This auction has not started yet.', 'error');
-            return;
-        }
+        const rawBid     = bidInput.value;
+        const bidAmount  = parseFloat(rawBid);
+        const currentBid = getCurrentBidValue();
+        const minBid     = updateMinBid();
+        const bidderNameInput = document.getElementById('bidderName');
+        const bidderName = bidderNameInput?.value.trim() ?? '';
 
-        const bidAmount = parseFloat(bidInput?.value);
-        const minBid = updateMinBid();
-        const bidderName = document.getElementById('bidderName')?.value.trim() ?? '';
-
-        if (!bidInput?.value || isNaN(bidAmount)) {
+        // --- Validation 1: bid must be a number ---
+        if (!rawBid || isNaN(bidAmount)) {
             showToast('Please enter a valid bid amount.', 'error');
+            bidInput.focus();
             return;
         }
+
+        // --- Validation 2: no fils — whole BDs only ---
         if (!Number.isInteger(bidAmount)) {
-            showToast('Bids must be in whole BD amounts.', 'error');
+            showToast('Bids must be in whole BD amounts — fils (e.g. 0.500) are not allowed.', 'error');
+            bidInput.focus();
             return;
         }
+
+        // --- Validation 3: bid must be at least currentBid + 1 BD ---
         if (bidAmount < minBid) {
-            showToast(`Your bid must be at least ${minBid} BD.`, 'error');
+            showToast(`Your bid must be at least ${minBid} BD (current bid + 1 BD minimum).`, 'error');
+            bidInput.focus();
             return;
         }
+
+        // --- Validation 4: name is required ---
         if (!bidderName) {
-            showToast('Please enter your name.', 'error');
+            showToast('Please enter your name before placing a bid.', 'error');
+            bidderNameInput?.focus();
             return;
         }
+
+        // --- Validation 5: name must be letters and spaces only (no numbers/symbols) ---
         if (!isValidName(bidderName)) {
-            showToast('Name must contain letters only.', 'error');
+            showToast('Name must contain letters only — no numbers or special characters.', 'error');
+            bidderNameInput?.focus();
             return;
         }
 
-        if (bidBtn) {
-            bidBtn.disabled = true;
-            bidBtn.textContent = 'Placing bid...';
+        // ── Success: update all UI elements ──
+
+        // Update current bid display with flash effect
+        const currentBidDisplay = document.querySelector('#current-bid-display');
+        if (currentBidDisplay) {
+            currentBidDisplay.textContent = `${bidAmount.toFixed(3)} BD`;
+            currentBidDisplay.style.color = '#10b981';
+            setTimeout(() => currentBidDisplay.style.color = '', 1500);
         }
 
-        try {
-            const res = await fetch(`/api/auctions/${auctionId}/bid`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: bidAmount, bidderName }),
-            });
-            const result = await res.json();
-
-            if (!res.ok || !result.success) {
-                showToast(result.message || 'Could not place bid.', 'error');
-                return;
-            }
-
-            document.getElementById('current-bid-display').textContent =
-                `${Math.round(result.currentHighestBid)} BD`;
-            if (result.highestBidderName) {
-                document.getElementById('highest-bidder-name').textContent = result.highestBidderName;
-            }
-            if (result.secondsRemaining != null) {
-                setCountdown(result.secondsRemaining);
-            }
-            updateMinBid();
-            bidForm.reset();
-            showToast(result.message, 'success');
-        } catch {
-            showToast('Network error — please try again.', 'error');
-        } finally {
-            if (bidBtn && auctionStatus === 'LIVE') {
-                bidBtn.disabled = false;
-                bidBtn.innerHTML = '<i class="fas fa-gavel mr-2"></i>Place Bid';
-            }
+        // Update highest bidder name — show first name + last initial for privacy
+        const highestBidderEl = document.getElementById('highest-bidder-name');
+        if (highestBidderEl) {
+            const nameParts  = bidderName.trim().split(/\s+/);
+            const firstName  = nameParts[0];
+            const lastInitial = nameParts.length > 1 ? ` ${nameParts[nameParts.length - 1][0]}.` : '';
+            highestBidderEl.textContent = `${firstName}${lastInitial}`;
+            highestBidderEl.style.color = '#10b981';
+            setTimeout(() => highestBidderEl.style.color = '', 1500);
         }
+
+        // Update bid count
+        const bidsCountEl = document.getElementById('total-bids-count');
+        if (bidsCountEl) {
+            const current = parseInt(bidsCountEl.textContent) || 0;
+            bidsCountEl.textContent = `${current + 1} bids`;
+        }
+
+        // Raise the minimum bid for the next bidder
+        updateMinBid();
+
+        showToast(`🎉 Bid of ${bidAmount} BD placed successfully!`, 'success');
+        bidForm.reset();
     });
 
-    document.getElementById('back-to-auctions')?.addEventListener('click', () => {
-        window.location.href = '/auctions';
-    });
-
-    window.changeImage = function (thumbnail) {
-        const mainImage = document.getElementById('mainImage');
-        if (!mainImage) return;
-        mainImage.style.opacity = '0.5';
-        setTimeout(() => {
-            mainImage.src = thumbnail.src.includes('unsplash.com')
-                ? thumbnail.src.replace(/w=\d+&h=\d+/, 'w=600&h=500')
-                : thumbnail.src;
-            mainImage.style.opacity = '1';
-        }, 150);
-        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-        thumbnail.classList.add('active');
-    };
-
-    function showToast(message, type) {
-        document.getElementById('av-toast')?.remove();
-        const colors = { success: 'bg-green-600', error: 'bg-red-500', info: 'bg-[#c17c5f]' };
-        const toast = document.createElement('div');
-        toast.id = 'av-toast';
-        toast.className = `fixed bottom-6 right-6 z-50 px-6 py-3 rounded-xl text-white font-medium shadow-lg ${colors[type] || colors.info}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3500);
+    // ============================================================
+    // 5. "Back to Auctions" button — returns to auction list
+    // ============================================================
+    const backBtn = document.getElementById('back-to-auctions');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            window.location.href = '/auctions';
+        });
     }
+
+    // ============================================================
+    // 6. Toast Notification
+    // ============================================================
+    function showToast(message, type = 'info') {
+        if (!document.getElementById('toast-styles')) {
+            const style = document.createElement('style');
+            style.id = 'toast-styles';
+            style.innerHTML = `
+                .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+                .toast { padding: 12px 24px; border-radius: 8px; color: white; font-family: 'Inter', sans-serif; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease-out; display: flex; align-items: center; gap: 10px; min-width: 250px; }
+                .toast.success { background-color: #10b981; border-left: 5px solid #059669; }
+                .toast.error   { background-color: #dc2626; border-left: 5px solid #991b1b; }
+                .toast.info    { background-color: #c17c5f; border-left: 5px solid #a5664d; }
+                @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+            `;
+            document.head.appendChild(style);
+            if (!document.querySelector('.toast-container')) {
+                document.body.insertAdjacentHTML('beforebegin', '<div class="toast-container"></div>');
+            }
+        }
+        const container = document.querySelector('.toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i> <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    updateLoginState();
 });
+
+// ============================================================
+// Utility helpers (shared across pages via global scope)
+// ============================================================
+
+/**
+ * Read the notification count from sessionStorage and update any badge on the page.
+ */
+function updateNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    if (!badge) return;
+    const count = parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+/**
+ * Read cart item count from sessionStorage and update any cart badge on the page.
+ */
+function updateCartBadge() {
+    document.querySelectorAll('.fa-shopping-cart')
+        .forEach(icon => {
+            const badge = icon.parentElement?.querySelector('span');
+            if (!badge) return;
+            const count = parseInt(sessionStorage.getItem('cartCount') ?? '0', 10);
+            badge.textContent = count;
+        });
+}

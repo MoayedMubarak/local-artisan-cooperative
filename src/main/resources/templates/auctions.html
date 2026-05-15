@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -273,10 +273,10 @@
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Bid Range</h3>
                     <div class="px-2">
-                        <input type="range" min="0" max="1000" value="1000" class="w-full" id="priceRange">
+                        <input type="range" min="0" max="1000" value="500" class="w-full" id="priceRange">
                         <div class="flex justify-between mt-2 text-sm text-[#8b7355]">
                             <span>0 BD</span>
-                            <span class="font-semibold text-[#c17c5f]" id="priceValue">1000 BD</span>
+                            <span class="font-semibold text-[#c17c5f]" id="priceValue">500 BD</span>
                             <span>1000 BD</span>
                         </div>
                     </div>
@@ -357,10 +357,8 @@
                 <!-- Dynamic Auction Cards -->
                 <div th:each="auction : ${auctions}" 
                      class="auction-card bg-white rounded-xl card-shadow overflow-hidden" 
-                     th:classappend="${auction.status == 'ENDED' ? 'ended' : ''}"
-                     th:attr="data-category=${#strings.toLowerCase(auction.product.category)},
-                              data-auction-id=${auction.id},
-                              data-status=${auction.status}">
+                     th:classappend="${#strings.toLowerCase(auction.status) == 'ended' ? 'ended' : ''}"
+                     th:attr="data-category=${#strings.toLowerCase(auction.product.category)}, data-product-id=${auction.id}">
                     
                     <div class="relative">
                         <img 
@@ -370,17 +368,17 @@
                         />
                         
                         <!-- Status Badge -->
-                        <span th:if="${auction.status == 'LIVE'}" 
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
                               class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                             LIVE
                         </span>
-                        <span th:if="${auction.status == 'UPCOMING'}" 
-                              class="upcoming-badge absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'UPCOMING'}" 
+                              class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                             UPCOMING
                         </span>
-                        <span th:if="${auction.status == 'ENDED'}" 
-                              class="ended-badge absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
+                              class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                             ENDED
                         </span>
                     </div>
@@ -394,9 +392,9 @@
                         <div class="flex items-end justify-between mb-3">
                             <div>
                                 <p class="text-xs text-[#8b7355] uppercase tracking-wide" 
-                                   th:text="${auction.status == 'UPCOMING' ? 'Starting Bid' : 'Current Bid'}">Current Bid</p>
+                                   th:text="${#strings.toUpperCase(auction.status) == 'UPCOMING' ? 'Starting Bid' : 'Current Bid'}">Current Bid</p>
                                 <p class="text-xl font-bold" 
-                                   th:classappend="${auction.status == 'ENDED' ? 'text-gray-500' : 'text-[#c17c5f]'}"
+                                   th:classappend="${#strings.toLowerCase(auction.status) == 'ended' ? 'text-gray-500' : 'text-[#c17c5f]'}"
                                    th:text="${#numbers.formatDecimal(auction.currentHighestBid, 1, 3)} + ' BD'">53.690 BD</p>
                             </div>
                         </div>
@@ -404,7 +402,7 @@
                         <!-- Time/Status Info -->
                         <div class="flex items-center justify-between mb-4">
                             <!-- Countdown for Live -->
-                            <span th:if="${auction.status == 'LIVE'}" 
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
                                   class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
                                 <i class="far fa-clock mr-1.5"></i>
                                 <span class="countdown" 
@@ -417,14 +415,14 @@
                             </span>
                             
                             <!-- Starts in for Upcoming -->
-                            <span th:if="${auction.status == 'UPCOMING'}" 
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'UPCOMING'}" 
                                   class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full">
                                 <i class="far fa-calendar mr-1.5"></i>
                                 <span th:text="'Starts in ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + 'd'">Starts in 1d</span>
                             </span>
                             
                             <!-- Sold for Ended -->
-                            <span th:if="${auction.status == 'ENDED'}" 
+                            <span th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
                                   class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm font-semibold rounded-full">
                                 <i class="fas fa-check mr-1.5"></i>
                                 Sold
@@ -434,27 +432,18 @@
                         </div>
                         
                         <!-- Action Buttons -->
-                        <div class="flex flex-col gap-2">
-                            <a th:href="@{/ProductDetailsAuction(id=${auction.id})}"
-                               class="auction-view-details w-full py-2.5 text-center border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors text-sm">
-                                View Details
-                            </a>
-                            <button th:if="${auction.status == 'LIVE'}"
-                                    type="button"
-                                    class="auction-place-bid w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
-                                Place Bid
-                            </button>
-                            <button th:if="${auction.status == 'UPCOMING'}"
-                                    type="button"
-                                    class="w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors">
-                                Notify Me
-                            </button>
-                            <button th:if="${auction.status == 'ENDED'}"
-                                    type="button"
-                                    class="w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed" disabled>
-                                Auction Ended
-                            </button>
-                        </div>
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'LIVE'}" 
+                                class="w-full py-2.5 bg-[#c17c5f] hover:bg-[#a5664d] text-white rounded-lg font-semibold transition-colors shadow-md">
+                            Place Bid
+                        </button>
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'UPCOMING'}" 
+                                class="w-full py-2.5 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white rounded-lg font-semibold transition-colors">
+                            Notify Me
+                        </button>
+                        <button th:if="${#strings.toUpperCase(auction.status) == 'ENDED'}" 
+                                class="w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed" disabled>
+                            Auction Ended
+                        </button>
                     </div>
                 </div>
             </div>
@@ -471,6 +460,6 @@
     <script src="/authguard.js"></script>
     
     <!-- All JS logic is handled by auctions.js -->
-    <script src="/auctions.js?v=5"></script>
+    <script src="/auctions.js?v=2"></script>
 </body>
 </html>
