@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByCustomerAndStatusIgnoreCase(Customer customer, String status);
+    java.util.List<Order> findByCustomerAndStatusNotIgnoreCaseOrderByDateDesc(Customer customer, String status);
 }

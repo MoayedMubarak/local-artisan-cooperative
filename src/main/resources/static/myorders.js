@@ -70,7 +70,98 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNotificationBadge();
     updateCartBadge();
     updateLoginState();
+    loadOrders();
 });
+
+async function loadOrders() {
+    const email = sessionStorage.getItem('userEmail');
+    if (!email) return;
+
+    try {
+        const res = await fetch('/api/orders', {
+            headers: { 'X-User-Email': email }
+        });
+        if (!res.ok) throw new Error('Failed to fetch orders');
+        const orders = await res.json();
+        renderOrders(orders);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function renderOrders(orders) {
+    const tbody = document.querySelector('tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!orders || orders.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="py-12 text-center">
+                    <div class="flex flex-col items-center">
+                        <i class="fas fa-box-open text-4xl text-[#e5e0d8] mb-4"></i>
+                        <p class="text-[#8b7355] font-medium">You haven't placed any orders yet.</p>
+                        <a href="/products" class="mt-4 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#c17c5f] to-[#a5664d] text-white text-sm font-semibold shadow-lg shadow-[#c17c5f]/20 transition-all hover:from-[#b06b4f] hover:to-[#8f5d3f]">
+                            Start Shopping
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    orders.forEach(order => {
+        const row = document.createElement('tr');
+        row.className = 'order-row border-b border-[#e5e0d8] order-item';
+        row.dataset.status = order.status.toLowerCase();
+        
+        const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
+        const moreCount = order.items ? order.items.length - 1 : 0;
+        
+        const statusClass = order.status.toLowerCase() === 'delivered' ? 'status-delivered'
+                          : order.status.toLowerCase() === 'shipped'   ? 'status-shipped'
+                          :                                              'status-pending';
+        
+        const statusIcon = order.status.toLowerCase() === 'delivered' ? 'fa-check-circle'
+                         : order.status.toLowerCase() === 'shipped'   ? 'fa-truck'
+                         :                                              'fa-clock';
+
+        const dateObj = new Date(order.date);
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        row.innerHTML = `
+            <td class="py-4 px-6">
+                <span class="font-semibold text-[#5c4a3d]">#AC-${order.orderId}</span>
+            </td>
+            <td class="py-4 px-6 text-[#8b7355]">${dateStr}</td>
+            <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                    <img src="${firstItem ? firstItem.imageUrl : '/images/placeholder.png'}" alt="${firstItem ? escapeHtml(firstItem.title) : 'Product'}" class="w-12 h-12 object-cover rounded-lg">
+                    <div>
+                        <p class="font-medium text-[#5c4a3d]">${firstItem ? escapeHtml(firstItem.title) : 'N/A'}</p>
+                        ${moreCount > 0 ? `<p class="text-sm text-[#8b7355]">+ ${moreCount} more item${moreCount > 1 ? 's' : ''}</p>` : ''}
+                    </div>
+                </div>
+            </td>
+            <td class="py-4 px-6">
+                <span class="font-bold text-[#5c4a3d]">${Number(order.totalAmount).toFixed(2)} BD</span>
+            </td>
+            <td class="py-4 px-6">
+                <span class="${statusClass} px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                    <i class="fas ${statusIcon} mr-1"></i>${capitalise(order.status)}
+                </span>
+            </td>
+            <td class="py-4 px-6">
+                <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium transition-colors">
+                    View Details <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    updateVisibleCount('all');
+}
 
 // ============================================================
 // Order count helper
