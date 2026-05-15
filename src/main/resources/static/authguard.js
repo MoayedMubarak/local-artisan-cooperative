@@ -272,11 +272,17 @@
     return data;
   };
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function runAuthGuardInit() {
     window.updateNavAuthState();
     window.updateNotificationBadge();
     window.updateCartBadge();
     window.syncCartCountFromServer();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runAuthGuardInit);
+  } else {
+    runAuthGuardInit();
+  }
 })();
 
