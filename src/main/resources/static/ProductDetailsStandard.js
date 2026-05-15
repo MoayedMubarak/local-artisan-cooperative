@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 closeModal();
                 showToast('Review submitted! Thank you.', 'success');
-                appendReview({ reviewId: data.reviewId, name: sessionStorage.getItem('userName') || 'You', email: sessionStorage.getItem('userEmail'), rating: parseInt(selectedRating.value), comment, date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) });
+                appendReview({ name: sessionStorage.getItem('userName') || 'You', rating: parseInt(selectedRating.value), comment, date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) });
                 updateRatingSummary(data.averageRating, data.reviewCount);
             } else {
                 showToast(data.message || 'Could not submit review.', 'error');
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── Append new review to the DOM instantly ───────────────────────────────
-    function appendReview({ reviewId, name, email, rating, comment, date }) {
+    function appendReview({ name, rating, comment, date }) {
         const list    = document.getElementById('reviews-list');
         const noMsg   = document.getElementById('no-reviews-msg');
         if (noMsg) noMsg.remove();
@@ -209,9 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ).join('');
 
         const el = document.createElement('div');
-        el.className = 'review-card border-t border-[#e5e0d8] py-6';
-        el.dataset.reviewId      = reviewId || '';
-        el.dataset.customerEmail = email    || '';
+        el.className = 'border-t border-[#e5e0d8] py-6';
         el.innerHTML = `
             <div class="flex items-start justify-between mb-2">
                 <div class="flex items-center">
@@ -223,12 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="flex text-sm mt-0.5">${stars}</div>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <span class="text-[#8b7355] text-sm">${date}</span>
-                    <button class="delete-review-btn text-[#8b7355] hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50" title="Delete your review">
-                        <i class="fas fa-trash-alt text-sm"></i>
-                    </button>
-                </div>
+                <span class="text-[#8b7355] text-sm flex-shrink-0">${date}</span>
             </div>
             <p class="text-[#8b7355] leading-relaxed mt-2">${comment}</p>
         `;
@@ -254,95 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 3000);
     };
 
-    // ── Reveal delete buttons for the logged-in user's own reviews ───────────
-    function applyDeleteButtons() {
-        const email = sessionStorage.getItem('userEmail');
-        const role  = (sessionStorage.getItem('userRole') || '').toUpperCase();
-        if (!email || role !== 'CUSTOMER') return;
-
-        document.querySelectorAll('.review-card').forEach(card => {
-            if (card.dataset.customerEmail === email) {
-                card.querySelector('.delete-review-btn')?.classList.remove('hidden');
-            }
-        });
-    }
-
-    // ── Delete review handler (event delegation on #reviews-list) ────────────
-    document.getElementById('reviews-list')?.addEventListener('click', async (e) => {
-        const btn = e.target.closest('.delete-review-btn');
-        if (!btn) return;
-
-        const card     = btn.closest('.review-card');
-        const reviewId = card?.dataset?.reviewId;
-        const email    = sessionStorage.getItem('userEmail');
-        if (!reviewId || !email) return;
-
-        // Show inline confirmation inside the button row
-        if (!card.dataset.confirming) {
-            card.dataset.confirming = 'true';
-            const row = btn.parentElement;
-            const confirmEl = document.createElement('div');
-            confirmEl.id = 'confirm-' + reviewId;
-            confirmEl.className = 'flex items-center gap-2 text-sm';
-            confirmEl.innerHTML = `
-                <span class="text-[#5c4a3d] font-medium">Delete this review?</span>
-                <button id="confirm-yes-${reviewId}" class="px-3 py-1 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors">Yes, delete</button>
-                <button id="confirm-no-${reviewId}"  class="px-3 py-1 rounded-lg border border-[#e5e0d8] hover:bg-[#f5ebe0] text-[#8b7355] font-medium transition-colors">Cancel</button>
-            `;
-            btn.classList.add('hidden');
-            row.appendChild(confirmEl);
-
-            // Cancel button
-            document.getElementById('confirm-no-' + reviewId)?.addEventListener('click', () => {
-                confirmEl.remove();
-                btn.classList.remove('hidden');
-                delete card.dataset.confirming;
-            });
-
-            // Confirm delete button
-            document.getElementById('confirm-yes-' + reviewId)?.addEventListener('click', async () => {
-                confirmEl.innerHTML = '<i class="fas fa-spinner fa-spin text-[#8b7355]"></i>';
-                try {
-                    const res  = await fetch(`/api/reviews/${reviewId}?email=${encodeURIComponent(email)}`, { method: 'DELETE' });
-                    const data = await res.json();
-                    if (data.success) {
-                        // Fade out and remove card
-                        card.style.transition = 'opacity 0.3s, max-height 0.4s';
-                        card.style.overflow   = 'hidden';
-                        card.style.opacity    = '0';
-                        card.style.maxHeight  = card.offsetHeight + 'px';
-                        setTimeout(() => { card.style.maxHeight = '0'; card.style.padding = '0'; }, 10);
-                        setTimeout(() => {
-                            card.remove();
-                            updateRatingSummary(data.averageRating, data.reviewCount);
-                            // Show empty state if no more reviews
-                            if (data.reviewCount === 0) {
-                                const list = document.getElementById('reviews-list');
-                                list.innerHTML = `<div id="no-reviews-msg" class="text-center py-10 text-[#8b7355]">
-                                    <i class="fas fa-comment-slash text-4xl mb-3 opacity-30"></i>
-                                    <p class="text-lg">No reviews yet. Be the first to share your thoughts!</p>
-                                </div>`;
-                            }
-                        }, 420);
-                        showToast('Review deleted.', 'success');
-                    } else {
-                        showToast(data.message || 'Could not delete review.', 'error');
-                        confirmEl.remove();
-                        btn.classList.remove('hidden');
-                        delete card.dataset.confirming;
-                    }
-                } catch {
-                    showToast('Network error. Please try again.', 'error');
-                    confirmEl.remove();
-                    btn.classList.remove('hidden');
-                    delete card.dataset.confirming;
-                }
-            });
-        }
-    });
-
     updateLoginState();
-    applyDeleteButtons();
+});
 
 // ── Notification badge ────────────────────────────────────────────────────────
 function updateNotificationBadge() {

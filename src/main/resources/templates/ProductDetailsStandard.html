@@ -195,8 +195,7 @@
 
                     <!-- Reviews rendered by Thymeleaf -->
                     <div th:each="review, iterStat : ${reviews}"
-                         th:class="${iterStat.last ? 'review-card py-6' : 'review-card border-b border-[#e5e0d8] py-6'}"
-                         th:attr="data-review-id=${review.reviewId},data-customer-email=${review.customer.email}">
+                         th:class="${iterStat.last ? 'py-6' : 'border-b border-[#e5e0d8] py-6'}">
                         <div class="flex items-start justify-between mb-2">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3 flex-shrink-0">
@@ -212,14 +211,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3 flex-shrink-0">
-                                <span class="text-[#8b7355] text-sm"
-                                      th:text="${#temporals.format(review.date, 'MMM dd, yyyy')}">Jan 1, 2024</span>
-                                <button class="delete-review-btn hidden text-[#8b7355] hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50"
-                                        title="Delete your review">
-                                    <i class="fas fa-trash-alt text-sm"></i>
-                                </button>
-                            </div>
+                            <span class="text-[#8b7355] text-sm flex-shrink-0"
+                                  th:text="${#temporals.format(review.date, 'MMM dd, yyyy')}">Jan 1, 2024</span>
                         </div>
                         <p class="text-[#8b7355] leading-relaxed mt-2 ml-13 pl-13" th:text="${review.comment}">Review comment.</p>
                     </div>
