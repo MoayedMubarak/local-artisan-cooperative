@@ -94,32 +94,6 @@ public class CartController {
         }
     }
 
-    @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(@RequestHeader(value = "X-User-Email", required = false) String email,
-                                      @RequestBody Map<String, Object> body) {
-        if (email == null || email.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Missing X-User-Email"));
-        }
-        Optional<ResponseEntity<?>> denied = verifyCustomer(email);
-        if (denied.isPresent()) {
-            return denied.get();
-        }
-        String paymentMethod = body != null && body.get("paymentMethod") != null
-                ? String.valueOf(body.get("paymentMethod")) : null;
-        String deliveryMode = body != null && body.get("deliveryMode") != null
-                ? String.valueOf(body.get("deliveryMode")) : "ship";
-        Long addressId = null;
-        if (body != null && body.get("addressId") != null) {
-            Object aid = body.get("addressId");
-            addressId = aid instanceof Number ? ((Number) aid).longValue() : Long.parseLong(String.valueOf(aid));
-        }
-        try {
-            return ResponseEntity.ok(cartService.checkout(email.trim(), paymentMethod, deliveryMode, addressId));
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", ex.getMessage()));
-        }
-    }
-
     @DeleteMapping("/items/{orderItemId}")
     public ResponseEntity<?> remove(@RequestHeader(value = "X-User-Email", required = false) String email,
                                     @PathVariable Long orderItemId) {

@@ -241,58 +241,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const email = sessionStorage.getItem('userEmail');
-            if (!email) {
-                alert('Please log in to complete your order.');
-                confirmBtn.disabled = false;
-                updateCartTotal();
-                return;
-            }
-
-            const paymentCard = document.querySelector('.payment-card.selected');
-            const paymentMethod = paymentCard?.querySelector('.font-semibold')?.textContent?.trim() || 'Credit Card';
-            const deliveryMode = isShipping ? 'ship' : 'pickup';
-            let addressId = null;
-            if (isShipping) {
-                const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
-                addressId = selectedAddress ? parseInt(selectedAddress.value, 10) : null;
-            }
-
             confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>Processing...';
             confirmBtn.disabled = true;
 
-            fetch('/api/cart/checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-User-Email': email
-                },
-                body: JSON.stringify({ paymentMethod, deliveryMode, addressId })
-            })
-            .then(res => res.json().then(data => ({ res, data })))
-            .then(({ res, data }) => {
-                if (!res.ok || !data.success) {
-                    throw new Error(data.message || 'Checkout failed');
-                }
-                sessionStorage.setItem('cartCount', '0');
-                updateCartBadge();
-                const profile = sessionStorage.getItem('userProfile');
-                if (profile) {
-                    try {
-                        const user = JSON.parse(profile);
-                        user.totalOrders = data.totalOrders;
-                        user.totalSpent = data.totalSpent;
-                        sessionStorage.setItem('userProfile', JSON.stringify(user));
-                    } catch (e) { /* ignore */ }
-                }
-                window.location.href = '/OrderConformation';
-            })
-            .catch(err => {
-                console.error(err);
-                alert(err.message || 'Could not complete your order. Please try again.');
-                confirmBtn.disabled = false;
-                updateCartTotal();
-            });
+            setTimeout(() => {
+                alert('Order confirmed! Redirecting to confirmation...');
+            }, 2000);
         });
     }
 

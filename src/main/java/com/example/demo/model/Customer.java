@@ -11,6 +11,4 @@ import lombok.EqualsAndHashCode;
 public class Customer extends User {
     private String address;
     private String phone;
-    private int totalOrders = 0;
-    private double totalSpent = 0.0;
 }

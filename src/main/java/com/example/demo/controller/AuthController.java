@@ -23,9 +23,6 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
-    private com.example.demo.repository.CustomerRepository customerRepository;
-
-    @Autowired
     private com.example.demo.repository.WishlistRepository wishlistRepository;
 
     @PostMapping("/login")
@@ -39,12 +36,7 @@ public class AuthController {
             if (BCrypt.checkpw(password, user.getPassword())) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
-                if (user instanceof Customer) {
-                    customerRepository.findByEmail(email)
-                            .ifPresentOrElse(c -> response.put("user", c), () -> response.put("user", user));
-                } else {
-                    response.put("user", user);
-                }
+                response.put("user", user);
                 return ResponseEntity.ok(response);
             }
         }
@@ -58,8 +50,6 @@ public class AuthController {
         }
         customer.setRole("CUSTOMER");
         customer.setPassword(BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt()));
-        customer.setTotalOrders(0);
-        customer.setTotalSpent(0.0);
         userRepository.save(customer);
         
         com.example.demo.model.Wishlist wishlist = new com.example.demo.model.Wishlist();
