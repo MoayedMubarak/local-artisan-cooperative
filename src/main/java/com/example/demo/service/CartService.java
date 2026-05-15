@@ -1,9 +1,12 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Address;
 import com.example.demo.model.Customer;
 import com.example.demo.model.Order;
 import com.example.demo.model.OrderItem;
+import com.example.demo.model.Payment;
 import com.example.demo.model.Product;
+import com.example.demo.repository.AddressRepository;
 import com.example.demo.repository.CustomerRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
@@ -23,9 +26,14 @@ import java.util.Optional;
 public class CartService {
 
     public static final String STATUS_CART = "cart";
+    public static final String STATUS_PENDING = "pending";
+    private static final double SHIPPING_COST = 2.0;
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -139,6 +147,82 @@ public class CartService {
         }
         refreshOrderTotal(orderId);
         return buildCartResponse(orderId);
+    }
+
+    @Transactional
+    public Map<String, Object> checkout(String email, String paymentMethod, String deliveryMode, Long addressId) {
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            throw new IllegalArgumentException("Payment method is required");
+        }
+        boolean pickup = "pickup".equalsIgnoreCase(deliveryMode);
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+        Order cart = orderRepository.findByCustomerAndStatusIgnoreCase(customer, STATUS_CART)
+                .orElseThrow(() -> new IllegalArgumentException("Cart is empty"));
+        List<OrderItem> lines = orderItemRepository.findByOrderIdWithProduct(cart.getOrderId());
+        if (lines.isEmpty()) {
+            throw new IllegalArgumentException("Cart is empty");
+        }
+
+        for (OrderItem line : lines) {
+            Product product = line.getProduct();
+            if (product.getStockQuantity() < line.getQuantity()) {
+                throw new IllegalArgumentException("Not enough stock for: " + product.getTitle());
+            }
+        }
+
+        double itemsTotal = lines.stream().mapToDouble(li -> li.getPrice() * li.getQuantity()).sum();
+        double shipping = pickup ? 0.0 : SHIPPING_COST;
+        double grandTotal = itemsTotal + shipping;
+
+        String shippingAddress;
+        if (pickup) {
+            shippingAddress = "Store pickup";
+        } else {
+            if (addressId == null) {
+                throw new IllegalArgumentException("Shipping address is required");
+            }
+            Address address = addressRepository.findById(addressId)
+                    .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+            if (!email.equalsIgnoreCase(address.getUserEmail())) {
+                throw new IllegalArgumentException("Address does not belong to this user");
+            }
+            shippingAddress = String.format("%s, %s, %s, %s (%s)",
+                    address.getStreet(), address.getCity(), address.getZip(), address.getCountry(), address.getLabel());
+        }
+
+        for (OrderItem line : lines) {
+            Product product = productRepository.findById(line.getProduct().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            product.setStockQuantity(product.getStockQuantity() - line.getQuantity());
+            productRepository.save(product);
+        }
+
+        cart.setStatus(STATUS_PENDING);
+        cart.setShippingAddress(shippingAddress);
+        cart.setTotalAmount(grandTotal);
+        cart.setDate(LocalDate.now());
+
+        Payment payment = new Payment();
+        payment.setOrder(cart);
+        payment.setAmount(grandTotal);
+        payment.setPaymentMethod(paymentMethod.trim());
+        payment.setStatus("completed");
+        payment.setDate(LocalDate.now());
+        cart.setPayment(payment);
+        orderRepository.save(cart);
+
+        customer.setTotalOrders(customer.getTotalOrders() + 1);
+        customer.setTotalSpent(customer.getTotalSpent() + grandTotal);
+        customerRepository.save(customer);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("orderId", cart.getOrderId());
+        result.put("totalAmount", grandTotal);
+        result.put("totalOrders", customer.getTotalOrders());
+        result.put("totalSpent", customer.getTotalSpent());
+        return result;
     }
 
     private Order createCartOrder(Customer customer) {

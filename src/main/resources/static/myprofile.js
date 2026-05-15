@@ -91,6 +91,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (bioTextarea) bioTextarea.value = userProfile.biography || '';
             }
         }
+
+        const statsSection = document.getElementById('profile-stats-section');
+        const totalOrdersEl = document.getElementById('total-orders');
+        const totalSpentEl = document.getElementById('total-spent');
+        if (userRole === 'CUSTOMER') {
+            statsSection?.classList.remove('hidden');
+            const orders = userProfile.totalOrders ?? 0;
+            const spent = userProfile.totalSpent ?? 0;
+            if (totalOrdersEl) {
+                totalOrdersEl.textContent = orders > 0 ? String(orders) : '—';
+            }
+            if (totalSpentEl) {
+                totalSpentEl.textContent = spent > 0 ? spent.toFixed(3) + ' BD' : '—';
+            }
+        } else {
+            statsSection?.classList.add('hidden');
+        }
+
         setRole(userRole.toLowerCase());
     }
 
