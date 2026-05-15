@@ -3,6 +3,9 @@ package com.example.demo.repository;
 import com.example.demo.model.Auction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
+    List<Auction> findByProductArtisanUserId(Long artisanId);
     long countByProductArtisanUserIdAndStatus(Long artisanId, String status);
 }
