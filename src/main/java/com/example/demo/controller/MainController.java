@@ -3,11 +3,14 @@ package com.example.demo.controller;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.AuctionRepository;
 import com.example.demo.repository.ReviewRepository;
+import com.example.demo.repository.OrderRepository;
+import com.example.demo.model.Order;
 import com.example.demo.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
 @Controller
 public class MainController {
@@ -23,6 +26,9 @@ public class MainController {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -125,7 +131,11 @@ public class MainController {
     }
 
     @GetMapping("/OrderConformation")
-    public String orderConformation() {
+    public String orderConformation(@RequestParam(required = false) Long orderId, Model model) {
+        if (orderId != null) {
+            Optional<Order> orderOpt = orderRepository.findById(orderId);
+            orderOpt.ifPresent(order -> model.addAttribute("order", order));
+        }
         return "OrderConformation";
     }
 
