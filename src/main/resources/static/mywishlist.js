@@ -145,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error loading wishlist:', error);
+            updateWishlistCount();
             checkEmptyState();
         }
     }
@@ -155,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tbody.innerHTML = '';
         if (products.length === 0) {
+            updateWishlistCount();
             checkEmptyState();
             return;
         }
