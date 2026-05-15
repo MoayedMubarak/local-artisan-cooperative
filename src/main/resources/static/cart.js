@@ -40,9 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const pickupInfo = document.getElementById('pickup-info');
         const shippingRow = document.getElementById('shipping-cost-row');
 
+        const radioShip   = document.getElementById('radio-ship');
+        const radioPickup = document.getElementById('radio-pickup');
+
         if (isShipping) {
             shipCard.classList.add('selected');
             pickupCard.classList.remove('selected');
+            if (radioShip)   { radioShip.className   = 'w-5 h-5 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full flex-shrink-0 flex items-center justify-center mt-0.5'; radioShip.innerHTML   = '<i class="fas fa-check text-white" style="font-size:9px;"></i>'; }
+            if (radioPickup) { radioPickup.className  = 'w-5 h-5 border-2 border-[#e5e0d8] rounded-full flex-shrink-0 mt-0.5';                                               radioPickup.innerHTML = ''; }
             shippingSection.style.display = 'block';
             pickupInfo.classList.add('hidden');
             if(shippingRow) {
@@ -52,6 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             pickupCard.classList.add('selected');
             shipCard.classList.remove('selected');
+            if (radioPickup) { radioPickup.className  = 'w-5 h-5 border-2 border-[#c17c5f] bg-[#c17c5f] rounded-full flex-shrink-0 flex items-center justify-center mt-0.5'; radioPickup.innerHTML = '<i class="fas fa-check text-white" style="font-size:9px;"></i>'; }
+            if (radioShip)   { radioShip.className    = 'w-5 h-5 border-2 border-[#e5e0d8] rounded-full flex-shrink-0 mt-0.5';                                               radioShip.innerHTML   = ''; }
             shippingSection.style.display = 'none';
             pickupInfo.classList.remove('hidden');
             if(shippingRow) {
