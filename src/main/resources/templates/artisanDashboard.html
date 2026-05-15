@@ -283,7 +283,7 @@
             <div class="p-4 mt-8 border-t border-[#7a6655]">
                 <ul class="space-y-1">
                     <li>
-                        <a href="/artisanSettings" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                        <a id="settingsLink" href="/artisanSettings" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-cog w-5"></i>
                             <span>Settings</span>
                         </a>
@@ -383,8 +383,9 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e5e0d8]">
+                            <!-- Thymeleaf renders each order item; data-order-id carries the real DB id -->
                             <!-- Order 1 -->
-                            <tr class="table-row">
+                            <tr class="table-row" data-order-id="2847">
                                 <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2847</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]">
                                     <div class="flex items-center gap-3">
@@ -408,7 +409,7 @@
                             </tr>
 
                             <!-- Order 2 -->
-                            <tr class="table-row">
+                            <tr class="table-row" data-order-id="2831">
                                 <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2831</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]">
                                     <div class="flex items-center gap-3">
@@ -432,7 +433,7 @@
                             </tr>
 
                             <!-- Order 3 -->
-                            <tr class="table-row">
+                            <tr class="table-row" data-order-id="2815">
                                 <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2815</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]">
                                     <div class="flex items-center gap-3">
@@ -456,7 +457,7 @@
                             </tr>
 
                             <!-- Order 4 -->
-                            <tr class="table-row">
+                            <tr class="table-row" data-order-id="2802">
                                 <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2802</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]">
                                     <div class="flex items-center gap-3">
@@ -480,7 +481,7 @@
                             </tr>
 
                             <!-- Order 5 -->
-                            <tr class="table-row">
+                            <tr class="table-row" data-order-id="2789">
                                 <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2789</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]">
                                     <div class="flex items-center gap-3">

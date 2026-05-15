@@ -63,7 +63,7 @@ public class ArtisanController {
             model.addAttribute("artisan", artisan);
             model.addAttribute("auctions", auctionRepository.findByProductArtisanUserId(artisanId));
         });
-        return "artisanAuctions";
+        return "artisanAuction";
     }
 
     @GetMapping("/artisanOrders")
@@ -105,10 +105,10 @@ public class ArtisanController {
         return "artisanSettings";
     }
         
-    @GetMapping("/artisanOrdersDetail")
+    @GetMapping("/artisanOrderDetail")
     public String ordersDetail(@RequestParam(required = false) Long id, Model model) {
         Long artisanId = (id != null) ? id : 2L;
         artisanRepository.findById(artisanId).ifPresent(artisan -> model.addAttribute("artisan", artisan));
-        return "artisanOrdersDetail";
+        return "artisanOrderDetail";
     }
 }
