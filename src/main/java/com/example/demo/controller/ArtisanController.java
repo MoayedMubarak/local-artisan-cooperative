@@ -56,7 +56,7 @@ public class ArtisanController {
         return "artisanProducts";
     }
 
-    @GetMapping("/artisanAuctions")
+    @GetMapping("/artisanAuction")
     public String auctions(@RequestParam(required = false) Long id, Model model) {
         Long artisanId = (id != null) ? id : 2L;
         artisanRepository.findById(artisanId).ifPresent(artisan -> {
