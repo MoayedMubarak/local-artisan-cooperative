@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -236,7 +236,7 @@
                     <div>
                         <!-- Main Image with Auction Badge -->
                         <div class="mb-4 relative">
-                            <img id="mainImage" th:src="${auction != null ? auction.product.imageUrl : 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=500&fit=crop'}" alt="Auction item" class="w-full h-96 object-cover rounded-xl">
+                            <img id="mainImage" src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&amp;h=500&amp;fit=crop" alt="Silver Moonstone Necklace" class="w-full h-96 object-cover rounded-xl">
                             <div class="absolute top-4 left-4 auction-badge-large bg-[#c17c5f] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                                 <i class="fas fa-gavel mr-2"></i>Live Auction
                             </div>
@@ -259,12 +259,12 @@
                         </span>
                         
                         <!-- Product Name -->
-                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2" th:text="${auction != null ? auction.product.title : 'Silver Moonstone Necklace'}">Silver Moonstone Necklace</h1>
+                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2">Silver Moonstone Necklace</h1>
                         
                         <!-- Artisan Name -->
-                        <p class="text-[#8b7355] mb-4 block" th:text="${auction != null ? 'by ' + auction.product.artisanName : 'by Marcus Chen'}">
+                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block">
                             by Marcus Chen
-                        </p>
+                        </a>
                         
                         <!-- Star Rating -->
                         <div class="flex items-center mb-6">
@@ -301,13 +301,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
                                     <p class="text-sm text-[#8b7355] mb-1">Current Bid</p>
-                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] break-words break-all max-w-full" id="current-bid-display"
-                                       th:text="${auction != null ? #numbers.formatDecimal(auction.currentHighestBid, 1, 0) + ' BD' : '120 BD'}">120 BD</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] break-words break-all max-w-full" id="current-bid-display">120.00 BD</p>
                                 </div>
                                 <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
                                     <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Highest Bidder</p>
-                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name"
-                                       th:text="${auction != null && auction.highestBidderName != null ? auction.highestBidderName : 'No bids yet'}">No bids yet</p>
+                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name">Jennifer M.</p>
                                 </div>
                             </div>
                             
@@ -339,9 +337,9 @@
                                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></span>
                                         <input 
                                             type="number" 
-                                            th:min="${minBid != null ? minBid : 121}"
+                                            min="121" 
                                             step="1" 
-                                            th:placeholder="${minBid != null ? 'Min: ' + minBid + ' BD' : 'Min: 121 BD'}" 
+                                            placeholder="Min: 121 BD" 
                                             class="w-full pl-4 pr-12 py-3 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] font-semibold"
                                             id="bidAmount"
                                         />
@@ -465,24 +463,97 @@
         </main>
     </div>
 
-    <input type="hidden" id="auction-id" th:value="${auction != null ? auction.id : ''}" />
-    <script th:if="${auction != null}" th:inline="javascript">
-        window.__AUCTION_DATA__ = {
-            id: /*[[${auction.id}]]*/ 0,
-            name: /*[[${auction.product.title}]]*/ '',
-            artist: /*[[${'by ' + auction.product.artisanName}]]*/ '',
-            bid: /*[[${auction.currentHighestBid}]]*/ 0,
-            minBid: /*[[${minBid}]]*/ 1,
-            highestBidder: /*[[${auction.highestBidderName != null ? auction.highestBidderName : 'No bids yet'}]]*/ '',
-            img: /*[[${auction.product.imageUrl}]]*/ '',
-            category: /*[[${auction.product.category}]]*/ '',
-            status: /*[[${auction.status}]]*/ 'LIVE',
-            secondsRemaining: /*[[${secondsRemaining}]]*/ 0,
-            endTimeLabel: /*[[${#temporals.format(auction.endTime, 'MMMM d, yyyy ''at'' h:mm a')}]]*/ ''
-        };
-    </script>
     <script src="/authguard.js"></script>
-    <script src="/ProductDetailsAuction.js?v=2"></script>
+    <script src="/ProductDetailsAuction.js"></script>
+    
+    <script>
+        // Change main image when clicking thumbnail
+        function changeImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            if (!mainImage) return;
+            mainImage.src = thumbnail.src
+                .replace(/([?&])w=\d+(&|$)/, '$1w=600$2')
+                .replace(/([?&])h=\d+(&|$)/, '$1h=500$2');
+            
+            // Update active state
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+        
+        // Price range slider functionality
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        
+        if (priceRange && priceValue) {
+            priceRange.addEventListener('input', function() {
+                priceValue.textContent = this.value + ' BD';
+            });
+        }
+
+        const detailSearchInput = document.querySelector('aside input[type="text"][placeholder="Search..."]');
+        if (detailSearchInput) {
+            detailSearchInput.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                const query = detailSearchInput.value.trim();
+                if (!query) return;
+                window.location.href = `/products?search=${encodeURIComponent(query)}`;
+            });
+        }
+        
+
+        // Countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const endDate = new Date();
+            endDate.setHours(20, 0, 0, 0); // 8:00 PM today
+            
+            if (now > endDate) {
+                endDate.setDate(endDate.getDate() + 1); // Set to tomorrow if already past
+            }
+            
+            const diff = endDate - now;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // Bid form validation
+        const bidForm = document.querySelector('form');
+        if (bidForm) {
+            bidForm.addEventListener('submit', function(e) {
+                if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to place a bid.') : true)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                e.preventDefault();
+                const bidAmount = parseFloat(document.getElementById('bidAmount').value);
+                const bidderName = document.getElementById('bidderName').value.trim();
+                const currentBid = 120.00;
+                
+                if (!bidAmount || bidAmount <= currentBid) {
+                    alert('Your bid must be higher than the current bid of $120.00');
+                    return;
+                }
+                
+                if (!bidderName) {
+                    alert('Please enter your name');
+                    return;
+                }
+                
+                alert(`Thank you, ${bidderName}! Your bid of $${bidAmount.toFixed(2)} has been placed.`);
+                this.reset();
+            });
+        }
+    </script>
 
     <script>
         if (!window.isUserAuthenticated?.()) {

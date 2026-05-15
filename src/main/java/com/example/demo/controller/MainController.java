@@ -6,16 +6,11 @@ import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.model.Order;
 import com.example.demo.service.AuctionService;
-import com.example.demo.service.BidResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Optional;
-import com.example.demo.model.Auction;
 
 @Controller
 public class MainController {
@@ -49,17 +44,14 @@ public class MainController {
 
     @GetMapping("/auctions")
     public String auctions(Model model) {
-        List<Auction> auctions = auctionRepository.findAll();
-        auctionService.refreshStaleSchedules(auctions);
-        auctions = auctionService.prepareAuctionsForDisplay(auctions);
-        model.addAttribute("auctions", auctions);
+        model.addAttribute("auctions", auctionRepository.findAll());
         return "auctions";
     }
 
     @PostMapping("/auctions/bid")
     public String placeBid(@RequestParam Long auctionId, @RequestParam double amount, Model model) {
-        BidResult result = auctionService.placeBid(auctionId, amount, "Jane Doe");
-        model.addAttribute("message", result.getMessage());
+        String message = auctionService.placeBid(auctionId, amount, "Jane Doe");
+        model.addAttribute("message", message);
         return "redirect:/auctions";
     }
 
@@ -148,17 +140,7 @@ public class MainController {
     }
 
     @GetMapping("/ProductDetailsAuction")
-    public String productDetailsAuction(@RequestParam(required = false) Long id, Model model) {
-        if (id != null) {
-            auctionRepository.findById(id).ifPresent(auction -> {
-                auction.setStatus(auctionService.resolveDisplayStatus(auction));
-                long secondsRemaining = Math.max(0,
-                        ChronoUnit.SECONDS.between(LocalDateTime.now(), auction.getEndTime()));
-                model.addAttribute("auction", auction);
-                model.addAttribute("minBid", auctionService.getMinimumBid(auction));
-                model.addAttribute("secondsRemaining", secondsRemaining);
-            });
-        }
+    public String productDetailsAuction() {
         return "ProductDetailsAuction";
     }
 
