@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.AuctionRepository;
+import com.example.demo.repository.ReviewRepository;
 import com.example.demo.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,9 @@ public class MainController {
 
     @Autowired
     private AuctionService auctionService;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -133,7 +137,14 @@ public class MainController {
     @GetMapping("/ProductDetailsStandard")
     public String productDetailsStandard(@RequestParam(required = false) Long id, Model model) {
         if (id != null) {
-            productRepository.findById(id).ifPresent(product -> model.addAttribute("product", product));
+            productRepository.findById(id).ifPresent(product -> {
+                model.addAttribute("product", product);
+                model.addAttribute("reviews", reviewRepository.findByProductIdOrderByDateDesc(id));
+                Double avg = reviewRepository.findAverageRatingByProductId(id);
+                long count = reviewRepository.countByProductId(id);
+                model.addAttribute("averageRating", avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0);
+                model.addAttribute("reviewCount", count);
+            });
         }
         return "ProductDetailsStandard";
     }
