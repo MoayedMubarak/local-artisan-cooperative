@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const userRole = (data.user.role || '').toUpperCase();
                 if (!next && userRole === 'ARTISAN') {
-                    window.location.href = '/artisan-dashboard';
+                    window.location.href = '/artisanDashboard';
                 } else {
                     window.location.href = next || '/index';
                 }

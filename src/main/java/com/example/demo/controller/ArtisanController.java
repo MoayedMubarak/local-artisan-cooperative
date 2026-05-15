@@ -26,7 +26,7 @@ public class ArtisanController {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-    @GetMapping("/artisan-dashboard")
+    @GetMapping("/artisanDashboard")
     public String dashboard(@RequestParam(required = false) Long id, Model model) {
         Long artisanId = (id != null) ? id : 2L; // Default to Elena for demo
         artisanRepository.findById(artisanId).ifPresent(artisan -> {
@@ -46,7 +46,7 @@ public class ArtisanController {
         return "artisanDashboard";
     }
 
-    @GetMapping("/artisan-products")
+    @GetMapping("/artisanProducts")
     public String products(@RequestParam(required = false) Long id, Model model) {
         Long artisanId = (id != null) ? id : 2L;
         artisanRepository.findById(artisanId).ifPresent(artisan -> {
@@ -54,5 +54,61 @@ public class ArtisanController {
             model.addAttribute("products", productRepository.findByArtisanUserId(artisanId));
         });
         return "artisanProducts";
+    }
+
+    @GetMapping("/artisanAuctions")
+    public String auctions(@RequestParam(required = false) Long id, Model model) {
+        Long artisanId = (id != null) ? id : 2L;
+        artisanRepository.findById(artisanId).ifPresent(artisan -> {
+            model.addAttribute("artisan", artisan);
+            model.addAttribute("auctions", auctionRepository.findByProductArtisanUserId(artisanId));
+        });
+        return "artisanAuctions";
+    }
+
+    @GetMapping("/artisanOrders")
+    public String orders(@RequestParam(required = false) Long id, Model model) {
+        Long artisanId = (id != null) ? id : 2L;
+        artisanRepository.findById(artisanId).ifPresent(artisan -> {
+            model.addAttribute("artisan", artisan);
+            List<OrderItem> orders = orderItemRepository.findByProductArtisanUserId(artisanId).stream()
+                    .filter(o -> !"cart".equalsIgnoreCase(o.getOrder().getStatus()))
+                    .toList();
+            model.addAttribute("orders", orders);
+        });
+        return "artisanOrders";
+    }
+
+    @GetMapping("/artisanAnalytics")
+    public String analytics(@RequestParam(required = false) Long id, Model model) {
+        Long artisanId = (id != null) ? id : 2L;
+        artisanRepository.findById(artisanId).ifPresent(artisan -> {
+            model.addAttribute("artisan", artisan);
+            // For simplicity, reusing the same stats as dashboard
+            model.addAttribute("productsCount", productRepository.countByArtisanUserId(artisanId));
+            model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(artisanId, "active"));
+            
+            List<OrderItem> orders = orderItemRepository.findByProductArtisanUserId(artisanId).stream()
+                    .filter(o -> !"cart".equalsIgnoreCase(o.getOrder().getStatus()))
+                    .toList();
+            model.addAttribute("pendingOrders", orders.stream().filter(o -> "pending".equalsIgnoreCase(o.getOrder().getStatus())).count());
+            model.addAttribute("totalRevenue", orders.stream().mapToDouble(o -> o.getPrice() * o.getQuantity()).sum());
+        });
+
+        return "artisanAnalytics";
+    }
+
+    @GetMapping("/artisanSettings")
+    public String settings(@RequestParam(required = false) Long id, Model model) {
+        Long artisanId = (id != null) ? id : 2L;
+        artisanRepository.findById(artisanId).ifPresent(artisan -> model.addAttribute("artisan", artisan));
+        return "artisanSettings";
+    }
+        
+    @GetMapping("/artisanOrdersDetail")
+    public String ordersDetail(@RequestParam(required = false) Long id, Model model) {
+        Long artisanId = (id != null) ? id : 2L;
+        artisanRepository.findById(artisanId).ifPresent(artisan -> model.addAttribute("artisan", artisan));
+        return "artisanOrdersDetail";
     }
 }
