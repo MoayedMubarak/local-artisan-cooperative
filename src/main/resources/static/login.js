@@ -104,7 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const next = url.searchParams.get('next') || sessionStorage.getItem('postLoginNext');
                 sessionStorage.removeItem('postLoginNext');
 
-                window.location.href = next || '/index';
+                const userRole = (data.user.role || '').toUpperCase();
+                if (!next && userRole === 'ARTISAN') {
+                    window.location.href = '/artisan-dashboard';
+                } else {
+                    window.location.href = next || '/index';
+                }
             } else {
                 showFormError(form, data.message || 'Invalid email or password');
                 resetButtonLoading(form.querySelector('button[type="submit"]'), 'Login');
@@ -163,14 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let payload = {};
         let endpoint = '';
-        
+
         if (isArtisan) {
             const fullName = inputs[0].value;
             const phone = inputs[2].value;
             const password = passwords[0].value;
             const shopName = form.querySelectorAll('input[type="text"]')[1]?.value;
             const biography = form.querySelector('textarea')?.value;
-            
+
             payload = {
                 name: fullName,
                 email: email,
@@ -184,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fullName = inputs[0].value;
             const phone = inputs[2].value;
             const password = passwords[0].value;
-            
+
             payload = {
                 name: fullName,
                 email: email,
@@ -218,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('userId', data.user.userId);
                     sessionStorage.setItem('userProfile', JSON.stringify(data.user));
                     sessionStorage.setItem('cartCount', '0');
-                    
+
                     showToast('Account created! Welcome to ArtsyVibe.', 'success');
 
                     // Redirect back to the originally requested page (if any)
