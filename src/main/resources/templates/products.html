@@ -166,7 +166,7 @@
 
             <div class="flex items-center space-x-4">
                 <div id="login-button-wrapper" class="flex items-center hidden">
-                    <a href="/login" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#c17c5f] to-[#a5664d] text-white text-sm font-semibold shadow-lg shadow-[#c17c5f]/20 transition-all hover:from-[#b06b4f] hover:to-[#8f5d3f]">
+                    <a href="/login" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#c17c5f] to-[#a5664d] text-white text-sm font-semibold shadow-lg shadow-[#c17c5f]/20 transition-all hover:from-[#b06b4f] hover:to                     [#8f5d3f]">
                         <i class="fas fa-sign-in-alt"></i>
                         Login
                     </a>
@@ -300,28 +300,24 @@
                 <div th:each="product : ${products}" 
                      class="product-card bg-white rounded-xl overflow-hidden card-shadow relative" 
                      th:attr="data-category=${#strings.toLowerCase(product.category)}, data-price=${product.price}, data-id=${product.id}">
-                    
+
                     <button class="wishlist-btn absolute top-3 right-3 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#8b7355] hover:text-[#ef4444] transition-all shadow-sm">
                         <i class="far fa-heart text-lg"></i>
                     </button>
-                    
+
                     <div class="relative">
                         <img th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-56 object-cover">
                     </div>
-                    
+
                     <div class="p-5">
                         <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1" th:text="${product.title}">Product Title</h3>
                         <p class="text-[#8b7355] text-sm mb-3" th:text="'by ' + ${product.artisanName}">by Artisan Name</p>
-                        <div class="flex flex-col gap-2 items-stretch sm:items-end">
-                            <div class="flex items-center justify-between gap-2 w-full">
+                            <div class="flex items-center justify-between">
                                 <span class="text-xl font-bold text-[#c17c5f]" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' BD'">0.00 BD</span>
-                                <button type="button" class="add-to-cart-quick-btn shrink-0 w-10 h-10 rounded-lg bg-[#c17c5f] hover:bg-[#a5664d] text-white flex items-center justify-center transition-colors shadow-sm" th:attr="data-product-id=${product.id}" title="Add to cart">
-                                    <i class="fas fa-cart-plus"></i>
-                                </button>
+                                <a th:href="@{/ProductDetailsStandard(id=${product.id})}" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                    View Details
+                                </a>
                             </div>
-                            <a th:href="@{/ProductDetailsStandard(id=${product.id})}" class="bg-[#faf9f6] hover:bg-[#f5ebe0] text-[#c17c5f] border border-[#e5e0d8] text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                View Details
-                            </a>
                         </div>
                     </div>
                 </div>
