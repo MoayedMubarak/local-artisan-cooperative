@@ -139,6 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
     //    — clicking either navigates to the product detail page
     // ----------------------------------------------------------
     document.getElementById('auction-grid')?.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.textContent.trim() === 'View Details') {
+            return;
+        }
+
         const btn = e.target.closest('button');
         if (!btn) return;
 
@@ -212,7 +217,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const isTitle = e.target.closest('h3');
 
         if (isImage || isTitle) {
-            navigateToProductPage(card.querySelector('button'));
+            const auctionId = card.getAttribute('data-auction-id');
+            if (auctionId) {
+                window.location.href = `/ProductDetailsAuction?id=${encodeURIComponent(auctionId)}`;
+            }
         }
     });
 
@@ -253,7 +261,13 @@ function navigateToProductPage(placeBidBtn) {
     const card = placeBidBtn.closest('.auction-card');
     if (!card) return;
 
-    // Extract all data from the card
+    const auctionId = card.getAttribute('data-auction-id');
+    if (auctionId) {
+        window.location.href = `/ProductDetailsAuction?id=${encodeURIComponent(auctionId)}`;
+        return;
+    }
+
+    // Fallback: legacy query-param navigation
     const productId   = card.getAttribute('data-product-id') ?? '';
     const name        = card.querySelector('h3')?.textContent.trim() ?? '';
     const artist      = card.querySelector('p.text-sm')?.textContent.trim() ?? '';
@@ -328,10 +342,6 @@ function tickCountdowns() {
             parent.classList.remove('bg-[#f5ebe0]', 'text-[#c17c5f]');
         }
 
-        // Anti-sniping notice
-        if (hours === 0 && minutes === 0 && seconds === 30) {
-            showToast('⏰ Anti-snipe: bid placed in last 30 s — auction extended 2 min!', 'info');
-        }
     });
 }
 
@@ -340,6 +350,7 @@ function markAuctionEnded(countdownEl) {
     if (!card || card.classList.contains('ended')) return;
 
     card.classList.add('ended');
+    card.setAttribute('data-auction-status', 'ENDED');
     const badge = card.querySelector('.live-badge');
     if (badge) {
         badge.className = 'absolute top-3 left-3 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full';
@@ -380,7 +391,7 @@ function applyFilters() {
         const matchesCat = _activeCategory === 'all' || cardCat === _activeCategory;
 
         // Price match
-        const bidText  = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
+        const bidText  = card.querySelector('.auction-bid-amount')?.textContent ?? '0';
         const bidValue = parseFloat(bidText.replace(/[^0-9.]/g, '')) || 0;
         const matchesPrice = bidValue <= priceMax;
 
@@ -423,14 +434,17 @@ function applyFilters() {
     }
 }
 
+function getCardStatus(card) {
+    return (card.getAttribute('data-auction-status') || '').toUpperCase();
+}
 function isLiveCard(card) {
-    return card.querySelector('.live-badge') !== null && !card.classList.contains('ended');
+    return getCardStatus(card) === 'LIVE' && !card.classList.contains('ended');
 }
 function isUpcomingCard(card) {
-    return card.querySelector('.bg-blue-500') !== null;
+    return getCardStatus(card) === 'UPCOMING';
 }
 function isEndedCard(card) {
-    return card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
+    return getCardStatus(card) === 'ENDED' || card.classList.contains('ended');
 }
 
 function sortAuctions(criteria) {
@@ -461,7 +475,7 @@ function totalSeconds(card) {
 }
 
 function getBidValue(card) {
-    const text = card.querySelector('.text-xl.font-bold')?.textContent ?? '0';
+    const text = card.querySelector('.auction-bid-amount')?.textContent ?? '0';
     return parseFloat(text.replace(/[^0-9.]/g, '')) || 0;
 }
 

@@ -49,9 +49,11 @@ public class MainController {
     }
 
     @PostMapping("/auctions/bid")
-    public String placeBid(@RequestParam Long auctionId, @RequestParam double amount, Model model) {
-        String message = auctionService.placeBid(auctionId, amount, "Jane Doe");
-        model.addAttribute("message", message);
+    public String placeBid(@RequestParam Long auctionId, @RequestParam int amount,
+                           @RequestParam(required = false) String bidderName, Model model) {
+        String name = (bidderName != null && !bidderName.isBlank()) ? bidderName : "Guest Bidder";
+        var result = auctionService.placeBid(auctionId, amount, name);
+        model.addAttribute("message", result.get("message"));
         return "redirect:/auctions";
     }
 
@@ -140,7 +142,13 @@ public class MainController {
     }
 
     @GetMapping("/ProductDetailsAuction")
-    public String productDetailsAuction() {
+    public String productDetailsAuction(@RequestParam(required = false) Long id, Model model) {
+        if (id != null) {
+            auctionRepository.findById(id).ifPresent(auction -> {
+                model.addAttribute("auction", auction);
+                model.addAttribute("displayStatus", auctionService.resolveDisplayStatus(auction));
+            });
+        }
         return "ProductDetailsAuction";
     }
 
