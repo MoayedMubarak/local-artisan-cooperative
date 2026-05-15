@@ -349,3 +349,5 @@ function updateCartBadge() {
             badge.textContent = count;
         });
 }
+
+
