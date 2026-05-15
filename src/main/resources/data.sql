@@ -20,13 +20,13 @@ INSERT INTO product_categories (category_id, name) OVERRIDING SYSTEM VALUE VALUE
 -- Artisans: IDs 2-4
 -- Customers: IDs 5-7
 INSERT INTO users (user_id, name, email, password, role, profile_picture) OVERRIDING SYSTEM VALUE VALUES
-  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ADMIN', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
-  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'),
-  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'),
-  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'ARTISAN', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'),
-  (5,  'John Doe',      'john@example.com',      '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
-  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
-  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGKK2p9J4G1R59dY6d5W', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png');
+  (1,  'Alice Admin',   'alice@artsyvibe.com',   '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'ADMIN', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+  (2,  'Elena Craft',   'elena@artsyvibe.com',   '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'ARTISAN', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'),
+  (3,  'Marco Pottery', 'marco@artsyvibe.com',   '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'ARTISAN', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'),
+  (4,  'Zara Weaves',   'zara@artsyvibe.com',    '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'ARTISAN', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'),
+  (5,  'John Doe',      'john@example.com',      '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+  (6,  'Sarah Miller',  'sarah@example.com',     '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+  (7,  'Tom Brown',     'tom@example.com',       '$2a$10$FIVPPbrxrRXHIsD.jIwtkOYaWLhZ1YYpu2mtAzbi2aUlceQT728wu', 'CUSTOMER', 'https://cdn-icons-png.flaticon.com/512/149/149071.png');
 
 
 -- ── 3. Admins (joined subtable) ──────────────────────────────
