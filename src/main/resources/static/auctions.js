@@ -102,6 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     const sortSelect = document.querySelector('select');
     sortSelect?.addEventListener('change', () => sortAuctions(sortSelect.value));
+    if (sortSelect?.value === 'status-order') {
+        sortAuctions('status-order');
+    }
 
     // ----------------------------------------------------------
     // 6. Custom checkboxes in sidebar
@@ -146,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnText === 'Place Bid') {
             if (!requireLoginToAct('Login/Register first to place a bid.')) return;
-            navigateToProductPage(btn);
+            navigateToAuctionDetail(btn);
             return;
         }
 
@@ -212,7 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const isTitle = e.target.closest('h3');
 
         if (isImage || isTitle) {
-            navigateToProductPage(card.querySelector('button'));
+            const auctionId = card.getAttribute('data-auction-id');
+            if (auctionId) {
+                window.location.href = `/ProductDetailsAuction?id=${auctionId}`;
+            }
         }
     });
 
@@ -236,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         card.style.display = '';
     });
 
-    // Initial render — apply default filters
     applyFilters();
 });
 
@@ -247,42 +252,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Reads card data and passes it as URL query params
 // ============================================================
 
-function navigateToProductPage(placeBidBtn) {
-    if (!placeBidBtn) return;
+function navigateToAuctionDetail(triggerEl) {
+    if (!triggerEl) return;
 
-    const card = placeBidBtn.closest('.auction-card');
+    const card = triggerEl.closest('.auction-card');
     if (!card) return;
 
-    // Extract all data from the card
-    const productId   = card.getAttribute('data-product-id') ?? '';
-    const name        = card.querySelector('h3')?.textContent.trim() ?? '';
-    const artist      = card.querySelector('p.text-sm')?.textContent.trim() ?? '';
-    const currentBid  = card.querySelector('.text-xl.font-bold')?.textContent.trim() ?? '0.000 BD';
-    const imgSrc      = card.querySelector('img')?.src ?? '';
-    const category    = card.getAttribute('data-category') ?? '';
-    const bidsCount   = card.querySelector('.text-xs.text-\\[\\#8b7355\\]')?.textContent.trim() ?? '0 bids';
+    const auctionId = card.getAttribute('data-auction-id');
+    if (!auctionId) return;
 
-    // Read countdown time remaining
-    const countdownEl = card.querySelector('.countdown');
-    const hoursLeft   = countdownEl?.dataset.hours   ?? '0';
-    const minsLeft    = countdownEl?.dataset.minutes ?? '0';
-    const secsLeft    = countdownEl?.dataset.seconds ?? '0';
-
-    // Build query string so ProductDetailsAuction.html can read the data
-    const params = new URLSearchParams({
-        id:       productId,
-        name:     name,
-        artist:   artist,
-        bid:      currentBid,
-        img:      imgSrc,
-        category: category,
-        bids:     bidsCount,
-        hours:    hoursLeft,
-        minutes:  minsLeft,
-        seconds:  secsLeft,
-    });
-
-    window.location.href = `/ProductDetailsAuction?${params.toString()}`;
+    window.location.href = `/ProductDetailsAuction?id=${auctionId}`;
 }
 
 // ============================================================
@@ -328,10 +307,6 @@ function tickCountdowns() {
             parent.classList.remove('bg-[#f5ebe0]', 'text-[#c17c5f]');
         }
 
-        // Anti-sniping notice
-        if (hours === 0 && minutes === 0 && seconds === 30) {
-            showToast('⏰ Anti-snipe: bid placed in last 30 s — auction extended 2 min!', 'info');
-        }
     });
 }
 
@@ -423,14 +398,17 @@ function applyFilters() {
     }
 }
 
+function cardStatus(card) {
+    return (card.getAttribute('data-status') || '').toLowerCase();
+}
 function isLiveCard(card) {
-    return card.querySelector('.live-badge') !== null && !card.classList.contains('ended');
+    return cardStatus(card) === 'live';
 }
 function isUpcomingCard(card) {
-    return card.querySelector('.bg-blue-500') !== null;
+    return cardStatus(card) === 'upcoming';
 }
 function isEndedCard(card) {
-    return card.classList.contains('ended') || card.querySelector('.bg-gray-500') !== null;
+    return cardStatus(card) === 'ended' || card.classList.contains('ended');
 }
 
 function sortAuctions(criteria) {
@@ -439,6 +417,12 @@ function sortAuctions(criteria) {
     const cards = [...grid.querySelectorAll('.auction-card')];
 
     cards.sort((a, b) => {
+        if (criteria === 'status-order') {
+            const order = { live: 0, upcoming: 1, ended: 2 };
+            const diff = (order[cardStatus(a)] ?? 3) - (order[cardStatus(b)] ?? 3);
+            if (diff !== 0) return diff;
+            return totalSeconds(a) - totalSeconds(b);
+        }
         if (criteria === 'ending-soonest') {
             return totalSeconds(a) - totalSeconds(b);
         }
