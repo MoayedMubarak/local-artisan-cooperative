@@ -149,7 +149,7 @@
                             <span id="rating-avg" class="text-[#5c4a3d] font-medium"
                                   th:text="${averageRating != null ? averageRating : '0.0'}">0.0</span>
                             <span id="rating-count" class="text-[#8b7355] ml-2"
-                                  th:text="${reviewCount != null ? '(' + reviewCount + ' review' + (reviewCount == 1 ? ')' : 's)') : '(0 reviews)'}">
+                                  th:text="${reviewCount != null and reviewCount > 0 ? '(' + reviewCount + (reviewCount == 1 ? ' review)' : ' reviews)') : '(0 reviews)'}">
                                 (0 reviews)
                             </span>
                         </div>
@@ -200,10 +200,11 @@
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                                     <span class="text-[#c17c5f] font-semibold text-sm"
-                                          th:text="${#strings.substring(review.customer.name, 0, 1).toUpperCase() + (review.customer.name.contains(' ') ? #strings.substring(review.customer.name, review.customer.name.indexOf(' ') + 1, review.customer.name.indexOf(' ') + 2).toUpperCase() : '')}">XX</span>
+                                          th:text="${review.customer != null and review.customer.name != null and !#strings.isEmpty(review.customer.name) ? #strings.toUpperCase(#strings.substring(review.customer.name, 0, 1)) : '?'}">?</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-[#5c4a3d]" th:text="${review.customer.name}">Customer</h4>
+                                    <h4 class="font-semibold text-[#5c4a3d]"
+                                        th:text="${review.customer != null ? review.customer.name : 'Customer'}">Customer</h4>
                                     <div class="flex text-sm mt-0.5">
                                         <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                                             <i th:class="${i <= review.rating ? 'fas fa-star star-filled' : 'far fa-star star-empty'}"></i>

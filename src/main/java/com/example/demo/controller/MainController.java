@@ -139,7 +139,7 @@ public class MainController {
         if (id != null) {
             productRepository.findById(id).ifPresent(product -> {
                 model.addAttribute("product", product);
-                model.addAttribute("reviews", reviewRepository.findByProductIdOrderByDateDesc(id));
+                model.addAttribute("reviews", reviewRepository.findByProductIdWithCustomerOrderByDateDesc(id));
                 Double avg = reviewRepository.findAverageRatingByProductId(id);
                 long count = reviewRepository.countByProductId(id);
                 model.addAttribute("averageRating", avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0);
