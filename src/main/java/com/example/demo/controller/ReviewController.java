@@ -90,6 +90,36 @@ public class ReviewController {
         return ResponseEntity.ok(Map.of(
             "success", true,
             "message", "Review submitted successfully",
+            "reviewId", review.getReviewId(),
+            "averageRating", newAvg != null ? Math.round(newAvg * 10.0) / 10.0 : 0.0,
+            "reviewCount", newCount
+        ));
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<?> deleteReview(
+            @PathVariable Long reviewId,
+            @RequestParam String email) {
+
+        Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
+        if (reviewOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Review not found"));
+        }
+
+        Review review = reviewOpt.get();
+        if (!review.getCustomer().getEmail().equals(email)) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "You can only delete your own reviews"));
+        }
+
+        Long productId = review.getProduct().getId();
+        reviewRepository.delete(review);
+
+        Double newAvg = reviewRepository.findAverageRatingByProductId(productId);
+        long newCount = reviewRepository.countByProductId(productId);
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", "Review deleted",
             "averageRating", newAvg != null ? Math.round(newAvg * 10.0) / 10.0 : 0.0,
             "reviewCount", newCount
         ));
