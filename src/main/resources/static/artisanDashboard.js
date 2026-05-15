@@ -53,15 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 2. Sidebar Navigation — active state
+    // 2. Sidebar Navigation — active state only, never block real hrefs
     // ----------------------------------------------------------
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
     sidebarLinks.forEach(link => {
         link.addEventListener('click', function (e) {
-            // Only handle # links (not real navigations)
-            if (this.getAttribute('href') === '#') e.preventDefault();
+            const href = this.getAttribute('href');
 
+            // Only block navigation for placeholder # links
+            if (href === '#') e.preventDefault();
+
+            // Always update active highlight regardless
             sidebarLinks.forEach(l => {
                 l.classList.remove('active', 'text-white');
                 l.classList.add('text-[#d4c5b5]');
@@ -69,7 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.classList.add('active', 'text-white');
             this.classList.remove('text-[#d4c5b5]');
+
+            // Real hrefs (e.g. /artisanSettings, /artisanOrders) navigate normally
         });
+    });
+
+    // Ensure settings navigation always works (covers cases where click may be swallowed)
+    const settingsLink = document.getElementById('settingsLink');
+    settingsLink?.addEventListener('click', function (e) {
+        e.preventDefault();
+        // Small protective delay to allow UI highlight updates to run
+        setTimeout(() => window.location.href = '/artisanSettings', 10);
     });
 
     // ----------------------------------------------------------
@@ -111,30 +124,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 5. Recent Orders — "View" buttons
+    // 5. Recent Orders — "View" buttons → /artisanOrderDetail?id=
     // ----------------------------------------------------------
     document.querySelectorAll('tbody .table-row').forEach(row => {
         const viewBtn = row.querySelector('button');
         if (!viewBtn) return;
 
         viewBtn.addEventListener('click', () => {
-            const orderId = row.querySelector('td:first-child')?.textContent.trim();
-            // Navigate to order detail page
-            window.location.href = `/orders/${orderId.replace('#', '')}`;
+            // Prefer data-order-id set by Thymeleaf; fall back to parsing the text
+            const orderId = row.getAttribute('data-order-id')
+                ?? row.querySelector('td:first-child')?.textContent.trim().replace(/[^0-9]/g, '');
+
+            if (orderId) {
+                window.location.href = `/artisanOrderDetail?id=${orderId}`;
+            } else {
+                showToast('Could not load order details.', 'error');
+            }
         });
     });
 
     // ----------------------------------------------------------
-    // 6. "View All" orders link
+    // 6. "View All" orders link → /artisanOrders
     // ----------------------------------------------------------
-    const viewAllLink = document.querySelector('a[href="#"].text-\\[\\#c17c5f\\]');
-    viewAllLink?.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = '/artisan/orders';
+    document.querySelectorAll('a').forEach(a => {
+        if (a.textContent.trim().startsWith('View All')) {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = '/artisanOrders';
+            });
+        }
     });
 
     // ----------------------------------------------------------
-    // 7. Quick Action Cards
+    // 7. Quick Action Cards — routes match ArtisanController
     // ----------------------------------------------------------
     const quickActions = document.querySelectorAll('.mt-8 a');
 
@@ -144,9 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const label = card.querySelector('h3')?.textContent.trim();
 
             if (label === 'Add New Product') {
-                window.location.href = '/artisan/products/new';
+                window.location.href = '/artisanProducts';
             } else if (label === 'Create Auction') {
-                window.location.href = '/artisan/auctions/new';
+                window.location.href = '/artisanAuction';
             } else if (label === 'Download Report') {
                 handleDownloadReport(card);
             }

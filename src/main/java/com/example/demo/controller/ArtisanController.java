@@ -31,11 +31,11 @@ public class ArtisanController {
         Long artisanId = (id != null) ? id : 2L; // Default to Elena for demo
         artisanRepository.findById(artisanId).ifPresent(artisan -> {
             model.addAttribute("artisan", artisan);
-            
+
             // Stats
             model.addAttribute("productsCount", productRepository.countByArtisanUserId(artisanId));
             model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(artisanId, "active"));
-            
+
             List<OrderItem> orders = orderItemRepository.findByProductArtisanUserId(artisanId).stream()
                     .filter(o -> !"cart".equalsIgnoreCase(o.getOrder().getStatus()))
                     .toList();
@@ -63,7 +63,7 @@ public class ArtisanController {
             model.addAttribute("artisan", artisan);
             model.addAttribute("auctions", auctionRepository.findByProductArtisanUserId(artisanId));
         });
-        return "artisanAuctions";
+        return "artisanAuction";
     }
 
     @GetMapping("/artisanOrders")
@@ -87,7 +87,7 @@ public class ArtisanController {
             // For simplicity, reusing the same stats as dashboard
             model.addAttribute("productsCount", productRepository.countByArtisanUserId(artisanId));
             model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(artisanId, "active"));
-            
+
             List<OrderItem> orders = orderItemRepository.findByProductArtisanUserId(artisanId).stream()
                     .filter(o -> !"cart".equalsIgnoreCase(o.getOrder().getStatus()))
                     .toList();
@@ -104,11 +104,18 @@ public class ArtisanController {
         artisanRepository.findById(artisanId).ifPresent(artisan -> model.addAttribute("artisan", artisan));
         return "artisanSettings";
     }
-        
-    @GetMapping("/artisanOrdersDetail")
+
+    @GetMapping("/artisanOrderDetail")
     public String ordersDetail(@RequestParam(required = false) Long id, Model model) {
         Long artisanId = (id != null) ? id : 2L;
         artisanRepository.findById(artisanId).ifPresent(artisan -> model.addAttribute("artisan", artisan));
-        return "artisanOrdersDetail";
+        return "artisanOrderDetail";
+    }
+
+    @GetMapping("/artisanNotification")
+    public String notifications(@RequestParam(required = false) Long id, Model model) {
+        Long artisanId = (id != null) ? id : 2L;
+        artisanRepository.findById(artisanId).ifPresent(artisan -> model.addAttribute("artisan", artisan));
+        return "artisanNotification";
     }
 }
