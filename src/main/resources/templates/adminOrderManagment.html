@@ -425,7 +425,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -477,7 +477,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -529,7 +529,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -581,7 +581,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -633,7 +633,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -685,7 +685,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -737,7 +737,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
 
@@ -789,7 +789,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                    <a href="/adminOrderDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -864,19 +864,9 @@
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
                 sessionStorage.clear();
-                window.location.replace('/index');
+                localStorage.clear();
+                window.location.href = '/login';
             }
-        });
-                // Remove active class from all links
-                document.querySelectorAll('.sidebar-link').forEach(l => {
-                    l.classList.remove('active');
-                    l.classList.add('text-[#d4c5b5]');
-                });
-
-                // Add active class to clicked link
-                this.classList.add('active');
-                this.classList.remove('text-[#d4c5b5]');
-            });
         });
     </script>
     <script>
