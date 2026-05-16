@@ -26,6 +26,9 @@ public class OrderController {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private com.example.demo.service.NotificationService notificationService;
+
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<?> getMyOrders(@RequestHeader(value = "X-User-Email", required = false) String email) {
@@ -64,7 +67,37 @@ public class OrderController {
             orderMap.put("items", items);
             response.add(orderMap);
         }
-
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> body) {
+        String status = body.get("status");
+        if (status == null) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Status is required"));
+
+        return orderRepository.findById(orderId).map(order -> {
+            order.setStatus(status.toLowerCase());
+            orderRepository.save(order);
+
+            String title = "";
+            String message = "";
+            String type = "";
+
+            if ("shipped".equalsIgnoreCase(status)) {
+                title = "Order Shipped!";
+                message = "Your order #" + order.getOrderId() + " has been shipped.";
+                type = "ORDER_SHIPPED";
+            } else if ("delivered".equalsIgnoreCase(status)) {
+                title = "Order Delivered!";
+                message = "Your order #" + order.getOrderId() + " has been delivered. Enjoy your purchase!";
+                type = "ORDER_DELIVERED";
+            }
+
+            if (!title.isEmpty()) {
+                notificationService.sendNotification(order.getCustomer(), title, message, type, "/orders");
+            }
+
+            return ResponseEntity.ok(Map.of("success", true));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

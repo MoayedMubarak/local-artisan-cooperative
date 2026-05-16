@@ -57,7 +57,7 @@ public class MainController {
     public String placeBid(@RequestParam Long auctionId, @RequestParam int amount,
                            @RequestParam(required = false) String bidderName, Model model) {
         String name = (bidderName != null && !bidderName.isBlank()) ? bidderName : "Guest Bidder";
-        var result = auctionService.placeBid(auctionId, amount, name);
+        var result = auctionService.placeBid(auctionId, amount, name, null);
         model.addAttribute("message", result.get("message"));
         return "redirect:/auctions";
     }

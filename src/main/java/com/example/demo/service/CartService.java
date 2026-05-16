@@ -44,6 +44,9 @@ public class CartService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional(readOnly = true)
     public Map<String, Object> getCartPayload(String email) {
         Customer customer = customerRepository.findByEmail(email)
@@ -211,6 +214,15 @@ public class CartService {
         payment.setDate(LocalDate.now());
         cart.setPayment(payment);
         orderRepository.save(cart);
+
+        // Send order confirmation notification
+        notificationService.sendNotification(
+            customer,
+            "Order Confirmed!",
+            "Your order #" + cart.getOrderId() + " has been confirmed and is being processed.",
+            "ORDER_CONFIRM",
+            "/orders"
+        );
 
         int orders = customer.getTotalOrders() != null ? customer.getTotalOrders() : 0;
         double spent = customer.getTotalSpent() != null ? customer.getTotalSpent() : 0.0;

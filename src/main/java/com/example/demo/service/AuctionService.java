@@ -21,6 +21,15 @@ public class AuctionService {
     @Autowired
     private AuctionRepository auctionRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private com.example.demo.repository.CustomerRepository customerRepository;
+
+    @Autowired
+    private com.example.demo.repository.UserRepository userRepository;
+
     public String resolveDisplayStatus(Auction auction) {
         if (auction == null) return DISPLAY_ENDED;
         LocalDateTime now = LocalDateTime.now();
@@ -90,12 +99,19 @@ public class AuctionService {
         return current + 1;
     }
 
-    public Map<String, Object> placeBid(Long auctionId, int bidAmount, String bidderName) {
+    public Map<String, Object> placeBid(Long auctionId, int bidAmount, String bidderName, Long bidderId) {
         Map<String, Object> result = new HashMap<>();
         Auction auction = auctionRepository.findById(auctionId).orElse(null);
         if (auction == null) {
             result.put("success", false);
             result.put("message", "Auction not found.");
+            return result;
+        }
+
+        Customer newBidder = bidderId != null ? customerRepository.findById(bidderId).orElse(null) : null;
+        if (newBidder == null && bidderId != null) {
+            result.put("success", false);
+            result.put("message", "User not found.");
             return result;
         }
 
@@ -124,6 +140,17 @@ public class AuctionService {
             return result;
         }
 
+        // Notify previous highest bidder
+        if (auction.getHighestBidder() != null && !auction.getHighestBidder().getUserId().equals(bidderId)) {
+            notificationService.sendNotification(
+                auction.getHighestBidder(),
+                "Outbid!",
+                "Someone has placed a higher bid of " + bidAmount + " BD on " + auction.getProduct().getTitle(),
+                "BID_OUTBID",
+                "/auctions" // Link to auctions page
+            );
+        }
+
         boolean extended = false;
         long secondsRemaining = ChronoUnit.SECONDS.between(LocalDateTime.now(), auction.getEndTime());
         if (secondsRemaining <= 30 && secondsRemaining >= 0) {
@@ -133,6 +160,7 @@ public class AuctionService {
 
         auction.setCurrentHighestBid(bidAmount);
         auction.setHighestBidderName(bidderName.trim());
+        auction.setHighestBidder(newBidder);
         auction.setStatus(DISPLAY_LIVE);
         auctionRepository.save(auction);
 
@@ -170,7 +198,25 @@ public class AuctionService {
         for (Auction auction : auctionRepository.findAll()) {
             String resolved = resolveDisplayStatus(auction);
             String normalized = normalizeStatus(auction.getStatus());
+            
             if (!resolved.equals(normalized)) {
+                // Trigger notifications based on status change
+                if (DISPLAY_LIVE.equals(resolved) && DISPLAY_UPCOMING.equals(normalized)) {
+                    // Auction Started
+                    notifyAllUsers("Auction Started!", "A new auction for " + auction.getProduct().getTitle() + " has just started!", "AUCTION_START", "/auctions");
+                } else if (DISPLAY_ENDED.equals(resolved) && DISPLAY_LIVE.equals(normalized)) {
+                    // Auction Ended
+                    if (auction.getHighestBidder() != null) {
+                        notificationService.sendNotification(
+                            auction.getHighestBidder(),
+                            "Auction Won!",
+                            "Congratulations! You won the auction for " + auction.getProduct().getTitle() + " with a bid of " + auction.getCurrentHighestBid() + " BD",
+                            "AUCTION_WON",
+                            "/orders"
+                        );
+                    }
+                }
+                
                 auction.setStatus(resolved);
                 auctionRepository.save(auction);
             }
@@ -179,5 +225,11 @@ public class AuctionService {
                 auctionRepository.save(auction);
             }
         }
+    }
+
+    private void notifyAllUsers(String title, String message, String type, String link) {
+        userRepository.findAll().forEach(user -> {
+            notificationService.sendNotification(user, title, message, type, link);
+        });
     }
 }

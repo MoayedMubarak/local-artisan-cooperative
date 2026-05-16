@@ -266,11 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
             bidBtn.textContent = 'Placing bid...';
         }
 
+        const bidderId = sessionStorage.getItem('userId');
+
         try {
             const res = await fetch(`/api/auctions/${encodeURIComponent(auctionId)}/bid`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: bidAmount, bidderName }),
+                body: JSON.stringify({ amount: bidAmount, bidderName, bidderId }),
             });
             const result = await res.json();
 

@@ -19,6 +19,9 @@ public class Auction {
     private double startingBid;
     private double currentHighestBid;
     private String highestBidderName;
+    @ManyToOne
+    @JoinColumn(name = "highest_bidder_id")
+    private Customer highestBidder;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;

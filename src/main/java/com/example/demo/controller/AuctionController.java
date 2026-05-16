@@ -54,7 +54,10 @@ public class AuctionController {
                     "message", "Please enter a valid bid amount."));
         }
 
-        Map<String, Object> result = auctionService.placeBid(id, bidAmount, bidderName);
+        Object bidderIdObj = body.get("bidderId");
+        Long bidderId = bidderIdObj != null ? Long.parseLong(bidderIdObj.toString()) : null;
+
+        Map<String, Object> result = auctionService.placeBid(id, bidAmount, bidderName, bidderId);
         boolean success = Boolean.TRUE.equals(result.get("success"));
         return success ? ResponseEntity.ok(result) : ResponseEntity.badRequest().body(result);
     }
