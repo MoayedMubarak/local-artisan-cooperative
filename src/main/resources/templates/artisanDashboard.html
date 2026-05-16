@@ -314,7 +314,7 @@
                             <i class="fas fa-arrow-up mr-1"></i> 12%
                         </span>
                     </div>
-                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1 stat-val" th:data-end="${productsCount}">0</h3>
+                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1">24</h3>
                     <p class="text-[#8b7355] text-sm">Total Products</p>
                 </div>
 
@@ -328,7 +328,7 @@
                             <i class="fas fa-arrow-up mr-1"></i> 3 new
                         </span>
                     </div>
-                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1 stat-val" th:data-end="${activeAuctions}">0</h3>
+                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1">8</h3>
                     <p class="text-[#8b7355] text-sm">Active Auctions</p>
                 </div>
 
@@ -342,7 +342,7 @@
                             <i class="fas fa-arrow-down mr-1"></i> 2
                         </span>
                     </div>
-                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1 stat-val" th:data-end="${pendingOrders}">0</h3>
+                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1">5</h3>
                     <p class="text-[#8b7355] text-sm">Pending Orders</p>
                 </div>
 
@@ -356,7 +356,7 @@
                             <i class="fas fa-arrow-up mr-1"></i> 18%
                         </span>
                     </div>
-                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1 stat-val" th:data-end="${totalRevenue}">0</h3>
+                    <h3 class="text-3xl font-bold text-[#5c4a3d] mb-1">3,245 BD</h3>
                     <p class="text-[#8b7355] text-sm">Total Revenue</p>
                 </div>
             </div>
@@ -365,7 +365,7 @@
             <div class="bg-white rounded-xl card-shadow overflow-hidden">
                 <div class="flex items-center justify-between p-6 border-b border-[#e5e0d8]">
                     <h2 class="text-xl font-bold text-[#5c4a3d]">Recent Orders</h2>
-                    <a href="/artisanOrders" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm flex items-center">
+                    <a href="/artisanOrdersDetail" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm flex items-center">
                         View All
                         <i class="fas fa-arrow-right ml-2"></i>
                     </a>
@@ -385,29 +385,122 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e5e0d8]">
-                            <tr th:if="${recentOrders == null or recentOrders.isEmpty()}">
-                                <td colspan="7" class="px-6 py-4 text-center text-[#8b7355]">No recent orders found.</td>
-                            </tr>
-                            <tr class="table-row" th:each="order : ${recentOrders}" th:data-order-id="${order.id}">
-                                <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]" th:text="'#ORD-' + ${order.order.id}">#ORD-2847</td>
+                            <!-- Thymeleaf renders each order item; data-order-id carries the real DB id -->
+                            <!-- Order 1 -->
+                            <tr class="table-row" data-order-id="2847">
+                                <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2847</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 bg-[#f5ebe0] rounded-full flex items-center justify-center">
-                                            <span class="text-xs font-semibold text-[#c17c5f]" th:text="${#strings.substring(order.order.customer.name,0,2).toUpperCase()}">JD</span>
+                                            <span class="text-xs font-semibold text-[#c17c5f]">JD</span>
                                         </div>
-                                        <span th:text="${order.order.customer.name}">John Doe</span>
+                                        <span>John Doe</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${order.product.name}">Handcrafted Ceramic Vase</td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]" th:text="${order.price * order.quantity} + ' BD'">85.00 BD</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Handcrafted Ceramic Vase</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">85.00 BD</td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge" 
-                                        th:classappend="${'status-' + order.order.status.toLowerCase()}" 
-                                        th:text="${#strings.capitalize(order.order.status)}">Processing</span>
+                                    <span class="status-badge status-processing">Processing</span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${#temporals.format(order.order.orderDate, 'MMM dd, yyyy')}">Mar 12, 2025</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Mar 12, 2025</td>
                                 <td class="px-6 py-4">
-                                    <button th:onclick="'window.location.href=\'/artisanOrderDetail?orderId=' + ${order.id} + '\''" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 2 -->
+                            <tr class="table-row" data-order-id="2831">
+                                <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2831</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">SM</span>
+                                        </div>
+                                        <span>Sarah Mitchell</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Ceramic Bowl Set</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">120.00 BD</td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-shipped">Shipped</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Mar 10, 2025</td>
+                                <td class="px-6 py-4">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 3 -->
+                            <tr class="table-row" data-order-id="2815">
+                                <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2815</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">MK</span>
+                                        </div>
+                                        <span>Michael Kim</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Decorative Plant Pot</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">45.00 BD</td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-completed">Completed</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Mar 8, 2025</td>
+                                <td class="px-6 py-4">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 4 -->
+                            <tr class="table-row" data-order-id="2802">
+                                <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2802</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">EW</span>
+                                        </div>
+                                        <span>Emily Watson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Artisan Tea Set</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">195.00 BD</td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-pending">Pending</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Mar 11, 2025</td>
+                                <td class="px-6 py-4">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order 5 -->
+                            <tr class="table-row" data-order-id="2789">
+                                <td class="px-6 py-4 text-sm font-semibold text-[#5c4a3d]">#ORD-2789</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-[#f5ebe0] rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-[#c17c5f]">DL</span>
+                                        </div>
+                                        <span>David Lee</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Ceramic Dinner Plates (Set of 4)</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">150.00 BD</td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-completed">Completed</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]">Mar 5, 2025</td>
+                                <td class="px-6 py-4">
+                                    <button class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
                                         View
                                     </button>
                                 </td>

@@ -176,16 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const shopName = form.querySelectorAll('input[type="text"]')[1]?.value;
             const biography = form.querySelector('textarea')?.value;
 
-            let profilePictureUrl = undefined;
-            const fileInputs = form.querySelectorAll('input[type="file"]');
-            if (fileInputs.length > 0 && fileInputs[0].files.length > 0) {
-                try {
-                    profilePictureUrl = await fileToBase64(fileInputs[0].files[0]);
-                } catch (e) {
-                    console.error("Failed to read file", e);
-                }
-            }
-
             payload = {
                 name: fullName,
                 email: email,
@@ -194,9 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 shopName: shopName,
                 biography: biography
             };
-            if (profilePictureUrl) {
-                payload.profilePicture = profilePictureUrl;
-            }
             endpoint = '/api/auth/register/artisan';
         } else {
             const fullName = inputs[0].value;
@@ -374,13 +361,5 @@ function showToast(message, type = 'info') {
     toast.className = `fixed bottom-6 right-6 z-50 px-6 py-3 rounded-xl text-white font-medium shadow-lg ${colours[type]}`;
     toast.textContent = message;
     document.body.appendChild(toast);
-}
-
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
