@@ -86,15 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') newsletterBtn?.click();
     });
 
-    // 5. Artisan role redirect
-    // ----------------------------------------------------------
-    const userRole = (sessionStorage.getItem('userRole') || '').toUpperCase();
-    const loggedIn = sessionStorage.getItem('loggedIn') === 'true' || sessionStorage.getItem('isLoggedIn') === 'true';
-    if (loggedIn && userRole === 'ARTISAN') {
-        window.location.replace('/artisanDashboard');
-        return;
-    }
-
     // 6. Badges initialization (Login state handled by authguard.js)
     // ----------------------------------------------------------
     if (window.updateNotificationBadge) updateNotificationBadge();

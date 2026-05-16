@@ -107,6 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userRole = (data.user.role || '').toUpperCase();
                 if (!next && userRole === 'ARTISAN') {
                     window.location.href = `/artisanDashboard?id=${data.user.userId}`;
+                } else if (!next && userRole === 'ADMIN') {
+                    window.location.href = '/adminDashboard';
                 } else {
                     window.location.href = next || '/index';
                 }

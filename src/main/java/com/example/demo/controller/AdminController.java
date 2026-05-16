@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
@@ -25,7 +24,7 @@ public class AdminController {
     @Autowired
     private ProductRepository productRepository;
 
-    @GetMapping("/dashboard")
+    @GetMapping("/adminDashboard")
     public String dashboard(Model model) {
         model.addAttribute("totalUsers", userRepository.count());
         model.addAttribute("totalProducts", productRepository.count());
@@ -34,13 +33,68 @@ public class AdminController {
         return "adminDashboard";
     }
 
+    @GetMapping("/adminArtisanApproval")
+    public String adminArtisanApproval() {
+        return "adminArtisanApproval";
+    }
+
+    @GetMapping("/adminAuction")
+    public String adminAuction() {
+        return "adminAuction";
+    }
+
+    @GetMapping("/adminLogs")
+    public String adminLogs() {
+        return "adminLogs";
+    }
+
+    @GetMapping("/adminNotification")
+    public String adminNotification() {
+        return "adminNotification";
+    }
+
+    @GetMapping("/adminOrderDetail")
+    public String adminOrderDetail() {
+        return "adminOrderDetail";
+    }
+
+    @GetMapping("/adminOrderManagment")
+    public String adminOrderManagment() {
+        return "adminOrderManagment";
+    }
+
+    @GetMapping("/adminProducts")
+    public String adminProducts() {
+        return "adminProducts";
+    }
+
+    @GetMapping("/adminRefund")
+    public String adminRefund() {
+        return "adminRefund";
+    }
+
+    @GetMapping("/adminReports")
+    public String adminReports() {
+        return "adminReports";
+    }
+
+    @GetMapping("/adminReview")
+    public String adminReview() {
+        return "adminReview";
+    }
+
+    @GetMapping("/adminUsersManagement")
+    public String adminUsersManagement() {
+        return "adminUsersManagement";
+    }
+
     @PostMapping("/approve-artisan/{id}")
     public String approveArtisan(@PathVariable Long id) {
         artisanRepository.findById(id).ifPresent(artisan -> {
             // Logic to approve artisan (e.g. set a flag if added)
             // For now, we'll just redirect
         });
-        return "redirect:/admin/dashboard";
+        return "redirect:/adminDashboard";
     }
 
     @PostMapping("/suspend-user/{id}")
@@ -48,6 +102,6 @@ public class AdminController {
         userRepository.findById(id).ifPresent(user -> {
             // Logic to suspend user
         });
-        return "redirect:/admin/dashboard";
+        return "redirect:/adminDashboard";
     }
 }

@@ -172,7 +172,7 @@
       if (userSection) userSection.classList.remove('hidden');
       if (userName) userName.textContent = profile.name || 'Profile';
       if (userEmail) userEmail.textContent = profile.email || '';
-      
+
       if (userMenuBtn) {
         const profileIcon = userMenuBtn.querySelector('i.fas.fa-user-circle');
         let profileImg = userMenuBtn.querySelector('img.nav-profile-img');
@@ -274,6 +274,42 @@
 
   function runAuthGuardInit() {
     window.updateNavAuthState();
+
+    // Role-based redirection for logged-in users on general pages
+    const loggedIn = getLoggedIn();
+    if (loggedIn) {
+        const userRole = (sessionStorage.getItem('userRole') || '').toUpperCase();
+        const path = window.location.pathname.toLowerCase();
+
+        // 1. Admin redirection: if logged in as Admin but on a non-admin page
+        if (userRole === 'ADMIN') {
+            const isAdminPage = path.includes('admin');
+            const isLoginPage = path.includes('login');
+            if (!isAdminPage && !isLoginPage) {
+                window.location.replace('/adminDashboard');
+                return;
+            }
+        }
+
+        // 2. Artisan redirection: if on home or login pages
+        if (userRole === 'ARTISAN') {
+             const isPublicHome = path === '/' || path === '/index' || path === '/index.html' || path === '' || path === '/login';
+             if (isPublicHome) {
+                 // Try to get ID from profile if needed, or just generic dashboard
+                 const userProfileStr = sessionStorage.getItem('userProfile');
+                 let artisanId = '';
+                 if (userProfileStr) {
+                     try {
+                         const profile = JSON.parse(userProfileStr);
+                         artisanId = profile.userId || '';
+                     } catch(e) {}
+                 }
+                 window.location.replace(artisanId ? `/artisanDashboard?id=${artisanId}` : '/artisanDashboard');
+                 return;
+             }
+        }
+    }
+
     window.updateNotificationBadge();
     window.updateCartBadge();
     window.syncCartCountFromServer();
@@ -285,4 +321,3 @@
     runAuthGuardInit();
   }
 })();
-

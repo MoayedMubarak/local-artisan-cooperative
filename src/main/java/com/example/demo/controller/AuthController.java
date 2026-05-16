@@ -40,7 +40,22 @@ public class AuthController {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (BCrypt.checkpw(password, user.getPassword())) {
+            boolean passwordMatch = false;
+            String storedPassword = user.getPassword();
+
+            if (storedPassword != null) {
+                if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
+                    try {
+                        passwordMatch = BCrypt.checkpw(password, storedPassword);
+                    } catch (Exception e) {
+                        passwordMatch = false;
+                    }
+                } else {
+                    passwordMatch = password.equals(storedPassword);
+                }
+            }
+
+            if (passwordMatch) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 if (user instanceof Customer) {
@@ -68,12 +83,12 @@ public class AuthController {
         customer.setTotalOrders(0);
         customer.setTotalSpent(0.0);
         userRepository.save(customer);
-        
+
         com.example.demo.model.Wishlist wishlist = new com.example.demo.model.Wishlist();
         wishlist.setCustomer(customer);
         wishlist.setDateCreated(java.time.LocalDate.now());
         wishlistRepository.save(wishlist);
-        
+
         return ResponseEntity.ok(Map.of("success", true, "user", customer));
     }
 
