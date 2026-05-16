@@ -8,76 +8,76 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap');
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #faf9f6;
         }
-        
+
         h1, h2, h3, h4 {
             font-family: 'Playfair Display', serif;
         }
-        
+
         .terracotta {
             color: #c17c5f;
         }
-        
+
         .bg-terracotta {
             background-color: #c17c5f;
         }
-        
+
         .bg-terracotta-dark {
             background-color: #a5664d;
         }
-        
+
         .hover\:bg-terracotta-dark:hover {
             background-color: #a5664d;
         }
-        
+
         .border-terracotta {
             border-color: #c17c5f;
         }
-        
+
         .text-earth {
             color: #8b7355;
         }
-        
+
         .bg-earth {
             background-color: #8b7355;
         }
-        
+
         .card-shadow {
             box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
         }
-        
+
         .card-shadow:hover {
             box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
         }
-        
+
         .thumbnail {
             transition: all 0.2s ease;
             cursor: pointer;
             opacity: 0.7;
         }
-        
+
         .thumbnail:hover, .thumbnail.active {
             opacity: 1;
             transform: scale(1.05);
             border-color: #c17c5f;
         }
-        
+
         .star-filled {
             color: #fbbf24;
         }
-        
+
         .star-empty {
             color: #e5e0d8;
         }
-        
+
         .auction-badge-large {
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% {
                 opacity: 1;
@@ -88,7 +88,7 @@
                 transform: scale(1.02);
             }
         }
-        
+
         .countdown-digit {
             background: linear-gradient(135deg, #c17c5f 0%, #a5664d 100%);
         }
@@ -248,13 +248,13 @@
                                 <i class="fas fa-gavel mr-2"></i><span th:text="${displayStatus == 'LIVE' ? 'Live Auction' : (displayStatus == 'UPCOMING' ? 'Upcoming' : 'Ended')}">Live Auction</span>
                             </div>
                         </div>
-                        
+
                         <!-- Thumbnails (Using same image for now as placeholder for dynamic thumbnails) -->
                         <div class="flex gap-3">
                             <img th:src="${auction.product.imageUrl}" alt="Main Thumbnail" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8] active" onclick="changeImage(this)">
                         </div>
                     </div>
-                    
+
                     <!-- Right: Product Info & Bid Panel -->
                     <div>
                         <!-- Category Badge -->
@@ -262,15 +262,15 @@
                               th:text="${auction.product.productCategory != null ? auction.product.productCategory.name : auction.product.category}">
                             Jewelry
                         </span>
-                        
+
                         <!-- Product Name -->
                         <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2" th:text="${auction.product.title}">Silver Moonstone Necklace</h1>
-                        
+
                         <!-- Artisan Name -->
                         <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block" th:text="'by ' + ${auction.product.artisanName}">
                             by Marcus Chen
                         </a>
-                        
+
                         <!-- Star Rating (Placeholder dynamic) -->
                         <div class="flex items-center mb-6">
                             <div class="flex mr-3">
@@ -283,7 +283,7 @@
                             <span class="text-[#5c4a3d] font-medium">5.0</span>
                             <span class="text-[#8b7355] ml-2">(18 reviews)</span>
                         </div>
-                        
+
                         <!-- Description -->
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold text-[#5c4a3d] mb-2">Description</h3>
@@ -291,14 +291,14 @@
                                 Exquisite handcrafted silver necklace featuring a luminous moonstone pendant.
                             </p>
                         </div>
-                        
+
                         <!-- Place a Bid Panel -->
                         <div class="bg-gradient-to-br from-[#f5ebe0] to-[#ede3d5] rounded-xl p-6 border-2 border-[#c17c5f]">
                             <div class="flex items-center mb-4">
                                 <i class="fas fa-gavel text-2xl text-[#c17c5f] mr-3"></i>
                                 <h3 class="text-xl font-bold text-[#5c4a3d]">Place a Bid</h3>
                             </div>
-                            
+
                             <!-- Current Bid Info -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
@@ -310,7 +310,7 @@
                                     <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name" th:text="${auction.highestBidderName != null ? auction.highestBidderName : 'No bids yet'}">Jennifer M.</p>
                                 </div>
                             </div>
-                            
+
                             <!-- Countdown Timer -->
                             <div class="bg-white rounded-lg p-4 mb-6" th:if="${displayStatus == 'LIVE'}">
                                 <p class="text-sm text-[#8b7355] mb-3">Auction Ends In</p>
@@ -344,7 +344,7 @@
                                 <p class="text-lg font-bold text-gray-500 text-center">AUCTION ENDED</p>
                                 <p class="text-xs text-[#8b7355] mt-2 text-center" th:text="'Ended: ' + ${#temporals.format(auction.endTime, 'MMMM dd, yyyy HH:mm')}">Ended</p>
                             </div>
-                            
+
                             <!-- Bid Form -->
                             <form class="space-y-4" th:if="${displayStatus == 'LIVE'}">
                                 <input type="hidden" id="auction-id-field" th:value="${auction.id}">
@@ -363,7 +363,7 @@
                                         <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] font-medium pointer-events-none">BD</span>
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-[#5c4a3d] mb-2">Your Name</label>
                                     <input 
@@ -373,11 +373,11 @@
                                         id="bidderName"
                                     />
                                 </div>
-                                
+
                                 <button type="submit" id="bid-submit-btn" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg flex items-center justify-center">
                                     <i class="fas fa-gavel mr-2"></i>Place Bid
                                 </button>
-                                
+
                                 <p class="text-xs text-[#8b7355] text-center">
                                     <i class="fas fa-info-circle mr-1"></i>Bids must be whole BD amounts and at least 1 BD above the current bid. No fils allowed.
                                 </p>
@@ -399,92 +399,7 @@
                 </div>
             </div>
 
-            <!-- Customer Reviews Section -->
-            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow">
-                <h2 class="text-2xl font-bold text-[#5c4a3d] mb-6">Customer Reviews</h2>
-                
-                <!-- Review 1 -->
-                <div class="border-b border-[#e5e0d8] pb-6 mb-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
-                                <span class="text-[#c17c5f] font-semibold">LW</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-[#5c4a3d]">Lisa Wong</h4>
-                                <div class="flex text-sm">
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-[#8b7355] text-sm">February 20, 2024</span>
-                    </div>
-                    <p class="text-[#8b7355] leading-relaxed">
-                        I won this necklace in a previous auction and it's absolutely breathtaking! The craftsmanship is incredible and the moonstone has such a beautiful glow. Marcus is a true artist. Don't miss out on this auction!
-                    </p>
-                </div>
-                
-                <!-- Review 2 -->
-                <div class="border-b border-[#e5e0d8] pb-6 mb-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
-                                <span class="text-[#c17c5f] font-semibold">RP</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-[#5c4a3d]">Robert Peterson</h4>
-                                <div class="flex text-sm">
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-[#8b7355] text-sm">January 15, 2024</span>
-                    </div>
-                    <p class="text-[#8b7355] leading-relaxed">
-                        Bought this as an anniversary gift for my wife. She absolutely loves it! The quality is outstanding and it arrived beautifully packaged. Worth every penny. Marcus's work is exceptional.
-                    </p>
-                </div>
-                
-                <!-- Review 3 -->
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-[#f5ebe0] rounded-full flex items-center justify-center mr-3">
-                                <span class="text-[#c17c5f] font-semibold">EK</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-[#5c4a3d]">Emma Kowalski</h4>
-                                <div class="flex text-sm">
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="fas fa-star star-filled"></i>
-                                    <i class="far fa-star star-empty"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-[#8b7355] text-sm">December 8, 2023</span>
-                    </div>
-                    <p class="text-[#8b7355] leading-relaxed">
-                        Beautiful necklace with great attention to detail. The moonstone is genuine and has lovely iridescence. Only giving 4 stars because the chain is a bit shorter than I prefer, but overall a stunning piece.
-                    </p>
-                </div>
-                
-                <!-- Write Review Button -->
-                <div class="mt-8 text-center">
-                    <button class="bg-white hover:bg-[#f5ebe0] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-2 rounded-lg font-medium transition-colors">
-                        Write a Review
-                    </button>
-                </div>
-            </div>
+
         </main>
     </div>
 
@@ -495,21 +410,11 @@
         if (!window.isUserAuthenticated?.()) {
             const banner = document.createElement('div');
             banner.className = 'bg-[#fff4e5] border border-[#f1d2b7] text-[#8b7355] px-6 py-4 text-center';
-            banner.textContent = 'Login/Register first to place bids or write reviews. You can still browse this auction.';
+            banner.textContent = 'Login/Register first to place bids. You can still browse this auction.';
             document.body.insertBefore(banner, document.body.firstChild);
         }
 
-        document.addEventListener('click', function(event) {
-            const button = event.target.closest('button');
-            if (!button) return;
-            const text = button.innerText.trim();
-            if (/Write a Review/i.test(text)) {
-                if (!(window.requireLoginForAction ? window.requireLoginForAction('Login/Register first to write a review.') : true)) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            }
-        });
+
     </script>
 </body>
 </html>
