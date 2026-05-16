@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Auctions Management - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .table-row-hover:hover {
+            background-color: #fef9f3;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tab-button {
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            background-color: #c17c5f;
+            color: white;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #16a34a;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .countdown-timer {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Right Side - Notifications and User -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
+                </button>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div class="hidden md:block">
+                        <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                        <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                    </div>
+                    <i class="fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Logo at Top -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
+                    <span class="text-xl font-semibold text-white" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+                </div>
+
+                <!-- Admin Profile -->
+                <div class="flex items-center gap-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold text-sm">Admin User</h3>
+                        <span class="inline-block bg-[#c17c5f] text-white text-xs px-2 py-1 rounded-full mt-1">Administrator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-user-management.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-users w-5"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-user-check w-5"></i>
+                            <span>Artisan Approvals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-products.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-auctions.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-refunds.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-undo w-5"></i>
+                            <span>Refunds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-star w-5"></i>
+                            <span>Review Moderation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">Auctions Management</h1>
+                <p class="text-[#8b7355]">Monitor and oversee all auction activity on the platform.</p>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="bg-white rounded-t-xl card-shadow border-b border-[#e5e0d8] px-6 pt-4 mb-0">
+                <div class="flex items-center gap-2 overflow-x-auto">
+                    <button class="tab-button active px-5 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap flex items-center gap-2" onclick="switchTab('live')">
+                        <span class="pulse-dot"></span>
+                        Live Now
+                        <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap" onclick="switchTab('upcoming')">
+                        Upcoming
+                        <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">5</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap" onclick="switchTab('ended')">
+                        Ended
+                        <span class="bg-gray-500 text-white text-xs px-2 py-0.5 rounded-full">28</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap" onclick="switchTab('cancelled')">
+                        Cancelled
+                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="bg-white border-b border-[#e5e0d8] px-6 py-4">
+                <div class="flex flex-wrap items-center gap-4">
+                    <!-- Search Input -->
+                    <div class="flex-1 min-w-64">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                placeholder="Search auctions..." 
+                                class="w-full pl-10 pr-4 py-2.5 border border-[#e5e0d8] rounded-lg focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
+                            />
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="relative">
+                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                            <option value="">All Categories</option>
+                            <option value="ceramics">Ceramics</option>
+                            <option value="jewelry">Jewelry</option>
+                            <option value="paintings">Paintings</option>
+                            <option value="textiles">Textiles</option>
+                            <option value="woodwork">Woodwork</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
+                    </div>
+
+                    <!-- Artisan Filter -->
+                    <div class="relative">
+                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                            <option value="">All Artisans</option>
+                            <option value="elena">Elena Rodriguez</option>
+                            <option value="marcus">Marcus Chen</option>
+                            <option value="sarah">Sarah Mitchell</option>
+                            <option value="anna">Anna Kowalski</option>
+                            <option value="james">James Thompson</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
+                    </div>
+
+                    <!-- Date Range Picker -->
+                    <div class="flex items-center gap-2">
+                        <input 
+                            type="date" 
+                            class="border border-[#e5e0d8] rounded-lg px-4 py-2.5 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                        />
+                        <span class="text-[#8b7355]">to</span>
+                        <input 
+                            type="date" 
+                            class="border border-[#e5e0d8] rounded-lg px-4 py-2.5 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auctions Table -->
+            <div class="bg-white rounded-b-xl card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-[#f5ebe0]">
+                            <tr>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Auction ID</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Product</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Artisan</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Starting Bid</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Current Bid</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Total Bids</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Start Date</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">End Date</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Status</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#e5e0d8]">
+                            <!-- Row 1 - Live Auction -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0042</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=60&h=60&fit=crop" 
+                                            alt="Silver Moonstone Necklace" 
+                                            class="w-14 h-14 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                            <p class="font-semibold text-[#5c4a3d]">Silver Moonstone Necklace</p>
+                                            <p class="text-xs text-[#8b7355]">SKU: JWL-NCK-089</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Marcus Chen" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Marcus Chen</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">BD 100.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-green-600">BD 185.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">12 bids</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 18, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 20, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-green-100 text-green-700">
+                                        <span class="pulse-dot"></span>
+                                        Live
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="openMonitorModal(1)" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
+                                        <i class="fas fa-eye"></i>
+                                        Monitor
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Row 2 - Live Auction -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0043</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=60&h=60&fit=crop" 
+                                            alt="Abstract Oil Painting" 
+                                            class="w-14 h-14 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                            <p class="font-semibold text-[#5c4a3d]">Abstract Oil Painting</p>
+                                            <p class="text-xs text-[#8b7355]">SKU: ART-OIL-042</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Sarah Mitchell" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Sarah Mitchell</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">BD 250.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-green-600">BD 420.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">23 bids</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 17, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 21, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-green-100 text-green-700">
+                                        <span class="pulse-dot"></span>
+                                        Live
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="openMonitorModal(2)" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
+                                        <i class="fas fa-eye"></i>
+                                        Monitor
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3 - Upcoming Auction -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0044</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=60&h=60&fit=crop" 
+                                            alt="Handmade Ceramic Vase" 
+                                            class="w-14 h-14 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                            <p class="font-semibold text-[#5c4a3d]">Handmade Ceramic Vase</p>
+                                            <p class="text-xs text-[#8b7355]">SKU: CER-VASE-001</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Elena Rodriguez" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">BD 80.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">-</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">0 bids</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 22, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 25, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-blue-100 text-blue-700">
+                                        <i class="fas fa-clock"></i>
+                                        Upcoming
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                            View
+                                        </button>
+                                        <button onclick="confirmCancel()" class="border-2 border-red-500 text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                            Cancel Auction
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 4 - Ended Auction -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0038</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=60&h=60&fit=crop" 
+                                            alt="Woven Wool Blanket" 
+                                            class="w-14 h-14 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                            <p class="font-semibold text-[#5c4a3d]">Woven Wool Blanket</p>
+                                            <p class="text-xs text-[#8b7355]">SKU: TEX-BLK-015</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Anna Kowalski" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Anna Kowalski</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">BD 150.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-[#5c4a3d]">BD 245.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">18 bids</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 10, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 15, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-gray-100 text-gray-700">
+                                        <i class="fas fa-check-circle"></i>
+                                        Ended
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="openEndedModal(1)" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Row 5 - Cancelled Auction -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0035</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1681091638141-a87495ae612f?w=60&h=60&fit=crop" 
+                                            alt="Hammered Silver Cuff" 
+                                            class="w-14 h-14 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                            <p class="font-semibold text-[#5c4a3d]">Hammered Silver Cuff</p>
+                                            <p class="text-xs text-[#8b7355]">SKU: JWL-CUF-023</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Maya Singh" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Maya Singh</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">BD 50.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">BD 75.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">5 bids</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 05, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 08, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle"></i>
+                                        Cancelled
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
+                    <p class="text-sm text-[#8b7355]">
+                        Showing <span class="font-semibold text-[#5c4a3d]">1</span> to <span class="font-semibold text-[#5c4a3d]">5</span> of <span class="font-semibold text-[#5c4a3d]">38</span> auctions
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium">1</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">2</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">3</button>
+                        <span class="text-[#8b7355]">...</span>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">8</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Live Auction Monitoring Modal -->
+    <div id="monitorModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white border-b border-[#e5e0d8] px-6 py-4 flex items-center justify-between z-10">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-bold text-[#5c4a3d]">Live Auction Monitor</h2>
+                    <span class="status-badge bg-green-100 text-green-700">
+                        <span class="pulse-dot"></span>
+                        Live
+                    </span>
+                </div>
+                <button onclick="closeMonitorModal()" class="text-[#8b7355] hover:text-red-500 transition-colors p-2">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column - Product Details -->
+                    <div class="lg:col-span-1 space-y-4">
+                        <img 
+                            src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=400&fit=crop" 
+                            alt="Product" 
+                            class="w-full h-64 object-cover rounded-xl shadow-lg"
+                        />
+
+                        <div>
+                            <h3 class="text-xl font-bold text-[#5c4a3d] mb-2">Silver Moonstone Necklace</h3>
+                            <p class="text-sm text-[#8b7355] mb-3">SKU: JWL-NCK-089</p>
+                            <p class="text-[#5c4a3d] text-sm leading-relaxed">
+                                Exquisite handcrafted sterling silver necklace featuring a natural moonstone pendant. The hammered texture catches light beautifully. Chain length: 18 inches.
+                            </p>
+                        </div>
+
+                        <div class="bg-[#f5ebe0] rounded-lg p-4">
+                            <div class="flex items-center gap-3 mb-3">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face" 
+                                    alt="Marcus Chen" 
+                                    class="w-12 h-12 rounded-full object-cover"
+                                />
+                                <div>
+                                    <p class="font-semibold text-[#5c4a3d]">Marcus Chen</p>
+                                    <p class="text-xs text-[#8b7355]">Jewelry Artist</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs text-[#8b7355]">
+                                <span><i class="fas fa-star text-amber-500 mr-1"></i>4.8 (89 reviews)</span>
+                                <span><i class="fas fa-gavel mr-1"></i>15 auctions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Bidding Info -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Current Bid & Timer -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6">
+                                <p class="text-sm text-green-700 font-medium mb-2">Current Bid</p>
+                                <p class="text-4xl font-bold text-green-600" id="currentBid">BD 185.000</p>
+                                <p class="text-xs text-green-600 mt-2"><i class="fas fa-arrow-up mr-1"></i> BD 5.000 from last bid</p>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6">
+                                <p class="text-sm text-amber-700 font-medium mb-2">Time Remaining</p>
+                                <p class="text-3xl countdown-timer text-amber-600" id="countdown">02:45:32</p>
+                                <p class="text-xs text-amber-600 mt-2">Ends Mar 20, 2025 at 8:00 PM</p>
+                            </div>
+                        </div>
+
+                        <!-- Bid Statistics -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="bg-white border border-[#e5e0d8] rounded-lg p-4 text-center">
+                                <p class="text-xs text-[#8b7355] mb-1">Starting Bid</p>
+                                <p class="text-lg font-bold text-[#5c4a3d]">BD 100.000</p>
+                            </div>
+                            <div class="bg-white border border-[#e5e0d8] rounded-lg p-4 text-center">
+                                <p class="text-xs text-[#8b7355] mb-1">Total Bids</p>
+                                <p class="text-lg font-bold text-[#5c4a3d]">12</p>
+                            </div>
+                            <div class="bg-white border border-[#e5e0d8] rounded-lg p-4 text-center">
+                                <p class="text-xs text-[#8b7355] mb-1">Unique Bidders</p>
+                                <p class="text-lg font-bold text-[#5c4a3d]">7</p>
+                            </div>
+                        </div>
+
+                        <!-- Bid History -->
+                        <div>
+                            <h4 class="font-semibold text-[#5c4a3d] mb-3 flex items-center gap-2">
+                                <i class="fas fa-history text-[#c17c5f]"></i>
+                                Bid History
+                            </h4>
+                            <div class="bg-white border border-[#e5e0d8] rounded-lg overflow-hidden">
+                                <table class="w-full">
+                                    <thead class="bg-[#f5ebe0]">
+                                        <tr>
+                                            <th class="text-left text-xs font-semibold text-[#5c4a3d] px-4 py-3">Bidder</th>
+                                            <th class="text-left text-xs font-semibold text-[#5c4a3d] px-4 py-3">Bid Amount</th>
+                                            <th class="text-left text-xs font-semibold text-[#5c4a3d] px-4 py-3">Timestamp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[#e5e0d8]">
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=32&h=32&fit=crop&crop=face" class="w-8 h-8 rounded-full" alt="Bidder">
+                                                    <span class="text-sm font-medium text-[#5c4a3d]">Sarah J.</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3"><span class="font-bold text-green-600">BD 185.000</span></td>
+                                            <td class="px-4 py-3"><span class="text-sm text-[#8b7355]">2 minutes ago</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" class="w-8 h-8 rounded-full" alt="Bidder">
+                                                    <span class="text-sm font-medium text-[#5c4a3d]">Michael T.</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3"><span class="font-bold text-[#5c4a3d]">BD 180.000</span></td>
+                                            <td class="px-4 py-3"><span class="text-sm text-[#8b7355]">8 minutes ago</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face" class="w-8 h-8 rounded-full" alt="Bidder">
+                                                    <span class="text-sm font-medium text-[#5c4a3d]">David L.</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3"><span class="font-bold text-[#5c4a3d]">BD 175.000</span></td>
+                                            <td class="px-4 py-3"><span class="text-sm text-[#8b7355]">15 minutes ago</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=32&h=32&fit=crop&crop=face" class="w-8 h-8 rounded-full" alt="Bidder">
+                                                    <span class="text-sm font-medium text-[#5c4a3d]">Emma W.</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3"><span class="font-bold text-[#5c4a3d]">BD 170.000</span></td>
+                                            <td class="px-4 py-3"><span class="text-sm text-[#8b7355]">22 minutes ago</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="flex items-center gap-2">
+                                                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face" class="w-8 h-8 rounded-full" alt="Bidder">
+                                                    <span class="text-sm font-medium text-[#5c4a3d]">Lisa A.</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3"><span class="font-bold text-[#5c4a3d]">BD 165.000</span></td>
+                                            <td class="px-4 py-3"><span class="text-sm text-[#8b7355]">35 minutes ago</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Admin Actions -->
+                        <div class="pt-4 border-t border-[#e5e0d8]">
+                            <h4 class="font-semibold text-[#5c4a3d] mb-4 flex items-center gap-2">
+                                <i class="fas fa-shield-alt text-[#c17c5f]"></i>
+                                Admin Actions
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button onclick="handleMonitorAction('extend')" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-clock"></i>
+                                    Extend Auction (+30 min)
+                                </button>
+                                <button onclick="handleMonitorAction('cancel')" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-times-circle"></i>
+                                    Cancel Auction
+                                </button>
+                                <button onclick="handleMonitorAction('flag')" class="bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-flag"></i>
+                                    Flag Suspicious Activity
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ended Auction Summary Modal -->
+    <div id="endedModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white border-b border-[#e5e0d8] px-6 py-4 flex items-center justify-between z-10">
+                <h2 class="text-2xl font-bold text-[#5c4a3d]">Auction Summary</h2>
+                <button onclick="closeEndedModal()" class="text-[#8b7355] hover:text-red-500 transition-colors p-2">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <img 
+                            src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=400&h=400&fit=crop" 
+                            alt="Product" 
+                            class="w-full h-64 object-cover rounded-xl shadow-lg"
+                        />
+
+                        <div>
+                            <h3 class="text-xl font-bold text-[#5c4a3d] mb-2">Woven Wool Blanket</h3>
+                            <p class="text-sm text-[#8b7355]">SKU: TEX-BLK-015</p>
+                            <span class="status-badge bg-gray-100 text-gray-700 mt-2">
+                                <i class="fas fa-check-circle"></i>
+                                Ended
+                            </span>
+                        </div>
+
+                        <div class="bg-[#f5ebe0] rounded-lg p-4">
+                            <div class="flex items-center gap-3">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face" 
+                                    alt="Anna Kowalski" 
+                                    class="w-12 h-12 rounded-full object-cover"
+                                />
+                                <div>
+                                    <p class="font-semibold text-[#5c4a3d]">Anna Kowalski</p>
+                                    <p class="text-xs text-[#8b7355]">Textiles Artist</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <!-- Winning Bid -->
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6">
+                            <p class="text-sm text-green-700 font-medium mb-2">Winning Bid</p>
+                            <p class="text-4xl font-bold text-green-600">BD 245.000</p>
+                        </div>
+
+                        <!-- Winner Info -->
+                        <div class="bg-white border border-[#e5e0d8] rounded-lg p-4">
+                            <h4 class="font-semibold text-[#5c4a3d] mb-3">Winning Bidder</h4>
+                            <div class="flex items-center gap-3">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face" 
+                                    alt="Winner" 
+                                    class="w-12 h-12 rounded-full object-cover"
+                                />
+                                <div>
+                                    <p class="font-semibold text-[#5c4a3d]">Thomas White</p>
+                                    <p class="text-xs text-[#8b7355]">thomas.white@email.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Auction Stats -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white border border-[#e5e0d8] rounded-lg p-4">
+                                <p class="text-xs text-[#8b7355] mb-1">Starting Bid</p>
+                                <p class="text-lg font-bold text-[#5c4a3d]">BD 150.000</p>
+                            </div>
+                            <div class="bg-white border border-[#e5e0d8] rounded-lg p-4">
+                                <p class="text-xs text-[#8b7355] mb-1">Total Bids</p>
+                                <p class="text-lg font-bold text-[#5c4a3d]">18</p>
+                            </div>
+                        </div>
+
+                        <!-- Payment Status -->
+                        <div class="bg-white border border-[#e5e0d8] rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-semibold text-[#5c4a3d]">Payment Status</h4>
+                                <span class="status-badge bg-green-100 text-green-700">
+                                    <i class="fas fa-check-circle"></i>
+                                    Paid
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-[#8b7355]">Artisan Notified</span>
+                                <span class="status-badge bg-green-100 text-green-700 text-xs">
+                                    <i class="fas fa-check"></i>
+                                    Yes
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="bg-white border border-[#e5e0d8] rounded-lg p-4">
+                            <h4 class="font-semibold text-[#5c4a3d] mb-3">Auction Timeline</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[#8b7355]">Started:</span>
+                                    <span class="font-medium text-[#5c4a3d]">Mar 10, 2025 at 10:00 AM</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[#8b7355]">Ended:</span>
+                                    <span class="font-medium text-[#5c4a3d]">Mar 15, 2025 at 10:00 PM</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[#8b7355]">Payment Received:</span>
+                                    <span class="font-medium text-[#5c4a3d]">Mar 16, 2025 at 2:30 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#c17c5f]', 'text-white');
+                btn.classList.add('text-[#8b7355]');
+            });
+
+            event.target.closest('.tab-button').classList.add('active', 'bg-[#c17c5f]', 'text-white');
+            event.target.closest('.tab-button').classList.remove('text-[#8b7355]');
+        }
+
+        // Open monitor modal
+        function openMonitorModal(auctionId) {
+            const modal = document.getElementById('monitorModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            startCountdown();
+        }
+
+        // Close monitor modal
+        function closeMonitorModal() {
+            const modal = document.getElementById('monitorModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Open ended modal
+        function openEndedModal(auctionId) {
+            const modal = document.getElementById('endedModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close ended modal
+        function closeEndedModal() {
+            const modal = document.getElementById('endedModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Countdown timer simulation
+        function startCountdown() {
+            let hours = 2, minutes = 45, seconds = 32;
+            const countdownElement = document.getElementById('countdown');
+
+            const interval = setInterval(() => {
+                if (!document.getElementById('monitorModal') || document.getElementById('monitorModal').classList.contains('hidden')) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                seconds--;
+                if (seconds < 0) {
+                    seconds = 59;
+                    minutes--;
+                    if (minutes < 0) {
+                        minutes = 59;
+                        hours--;
+                    }
+                }
+
+                countdownElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Confirm cancel
+        function confirmCancel() {
+            if (confirm('Are you sure you want to cancel this auction? This action cannot be undone.')) {
+                showNotification('Auction cancelled successfully.', 'info');
+            }
+        }
+
+        // Handle monitor action
+        function handleMonitorAction(action) {
+            if (action === 'extend') {
+                showNotification('Auction extended by 30 minutes. All bidders have been notified.', 'success');
+            } else if (action === 'cancel') {
+                if (confirm('Are you sure you want to cancel this live auction?')) {
+                    showNotification('Auction cancelled. All bidders and artisan have been notified.', 'info');
+                    closeMonitorModal();
+                }
+            } else if (action === 'flag') {
+                showNotification('Auction flagged for review. Investigation team has been notified.', 'warning');
+            }
+        }
+
+        // Close modals on outside click
+        document.getElementById('monitorModal').addEventListener('click', function(e) {
+            if (e.target === this) closeMonitorModal();
+        });
+
+        document.getElementById('endedModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEndedModal();
+        });
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMonitorModal();
+                closeEndedModal();
+            }
+        });
+
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+
+            let bgColor = '#c17c5f';
+            if (type === 'success') {
+                bgColor = '#16a34a';
+            } else if (type === 'error') {
+                bgColor = '#dc2626';
+            } else if (type === 'warning') {
+                bgColor = '#d97706';
+            }
+
+            notification.className = 'fixed bottom-4 right-4 text-white px-6 py-3 rounded-xl shadow-lg z-50 transition-opacity duration-300';
+            notification.style.backgroundColor = bgColor;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

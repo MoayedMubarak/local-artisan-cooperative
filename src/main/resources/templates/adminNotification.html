@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notifications - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .tab-button {
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            background-color: #c17c5f;
+            color: white;
+        }
+
+        /* Notification card styles */
+        .notification-card {
+            transition: all 0.2s ease;
+        }
+
+        .notification-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .notification-card.unread {
+            background-color: #f8fafc;
+        }
+
+        .notification-card.urgent {
+            border-left: 4px solid #dc2626;
+        }
+
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Icon containers */
+        .icon-urgent {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .icon-auction {
+            background-color: #ffedd5;
+            color: #c2410c;
+        }
+
+        .icon-approval {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .icon-system {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .icon-refund {
+            background-color: #fae8ff;
+            color: #a21caf;
+        }
+
+        .icon-review {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .icon-milestone {
+            background-color: #cffafe;
+            color: #0e7490;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Right Side - Notifications and User -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors" onclick="window.location.href='admin-notifications.html'">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">12</span>
+                </button>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div class="hidden md:block">
+                        <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                        <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                    </div>
+                    <i class="fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Logo at Top -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
+                    <span class="text-xl font-semibold text-white" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+                </div>
+
+                <!-- Admin Profile -->
+                <div class="flex items-center gap-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold text-sm">Admin User</h3>
+                        <span class="inline-block bg-[#c17c5f] text-white text-xs px-2 py-1 rounded-full mt-1">Administrator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-user-management.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-users w-5"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-user-check w-5"></i>
+                            <span>Artisan Approvals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-products.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-auctions.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-refunds.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-undo w-5"></i>
+                            <span>Refunds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-review-moderation.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-star w-5"></i>
+                            <span>Review Moderation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-reports.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-system-logs.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">Notifications</h1>
+                        <p class="text-[#8b7355]">Stay on top of platform alerts and actions requiring your attention.</p>
+                    </div>
+                    <button onclick="markAllAsRead()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm flex items-center gap-2">
+                        <i class="fas fa-check-double"></i>
+                        Mark All as Read
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="bg-white rounded-t-xl card-shadow border-b border-[#e5e0d8] px-6 pt-4 mb-0">
+                <div class="flex items-center gap-2 overflow-x-auto">
+                    <button class="tab-button active px-5 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap flex items-center gap-2" onclick="switchTab('all')">
+                        All
+                        <span class="bg-[#c17c5f] text-white text-xs px-2 py-0.5 rounded-full">12</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap flex items-center gap-2" onclick="switchTab('urgent')">
+                        Urgent
+                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap flex items-center gap-2" onclick="switchTab('refunds')">
+                        Refunds
+                        <span class="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">2</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap flex items-center gap-2" onclick="switchTab('approvals')">
+                        Approvals
+                        <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">4</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap flex items-center gap-2" onclick="switchTab('reports')">
+                        Reports
+                        <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">2</span>
+                    </button>
+                    <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap flex items-center gap-2" onclick="switchTab('system')">
+                        System
+                        <span class="bg-gray-500 text-white text-xs px-2 py-0.5 rounded-full">1</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <div class="bg-white rounded-b-xl card-shadow p-6 space-y-4">
+                <!-- Notification 1 - Urgent: Refund Escalated (Unread) -->
+                <div class="notification-card urgent unread rounded-xl p-5 flex items-start gap-4" data-type="urgent refunds" data-id="1">
+                    <div class="w-12 h-12 icon-urgent rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Refund Request Escalated by Artisan</h3>
+                                    <span class="unread-dot"></span>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Artisan Marcus Chen has escalated refund request #REF-1247 for Order #ORD-2834. Customer claims item damaged during shipping. Review required within 24 hours.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>15 minutes ago</p>
+                            </div>
+                            <button onclick="handleAction('review')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Review Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 2 - Urgent: Suspicious Auction Activity (Unread) -->
+                <div class="notification-card urgent unread rounded-xl p-5 flex items-start gap-4" data-type="urgent auctions" data-id="2">
+                    <div class="w-12 h-12 icon-auction rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-gavel text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Suspicious Auction Activity Detected</h3>
+                                    <span class="unread-dot"></span>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Automated system detected potential bid manipulation on Auction #AUC-2024-0042 (Silver Moonstone Necklace). Multiple bids from same IP address within 2-minute window. Risk score: 87%.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>32 minutes ago</p>
+                            </div>
+                            <button onclick="handleAction('investigate')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Investigate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 3 - Urgent: Flagged Review (Unread) -->
+                <div class="notification-card urgent unread rounded-xl p-5 flex items-start gap-4" data-type="urgent reviews" data-id="3">
+                    <div class="w-12 h-12 icon-review rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-flag text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Flagged Review Awaiting Moderation</h3>
+                                    <span class="unread-dot"></span>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Review for "Hammered Silver Cuff" has been auto-flagged for offensive language. The review contains potentially inappropriate content that violates community guidelines. Manual review required.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>1 hour ago</p>
+                            </div>
+                            <button onclick="handleAction('moderate')" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Moderate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 4 - Approval: New Artisan Application (Unread) -->
+                <div class="notification-card unread rounded-xl p-5 flex items-start gap-4" data-type="approvals" data-id="4">
+                    <div class="w-12 h-12 icon-approval rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user-check text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">New Artisan Application Pending</h3>
+                                    <span class="unread-dot"></span>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">James Thompson has submitted an artisan application for the Woodwork category. Portfolio includes 12 items, 3 references provided. All documents uploaded and verified.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>2 hours ago</p>
+                            </div>
+                            <button onclick="handleAction('approve')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Review & Approve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 5 - Approval: Product Verification (Unread) -->
+                <div class="notification-card unread rounded-xl p-5 flex items-start gap-4" data-type="approvals" data-id="5">
+                    <div class="w-12 h-12 icon-approval rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-box-check text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Product Verification Required</h3>
+                                    <span class="unread-dot"></span>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">5 new products from Elena Rodriguez are awaiting verification before listing. Category: Ceramics. Average processing time: 24 hours.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>3 hours ago</p>
+                            </div>
+                            <button onclick="handleAction('verify')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Verify Products
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 6 - Refund: New Refund Request (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="refunds" data-id="6">
+                    <div class="w-12 h-12 icon-refund rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-undo text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">New Refund Request Submitted</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Customer Lisa Anderson has requested a refund for Order #ORD-2839. Reason: Item not as described. Amount: BD 125.000. Photos attached.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>5 hours ago</p>
+                            </div>
+                            <button onclick="handleAction('process')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Process Refund
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 7 - Report: Daily Sales Report (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="reports" data-id="7">
+                    <div class="w-12 h-12 icon-system rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Daily Sales Report Available</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Your daily sales report for March 19, 2025 is ready. Total revenue: BD 12,450. Total orders: 87. Top category: Jewelry (43% of sales).</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>Yesterday at 11:59 PM</p>
+                            </div>
+                            <button onclick="handleAction('view')" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                View Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 8 - Milestone: 1000th User (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="system" data-id="8">
+                    <div class="w-12 h-12 icon-milestone rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Milestone Achieved: 1,000th User Registered!</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Congratulations! The platform has reached 1,000 registered users. Emma Wilson from Manama is our 1,000th user. Special welcome package has been sent automatically.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>Yesterday at 3:42 PM</p>
+                            </div>
+                            <button onclick="handleAction('celebrate')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                View Milestone
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 9 - System: Backup Completed (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="system" data-id="9">
+                    <div class="w-12 h-12 icon-system rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-database text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Daily Backup Completed Successfully</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Scheduled database backup completed at 2:30 AM UTC. 2.4GB archived successfully. All 47 tables backed up with 1,847,293 total records. Stored in S3 backup bucket.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>Yesterday at 2:35 AM</p>
+                            </div>
+                            <button onclick="handleAction('details')" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 10 - System: Uptime Report (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="reports system" data-id="10">
+                    <div class="w-12 h-12 icon-system rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-server text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Weekly System Uptime Report</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">System uptime for the week of March 11-17: 99.9%. Meets NFR-R1 requirement. Two scheduled maintenance windows completed successfully. No critical incidents reported.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>Mar 18, 2025 at 9:00 AM</p>
+                            </div>
+                            <button onclick="handleAction('report')" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                View Full Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 11 - Approval: Bulk Product Upload (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="approvals" data-id="11">
+                    <div class="w-12 h-12 icon-approval rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-upload text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Bulk Product Upload Completed</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Anna Kowalski has uploaded 15 new textile products via bulk import. 14 products approved automatically, 1 product flagged for manual review due to missing category tag.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>Mar 17, 2025 at 4:20 PM</p>
+                            </div>
+                            <button onclick="handleAction('review')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                Review Flagged Item
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification 12 - Auction: Auction Ended (Read) -->
+                <div class="notification-card rounded-xl p-5 flex items-start gap-4" data-type="auctions" data-id="12">
+                    <div class="w-12 h-12 icon-auction rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-gavel text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-[#5c4a3d]">Auction Ended Successfully</h3>
+                                </div>
+                                <p class="text-[#8b7355] text-sm">Auction #AUC-2024-0038 (Woven Wool Blanket) has ended. Winning bid: BD 245.000 by Thomas White. Payment received. Artisan Anna Kowalski has been notified.</p>
+                                <p class="text-xs text-[#8b7355] mt-2"><i class="far fa-clock mr-1"></i>Mar 15, 2025 at 10:15 PM</p>
+                            </div>
+                            <button onclick="handleAction('view')" class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap">
+                                View Summary
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // Tab switching
+        function switchTab(tab) {
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-[#c17c5f]', 'text-white');
+                btn.classList.add('text-[#8b7355]');
+            });
+
+            const activeButton = event.target.closest('.tab-button');
+            activeButton.classList.add('active', 'bg-[#c17c5f]', 'text-white');
+            activeButton.classList.remove('text-[#8b7355]');
+
+            // Filter notifications
+            const notifications = document.querySelectorAll('.notification-card');
+            notifications.forEach(notification => {
+                const types = notification.getAttribute('data-type');
+                if (tab === 'all' || types.includes(tab)) {
+                    notification.style.display = 'flex';
+                } else {
+                    notification.style.display = 'none';
+                }
+            });
+        }
+
+        // Mark all as read
+        function markAllAsRead() {
+            const unreadCards = document.querySelectorAll('.notification-card.unread');
+            unreadCards.forEach(card => {
+                card.classList.remove('unread');
+                const dot = card.querySelector('.unread-dot');
+                if (dot) dot.remove();
+            });
+
+            showNotification('All notifications marked as read', 'success');
+        }
+
+        // Handle action button clicks
+        function handleAction(action) {
+            const actions = {
+                'review': 'Opening review interface...',
+                'investigate': 'Opening investigation dashboard...',
+                'moderate': 'Opening moderation tool...',
+                'approve': 'Opening approval workflow...',
+                'verify': 'Opening verification page...',
+                'process': 'Opening refund processing...',
+                'view': 'Opening report viewer...',
+                'celebrate': 'Opening milestone details...',
+                'details': 'Opening backup details...',
+                'report': 'Opening full report...'
+            };
+
+            showNotification(actions[action] || 'Processing...', 'info');
+
+            setTimeout(() => {
+                showNotification('Action completed successfully!', 'success');
+            }, 1500);
+        }
+
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+
+            let bgColor = '#c17c5f';
+            if (type === 'success') {
+                bgColor = '#16a34a';
+            } else if (type === 'error') {
+                bgColor = '#dc2626';
+            } else if (type === 'warning') {
+                bgColor = '#d97706';
+            }
+
+            notification.className = 'fixed bottom-4 right-4 text-white px-6 py-3 rounded-xl shadow-lg z-50 transition-opacity duration-300';
+            notification.style.backgroundColor = bgColor;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

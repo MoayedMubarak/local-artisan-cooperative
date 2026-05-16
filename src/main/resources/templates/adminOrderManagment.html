@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Orders Management - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .table-row-hover:hover {
+            background-color: #fef9f3;
+        }
+
+        .refund-highlight {
+            background-color: #fffbeb;
+        }
+
+        .refund-highlight:hover {
+            background-color: #fef3c7;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Right Side - Notifications and User -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
+                </button>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div class="hidden md:block">
+                        <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                        <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                    </div>
+                    <i class="fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Logo at Top -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
+                    <span class="text-xl font-semibold text-white" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+                </div>
+
+                <!-- Admin Profile -->
+                <div class="flex items-center gap-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold text-sm">Admin User</h3>
+                        <span class="inline-block bg-[#c17c5f] text-white text-xs px-2 py-1 rounded-full mt-1">Administrator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-user-management.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-users w-5"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-user-check w-5"></i>
+                            <span>Artisan Approvals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-orders.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-undo w-5"></i>
+                            <span>Refunds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-star w-5"></i>
+                            <span>Review Moderation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">Orders Management</h1>
+                <p class="text-[#8b7355]">Monitor and manage all platform orders.</p>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <!-- Search Input -->
+                    <div class="flex-1 min-w-64">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                placeholder="Search by order ID or customer name..." 
+                                class="w-full pl-10 pr-4 py-2.5 border border-[#e5e0d8] rounded-lg focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
+                            />
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter Dropdown -->
+                    <div class="relative">
+                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="refund-requested">Refund Requested</option>
+                            <option value="refund-escalated">Refund Escalated</option>
+                            <option value="refund-approved">Refund Approved</option>
+                            <option value="refund-declined">Refund Declined</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
+                    </div>
+
+                    <!-- Date Range Picker -->
+                    <div class="flex items-center gap-2">
+                        <input 
+                            type="date" 
+                            class="border border-[#e5e0d8] rounded-lg px-4 py-2.5 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                        />
+                        <span class="text-[#8b7355]">to</span>
+                        <input 
+                            type="date" 
+                            class="border border-[#e5e0d8] rounded-lg px-4 py-2.5 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                        />
+                    </div>
+
+                    <!-- Export Report Button -->
+                    <button class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-download"></i>
+                        <span>Export Report</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-[#f5ebe0]">
+                            <tr>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Order ID</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Customer</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Artisan</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Products</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Total</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Order Date</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Status</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#e5e0d8]">
+                            <!-- Order Row 1 - Delivered -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1547</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Sarah Johnson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Sarah Johnson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Elena Rodriguez" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=40&h=40&fit=crop" 
+                                            alt="Ceramic Vase" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Handmade Ceramic Vase</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 285.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 10, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-green-100 text-green-700">
+                                        <i class="fas fa-check-circle"></i>
+                                        Delivered
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 2 - Processing -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1548</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Michael Chen" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Michael Chen</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Marcus Chen" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Marcus Chen</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=40&h=40&fit=crop" 
+                                            alt="Silver Necklace" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Silver Moonstone Necklace</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 150.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 12, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-blue-100 text-blue-700">
+                                        <i class="fas fa-box-open"></i>
+                                        Processing
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 3 - Refund Requested (Highlighted) -->
+                            <tr class="refund-highlight">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1549</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Emma Wilson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Emma Wilson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Elena Rodriguez" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=40&h=40&fit=crop" 
+                                            alt="Tea Set" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Artisan Tea Set</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 120.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 14, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-amber-100 text-amber-700">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Refund Requested
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 4 - Shipped -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1550</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" 
+                                            alt="David Brown" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">David Brown</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="James Thompson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">James Thompson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=40&h=40&fit=crop" 
+                                            alt="Cutting Board" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Oak Wood Cutting Board</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 65.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 15, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-purple-100 text-purple-700">
+                                        <i class="fas fa-shipping-fast"></i>
+                                        Shipped
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 5 - Refund Escalated (Highlighted) -->
+                            <tr class="refund-highlight">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1551</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Lisa Anderson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Lisa Anderson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Maya Singh" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Maya Singh</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1681091638141-a87495ae612f?w=40&h=40&fit=crop" 
+                                            alt="Silver Cuff" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Hammered Silver Cuff</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 48.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 16, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-orange-100 text-orange-700">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Refund Escalated
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 6 - Pending -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1552</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Robert Taylor" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Robert Taylor</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Anna Kowalski" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Anna Kowalski</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=40&h=40&fit=crop" 
+                                            alt="Wool Blanket" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Woven Wool Blanket</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 195.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 17, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-gray-100 text-gray-700">
+                                        <i class="fas fa-clock"></i>
+                                        Pending
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 7 - Refund Approved -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1553</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Jennifer Lee" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Jennifer Lee</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Sarah Mitchell" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Sarah Mitchell</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=40&h=40&fit=crop" 
+                                            alt="Oil Painting" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Abstract Oil Painting</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 350.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 08, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-green-100 text-green-700">
+                                        <i class="fas fa-check-double"></i>
+                                        Refund Approved
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 8 - Refund Declined -->
+                            <tr class="table-row-hover">
+                                <td class="px-6 py-4">
+                                    <span class="font-mono font-semibold text-[#5c4a3d]">#ORD-2024-1554</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Thomas White" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Thomas White</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Elena Rodriguez" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=40&h=40&fit=crop" 
+                                            alt="Ceramic Bowl" 
+                                            class="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <span class="text-[#5c4a3d]">Ceramic Bowl Set</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]">BD 95.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]">Mar 05, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle"></i>
+                                        Refund Declined
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="admin-order-detail.html" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View Details</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
+                    <p class="text-sm text-[#8b7355]">
+                        Showing <span class="font-semibold text-[#5c4a3d]">1</span> to <span class="font-semibold text-[#5c4a3d]">8</span> of <span class="font-semibold text-[#5c4a3d]">156</span> orders
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium">1</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">2</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">3</button>
+                        <span class="text-[#8b7355]">...</span>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">20</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active class from all links
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                // Add active class to clicked link
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+    </script>
+</body>
+</html>

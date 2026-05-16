@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin System Logs - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {a
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .table-row-hover:hover {
+            background-color: #fef9f3;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e0d8;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #c17c5f;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Severity badges */
+        .severity-info {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .severity-warning {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .severity-error {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .severity-critical {
+            background-color: #7f1d1d;
+            color: #fecaca;
+        }
+
+        /* Log type badges */
+        .log-type-auth {
+            background-color: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .log-type-orders {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .log-type-payments {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .log-type-refunds {
+            background-color: #fae8ff;
+            color: #a21caf;
+        }
+
+        .log-type-auctions {
+            background-color: #ffedd5;
+            color: #c2410c;
+        }
+
+        .log-type-users {
+            background-color: #cffafe;
+            color: #0e7490;
+        }
+
+        .log-type-system {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .log-type-errors {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Error/Critical row background */
+        .error-row {
+            background-color: #fef2f2;
+        }
+
+        /* Live indicator animation */
+        .live-indicator {
+            animation: pulse-live 2s infinite;
+        }
+
+        @keyframes pulse-live {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        /* New log entry animation */
+        .new-log-entry {
+            animation: fadeInSlide 0.4s ease;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Expanded details section */
+        .log-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .log-details.expanded {
+            max-height: 500px;
+        }
+
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background-color: #1f2937;
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Right Side - Notifications and User -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
+                </button>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div class="hidden md:block">
+                        <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                        <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                    </div>
+                    <i class="fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Logo at Top -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
+                    <span class="text-xl font-semibold text-white" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+                </div>
+
+                <!-- Admin Profile -->
+                <div class="flex items-center gap-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold text-sm">Admin User</h3>
+                        <span class="inline-block bg-[#c17c5f] text-white text-xs px-2 py-1 rounded-full mt-1">Administrator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-user-management.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-users w-5"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-user-check w-5"></i>
+                            <span>Artisan Approvals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-products.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-auctions.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-refunds.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-undo w-5"></i>
+                            <span>Refunds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-review-moderation.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-star w-5"></i>
+                            <span>Review Moderation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-reports.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-system-logs.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#5c4a3d] mb-2">System Logs</h1>
+                <p class="text-[#8b7355]">Monitor all platform activity and system events.</p>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <!-- Search Input -->
+                    <div class="flex-1 min-w-64">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                placeholder="Search logs..." 
+                                class="w-full pl-10 pr-4 py-2.5 border border-[#e5e0d8] rounded-lg focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
+                            />
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Log Type Filter -->
+                    <div class="relative">
+                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                            <option value="">All Log Types</option>
+                            <option value="auth">Authentication</option>
+                            <option value="orders">Orders</option>
+                            <option value="payments">Payments</option>
+                            <option value="refunds">Refunds</option>
+                            <option value="auctions">Auctions</option>
+                            <option value="users">User Management</option>
+                            <option value="system">System</option>
+                            <option value="errors">Errors</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
+                    </div>
+
+                    <!-- Severity Filter -->
+                    <div class="relative">
+                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                            <option value="">All Severities</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
+                    </div>
+
+                    <!-- Date Range Picker -->
+                    <div class="flex items-center gap-2">
+                        <input 
+                            type="date" 
+                            class="border border-[#e5e0d8] rounded-lg px-4 py-2.5 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                            value="2025-03-01"
+                        />
+                        <span class="text-[#8b7355]">to</span>
+                        <input 
+                            type="date" 
+                            class="border border-[#e5e0d8] rounded-lg px-4 py-2.5 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
+                            value="2025-03-20"
+                        />
+                    </div>
+
+                    <!-- Live Mode Toggle -->
+                    <div class="flex items-center gap-3 pl-4 border-l border-[#e5e0d8]">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="liveModeToggle" onchange="toggleLiveMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="text-sm font-medium text-[#5c4a3d] flex items-center gap-2">
+                            Live Mode
+                            <span id="liveIndicator" class="hidden w-2 h-2 bg-green-500 rounded-full live-indicator"></span>
+                        </span>
+                    </div>
+
+                    <!-- Export Logs Button -->
+                    <button onclick="exportLogs()" class="ml-auto bg-[#c17c5f] hover:bg-[#a5664d] text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
+                        <i class="fas fa-download"></i>
+                        Export Logs
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logs Table -->
+            <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-[#f5ebe0]">
+                            <tr>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Timestamp</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Severity</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Log Type</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">User</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Action/Description</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">IP Address</th>
+                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#e5e0d8]" id="logsTableBody">
+                            <!-- Row 1 - Critical -->
+                            <tr class="error-row" data-log-id="1">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 14:32:18</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-critical">
+                                        <span class="w-2 h-2 bg-red-400 rounded-full live-indicator"></span>
+                                        Critical
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-errors">Errors</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="System" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">System</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Database connection pool exhausted - emergency failover initiated</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">10.0.0.1</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(1)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-1" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#fef2f2]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Technical Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "error_code": "DB_POOL_EXHAUSTED",
+  "pool_size": 50,
+  "active_connections": 50,
+  "waiting_requests": 127,
+  "timeout_ms": 30000,
+  "timestamp": "2025-03-20T14:32:18.456Z"
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Stack Trace</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>at DatabasePool.getConnection (db/pool.js:142)
+at QueryExecutor.execute (db/executor.js:87)
+at UserRepository.findById (repos/user.js:23)
+at AuthService.validateToken (auth/service.js:56)</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-external-link-alt"></i>
+                                            View System Status Dashboard
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-bug"></i>
+                                            Create Incident Report
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 2 - Error -->
+                            <tr class="error-row" data-log-id="2">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 14:28:45</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-error">
+                                        Error
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-payments">Payments</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Sarah Johnson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Sarah Johnson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Payment processing failed for Order #ORD-2847 - Card declined by issuer</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">192.168.1.105</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(2)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-2" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#fef2f2]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Technical Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "order_id": "ORD-2847",
+  "payment_gateway": "stripe",
+  "error_code": "card_declined",
+  "decline_code": "insufficient_funds",
+  "amount": "BD 245.000",
+  "currency": "BHD"
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Stack Trace</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>at StripeGateway.processPayment (gateways/stripe.js:89)
+at PaymentService.charge (services/payment.js:134)
+at OrderController.checkout (controllers/order.js:67)</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="admin-orders.html" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-shopping-bag"></i>
+                                            View Order #ORD-2847
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-user"></i>
+                                            View Customer Profile
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3 - Warning -->
+                            <tr class="table-row-hover" data-log-id="3">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 14:15:22</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-warning">
+                                        Warning
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-auctions">Auctions</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Michael Thompson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Michael Thompson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Suspicious bidding pattern detected on Auction #AUC-2024-0042 - Possible bid manipulation</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">203.45.67.89</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(3)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-3" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#fef3c7]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Technical Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "auction_id": "AUC-2024-0042",
+  "detection_type": "bid_manipulation",
+  "suspicious_bids": 8,
+  "time_window_seconds": 120,
+  "same_ip_count": 5,
+  "risk_score": 0.87
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Detection Algorithm</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>at BidAnalyzer.detectPatterns (analytics/bid.js:203)
+at AuctionMonitor.scanActivity (monitors/auction.js:78)
+at ScheduledTask.execute (tasks/scheduler.js:45)</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="admin-auctions.html" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-gavel"></i>
+                                            View Auction #AUC-2024-0042
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-flag"></i>
+                                            Flag for Review
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 4 - Info -->
+                            <tr class="table-row-hover" data-log-id="4">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 14:05:10</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-info">
+                                        Info
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-auth">Authentication</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Elena Rodriguez" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Successful login from new device - Chrome on Windows</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">85.123.45.67</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(4)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-4" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#dbeafe]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Technical Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "user_id": "USR-1847",
+  "event": "login_success",
+  "device": "Chrome 122.0 on Windows 11",
+  "location": "Manama, Bahrain",
+  "ip_address": "85.123.45.67",
+  "is_new_device": true,
+  "mfa_verified": true
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Session Information</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>Session ID: sess_8f7d9a2b4c1e
+Created: 2025-03-20T14:05:10.234Z
+Expires: 2025-03-21T14:05:10.234Z
+IP: 85.123.45.67
+User Agent: Mozilla/5.0...</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-user"></i>
+                                            View User Profile
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-shield-alt"></i>
+                                            View Security Settings
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 5 - Info -->
+                            <tr class="table-row-hover" data-log-id="5">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 13:58:33</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-info">
+                                        Info
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-orders">Orders</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Emma Wilson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Emma Wilson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Order #ORD-2851 placed successfully - Total: BD 185.000</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">172.16.0.45</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(5)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-5" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#dcfce7]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Order Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "order_id": "ORD-2851",
+  "customer_id": "USR-2034",
+  "items_count": 2,
+  "subtotal": "BD 175.000",
+  "shipping": "BD 5.000",
+  "tax": "BD 5.000",
+  "total": "BD 185.000",
+  "payment_method": "credit_card"
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Items</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>- Silver Moonstone Necklace (x1) - BD 125.000
+- Handmade Ceramic Vase (x1) - BD 50.000
+Shipping: Standard Delivery (3-5 days)
+Tracking: TRK-8472934</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="admin-orders.html" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-shopping-bag"></i>
+                                            View Order #ORD-2851
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-truck"></i>
+                                            Track Shipment
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 6 - Warning -->
+                            <tr class="table-row-hover" data-log-id="6">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 13:42:17</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-warning">
+                                        Warning
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-users">User Management</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Admin User" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Admin User</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Artisan account verification pending review - Application #APP-1847</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">10.0.0.15</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(6)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-6" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#fef3c7]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Application Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "application_id": "APP-1847",
+  "applicant_name": "James Thompson",
+  "category": "Woodwork",
+  "submitted_date": "2025-03-18",
+  "documents_count": 5,
+  "portfolio_items": 12,
+  "verification_status": "pending_review"
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Submitted Documents</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>- Government ID (Verified)
+- Business License (Pending)
+- Portfolio Photos (12 items)
+- Product Samples (Pending review)
+- References (3 submitted)</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-user-check"></i>
+                                            Review Application #APP-1847
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-envelope"></i>
+                                            Contact Applicant
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 7 - Info -->
+                            <tr class="table-row-hover" data-log-id="7">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 13:30:05</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-info">
+                                        Info
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-refunds">Refunds</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
+                                            alt="Lisa Anderson" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">Lisa Anderson</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Refund request submitted for Order #ORD-2834 - Reason: Item damaged</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">192.168.1.78</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(7)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-7" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#fae8ff]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Refund Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "refund_id": "REF-1247",
+  "order_id": "ORD-2834",
+  "customer_id": "USR-1923",
+  "amount": "BD 85.000",
+  "reason": "item_damaged",
+  "status": "pending_approval",
+  "photos_attached": 3
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Customer Notes</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>"The ceramic vase arrived with a crack 
+on the side. Packaging was intact but 
+the item was damaged during shipping. 
+Requesting full refund."</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="admin-refunds.html" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-undo"></i>
+                                            Process Refund #REF-1247
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-image"></i>
+                                            View Damage Photos
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 8 - Info -->
+                            <tr class="table-row-hover" data-log-id="8">
+                                <td class="px-6 py-4">
+                                    <span class="text-[#5c4a3d] text-sm font-mono">2025-03-20 13:15:42</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge severity-info">
+                                        Info
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge log-type-system">System</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                                            alt="System" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]">System</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[#5c4a3d] text-sm">Scheduled backup completed successfully - 2.4GB archived</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355] text-sm font-mono">10.0.0.1</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button onclick="toggleLogDetails(8)" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="log-details-8" class="log-details">
+                                <td colspan="7" class="px-6 py-4 bg-[#f3f4f6]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Backup Details</h4>
+                                            <div class="code-block">
+                                                <pre>{
+  "backup_id": "BKP-20250320-001",
+  "type": "scheduled_daily",
+  "size": "2.4 GB",
+  "duration_seconds": 847,
+  "tables_backed_up": 47,
+  "records_count": 1847293,
+  "storage_location": "s3://backups/daily/"
+}</pre>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-[#5c4a3d] mb-2">Backup Summary</h4>
+                                            <div class="code-block text-xs">
+                                                <pre>Users: 12,847 records
+Orders: 8,472 records
+Products: 3,291 records
+Auctions: 1,847 records
+Reviews: 15,284 records
+...and 42 more tables</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-4">
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-database"></i>
+                                            View Backup History
+                                        </a>
+                                        <a href="#" class="text-[#c17c5f] hover:underline text-sm flex items-center gap-1">
+                                            <i class="fas fa-download"></i>
+                                            Download Backup
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
+                    <div class="flex items-center gap-4">
+                        <p class="text-sm text-[#8b7355]">
+                            Showing <span class="font-semibold text-[#5c4a3d]">1</span> to <span class="font-semibold text-[#5c4a3d]">8</span> of <span class="font-semibold text-[#5c4a3d]">2,847</span> logs
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-[#8b7355]">Rows per page:</span>
+                            <select class="border border-[#e5e0d8] rounded-lg px-3 py-1.5 text-sm text-[#5c4a3d] focus:border-[#c17c5f] focus:outline-none">
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium">1</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">2</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">3</button>
+                        <span class="text-[#8b7355]">...</span>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">356</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // Toggle log details
+        function toggleLogDetails(logId) {
+            const detailsRow = document.getElementById(`log-details-${logId}`);
+            const mainRow = document.querySelector(`[data-log-id="${logId}"]`);
+            const button = mainRow.querySelector('button');
+            const icon = button.querySelector('i');
+
+            if (detailsRow.classList.contains('expanded')) {
+                detailsRow.classList.remove('expanded');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                detailsRow.classList.add('expanded');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+
+        // Toggle live mode
+        let liveModeInterval = null;
+        let logCounter = 9;
+
+        function toggleLiveMode() {
+            const isChecked = document.getElementById('liveModeToggle').checked;
+            const liveIndicator = document.getElementById('liveIndicator');
+            const tableBody = document.getElementById('logsTableBody');
+
+            if (isChecked) {
+                liveIndicator.classList.remove('hidden');
+                showNotification('Live Mode enabled - streaming new logs', 'success');
+
+                // Simulate incoming logs every 5-10 seconds
+                liveModeInterval = setInterval(() => {
+                    const randomLog = generateRandomLog();
+                    addNewLogEntry(tableBody, randomLog);
+                }, Math.random() * 5000 + 5000);
+            } else {
+                liveIndicator.classList.add('hidden');
+                showNotification('Live Mode disabled', 'info');
+
+                if (liveModeInterval) {
+                    clearInterval(liveModeInterval);
+                    liveModeInterval = null;
+                }
+            }
+        }
+
+        // Generate random log entry
+        function generateRandomLog() {
+            const severities = ['info', 'info', 'info', 'warning', 'error'];
+            const logTypes = [
+                { value: 'auth', label: 'Authentication', class: 'log-type-auth' },
+                { value: 'orders', label: 'Orders', class: 'log-type-orders' },
+                { value: 'payments', label: 'Payments', class: 'log-type-payments' },
+                { value: 'auctions', label: 'Auctions', class: 'log-type-auctions' },
+                { value: 'users', label: 'User Management', class: 'log-type-users' }
+            ];
+
+            const users = [
+                { name: 'Sarah Johnson', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face' },
+                { name: 'Michael Thompson', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face' },
+                { name: 'Elena Rodriguez', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face' },
+                { name: 'Emma Wilson', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face' }
+            ];
+
+            const actions = [
+                'User session refreshed successfully',
+                'Product view recorded for analytics',
+                'Email notification sent to customer',
+                'Cache invalidated for product catalog',
+                'API rate limit updated for user'
+            ];
+
+            const now = new Date();
+            const timestamp = now.toISOString().replace('T', ' ').substring(0, 19);
+            const severity = severities[Math.floor(Math.random() * severities.length)];
+            const logType = logTypes[Math.floor(Math.random() * logTypes.length)];
+            const user = users[Math.floor(Math.random() * users.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const ip = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+
+            return {
+                id: logCounter++,
+                timestamp,
+                severity,
+                logType,
+                user,
+                action,
+                ip
+            };
+        }
+
+        // Add new log entry to table
+        function addNewLogEntry(tableBody, log) {
+            const severityClasses = {
+                info: 'severity-info',
+                warning: 'severity-warning',
+                error: 'severity-error',
+                critical: 'severity-critical'
+            };
+
+            const row = document.createElement('tr');
+            row.className = 'table-row-hover new-log-entry';
+            row.setAttribute('data-log-id', log.id);
+
+            row.innerHTML = `
+                <td class="px-6 py-4">
+                    <span class="text-[#5c4a3d] text-sm font-mono">${log.timestamp}</span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="status-badge ${severityClasses[log.severity]}">
+                        ${log.severity.charAt(0).toUpperCase() + log.severity.slice(1)}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="status-badge ${log.logType.class}">${log.logType.label}</span>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <img src="${log.user.img}" alt="${log.user.name}" class="w-10 h-10 rounded-full object-cover"/>
+                        <span class="font-medium text-[#5c4a3d]">${log.user.name}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <p class="text-[#5c4a3d] text-sm">${log.action}</p>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-[#8b7355] text-sm font-mono">${log.ip}</span>
+                </td>
+                <td class="px-6 py-4">
+                    <button onclick="toggleLogDetails(${log.id})" class="text-[#c17c5f] hover:text-[#a5664d] text-sm font-medium flex items-center gap-1">
+                        <i class="fas fa-chevron-down"></i>
+                        Details
+                    </button>
+                </td>
+            `;
+
+            // Insert after the first row (most recent at top)
+            const firstRow = tableBody.querySelector('[data-log-id]');
+            if (firstRow) {
+                // Find the main row (not details row)
+                let insertBefore = firstRow;
+                while (insertBefore && !insertBefore.getAttribute('data-log-id')) {
+                    insertBefore = insertBefore.nextElementSibling;
+                }
+                if (insertBefore) {
+                    tableBody.insertBefore(row, insertBefore);
+                } else {
+                    tableBody.insertBefore(row, tableBody.firstChild);
+                }
+            } else {
+                tableBody.insertBefore(row, tableBody.firstChild);
+            }
+
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                row.classList.remove('new-log-entry');
+            }, 400);
+
+            // Show notification for critical/error logs
+            if (log.severity === 'error' || log.severity === 'critical') {
+                showNotification(`New ${log.severity} log detected`, 'warning');
+            }
+        }
+
+        // Export logs
+        function exportLogs() {
+            showNotification('Preparing log export...', 'info');
+
+            setTimeout(() => {
+                showNotification('Logs exported successfully! Download starting...', 'success');
+            }, 1500);
+        }
+
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+
+            let bgColor = '#c17c5f';
+            if (type === 'success') {
+                bgColor = '#16a34a';
+            } else if (type === 'error') {
+                bgColor = '#dc2626';
+            } else if (type === 'warning') {
+                bgColor = '#d97706';
+            }
+
+            notification.className = 'fixed bottom-4 right-4 text-white px-6 py-3 rounded-xl shadow-lg z-50 transition-opacity duration-300';
+            notification.style.backgroundColor = bgColor;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

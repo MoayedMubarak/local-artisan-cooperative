@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail - Admin - Artisan Co-op</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .terracotta {
+            color: #c17c5f;
+        }
+
+        .bg-terracotta {
+            background-color: #c17c5f;
+        }
+
+        .bg-terracotta-dark {
+            background-color: #a5664d;
+        }
+
+        .hover\:bg-terracotta-dark:hover {
+            background-color: #a5664d;
+        }
+
+        .border-terracotta {
+            border-color: #c17c5f;
+        }
+
+        .text-earth {
+            color: #8b7355;
+        }
+
+        .bg-earth {
+            background-color: #8b7355;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 3px solid white;
+        }
+
+        .timeline-step {
+            position: relative;
+            padding-left: 2.5rem;
+        }
+
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e5e0d8;
+        }
+
+        .timeline-step:last-child::before {
+            bottom: auto;
+            height: 50%;
+        }
+
+        .timeline-step:first-child::before {
+            top: 50%;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: -0.625rem;
+            top: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .timeline-step.completed .timeline-icon {
+            background-color: #c17c5f;
+            color: white;
+        }
+
+        .timeline-step.current .timeline-icon {
+            background-color: #fef3c7;
+            color: #c17c5f;
+            border: 2px solid #c17c5f;
+        }
+
+        .timeline-step.pending .timeline-icon {
+            background-color: #f5f5f4;
+            color: #a8a29e;
+        }
+
+        .timeline-step.completed::before {
+            background-color: #c17c5f;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hands text-2xl terracotta"></i>
+                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            </div>
+
+            <!-- Right Side - Notifications and User -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
+                </button>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div class="hidden md:block">
+                        <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                        <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                    </div>
+                    <i class="fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex flex-1">
+        <!-- Left Sidebar -->
+        <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
+            <!-- Logo at Top -->
+            <div class="p-6 border-b border-[#7a6655]">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
+                    <span class="text-xl font-semibold text-white" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+                </div>
+
+                <!-- Admin Profile -->
+                <div class="flex items-center gap-3">
+                    <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                        alt="Admin User" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-[#c17c5f]"
+                    />
+                    <div>
+                        <h3 class="text-white font-semibold text-sm">Admin User</h3>
+                        <span class="inline-block bg-[#c17c5f] text-white text-xs px-2 py-1 rounded-full mt-1">Administrator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-user-management.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-users w-5"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-user-check w-5"></i>
+                            <span>Artisan Approvals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-box w-5"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-orders.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-gavel w-5"></i>
+                            <span>Auctions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-undo w-5"></i>
+                            <span>Refunds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-star w-5"></i>
+                            <span>Review Moderation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout Section -->
+            <div class="p-4 mt-8 border-t border-[#7a6655]">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Back Link -->
+            <a href="admin-orders.html" class="inline-flex items-center gap-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-6">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Orders</span>
+            </a>
+
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-[#5c4a3d] mb-1">Order #ORD-2024-1549</h1>
+                    <p class="text-[#8b7355]">March 14, 2025</p>
+                </div>
+                <span class="status-badge bg-amber-100 text-amber-700 text-sm px-4 py-2">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Refund Requested
+                </span>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column (Wider) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Order Items Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Items</h2>
+                        </div>
+                        <div class="p-6">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-left text-sm text-[#8b7355] border-b border-[#e5e0d8]">
+                                        <th class="pb-3 font-medium">Product</th>
+                                        <th class="pb-3 font-medium text-center">Quantity</th>
+                                        <th class="pb-3 font-medium text-right">Unit Price</th>
+                                        <th class="pb-3 font-medium text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#e5e0d8]">
+                                    <tr>
+                                        <td class="py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                                    <img 
+                                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=80&h=80&fit=crop" 
+                                                        alt="Artisan Tea Set" 
+                                                        class="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-[#5c4a3d]">Artisan Tea Set</p>
+                                                    <p class="text-sm text-[#8b7355]">SKU: CER-TEA-003</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 text-center text-[#5c4a3d]">1</td>
+                                        <td class="py-4 text-right text-[#5c4a3d]">BD 120.000</td>
+                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 120.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Order Totals -->
+                            <div class="mt-6 pt-6 border-t border-[#e5e0d8] space-y-2">
+                                <div class="flex justify-between text-[#8b7355]">
+                                    <span>Subtotal</span>
+                                    <span>BD 120.000</span>
+                                </div>
+                                <div class="flex justify-between text-[#8b7355]">
+                                    <span>Shipping Fee</span>
+                                    <span>BD 10.000</span>
+                                </div>
+                                <div class="flex justify-between text-lg font-semibold text-[#5c4a3d] pt-2 border-t border-[#e5e0d8]">
+                                    <span>Total</span>
+                                    <span>BD 130.000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Timeline Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Timeline</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <!-- Order Placed - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Order Placed</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 14, 2025 at 2:30 PM</p>
+                                        <p class="text-sm text-[#8b7355]">Customer placed the order successfully</p>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Confirmed - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Payment Confirmed</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 14, 2025 at 2:32 PM</p>
+                                        <p class="text-sm text-[#8b7355]">Payment received via Credit Card</p>
+                                    </div>
+                                </div>
+
+                                <!-- Processing - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-box-open"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Processing</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 15, 2025 at 10:00 AM</p>
+                                        <p class="text-sm text-[#8b7355]">Artisan started preparing the order</p>
+                                    </div>
+                                </div>
+
+                                <!-- Shipped - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-shipping-fast"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Shipped</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 16, 2025 at 3:00 PM</p>
+                                        <p class="text-sm text-[#8b7355]">Tracking: BH78456123</p>
+                                    </div>
+                                </div>
+
+                                <!-- Delivered - Completed -->
+                                <div class="timeline-step completed">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Delivered</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 17, 2025 at 11:30 AM</p>
+                                        <p class="text-sm text-[#8b7355]">Package delivered to customer</p>
+                                    </div>
+                                </div>
+
+                                <!-- Refund Requested - Current -->
+                                <div class="timeline-step current">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-undo"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-[#5c4a3d]">Refund Requested</h4>
+                                        <p class="text-sm text-[#8b7355] mt-1">March 18, 2025 at 9:15 AM</p>
+                                        <p class="text-sm text-[#8b7355]">Customer requested refund - Item damaged</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Narrower) -->
+                <div class="space-y-6">
+                    <!-- Customer Information Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Customer Information</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-14 h-14 rounded-full bg-[#c17c5f] flex items-center justify-center text-white text-xl font-semibold">
+                                    EW
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-[#5c4a3d]">Emma Wilson</h3>
+                                    <p class="text-sm text-[#8b7355]">emma.wilson@email.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-[#8b7355]">
+                                <i class="fas fa-phone"></i>
+                                <span class="text-sm">+973 3678 9012</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Artisan Information Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Artisan Information</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=56&h=56&fit=crop&crop=face" 
+                                    alt="Elena Rodriguez" 
+                                    class="w-14 h-14 rounded-full object-cover"
+                                />
+                                <div>
+                                    <h3 class="font-semibold text-[#5c4a3d]">Elena Rodriguez</h3>
+                                    <p class="text-sm text-[#8b7355]">Ceramics Artist</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-[#8b7355]">
+                                <i class="fas fa-envelope"></i>
+                                <span class="text-sm">elena@artisan.com</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Shipping Address</h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-map-marker-alt text-[#c17c5f] mt-1"></i>
+                                <div class="text-[#5c4a3d] text-sm leading-relaxed">
+                                    <p>Building 567, Road 234</p>
+                                    <p>Block 902, Juffair</p>
+                                    <p>Manama, Bahrain</p>
+                                    <p class="text-[#8b7355] mt-2">Postal Code: 35902</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information Card -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <h2 class="text-xl font-semibold text-[#5c4a3d]">Payment Information</h2>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8b7355]">Payment Method</span>
+                                <span class="font-medium text-[#5c4a3d]">Credit Card (Visa)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8b7355]">Payment Status</span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                    <i class="fas fa-check-circle"></i>
+                                    Paid
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8b7355]">Transaction ID</span>
+                                <span class="text-sm text-[#8b7355]">TXN-9384756201</span>
+                            </div>
+                            <div class="pt-3 border-t border-[#e5e0d8]">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#8b7355]">Amount Paid</span>
+                                    <span class="font-semibold text-[#5c4a3d]">BD 130.000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Actions Panel -->
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden border-l-4 border-amber-500">
+                        <div class="p-6 border-b border-[#e5e0d8]">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-shield-alt text-amber-500 text-xl"></i>
+                                <h2 class="text-xl font-semibold text-[#5c4a3d]">Admin Actions</h2>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <!-- Refund Request Details -->
+                            <div>
+                                <h4 class="font-semibold text-[#5c4a3d] mb-2">Refund Request Details</h4>
+                                <div class="bg-amber-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-[#8b7355]">Request Date:</span>
+                                        <span class="text-sm font-medium text-[#5c4a3d]">March 18, 2025 at 9:15 AM</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-[#8b7355]">Refund Amount:</span>
+                                        <span class="text-sm font-semibold text-amber-600">BD 120.000</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-[#8b7355]">Reason:</span>
+                                        <span class="text-sm font-medium text-[#5c4a3d]">Item Damaged</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Customer's Reason -->
+                            <div>
+                                <p class="text-sm font-medium text-[#8b7355] mb-2">Customer's Reason:</p>
+                                <blockquote class="bg-amber-50 border-l-4 border-amber-400 p-4 italic text-[#5c4a3d] text-sm">
+                                    "The tea set arrived with a large crack on the side of the teapot. The packaging was also damaged during shipping. I would like a full refund for this item."
+                                </blockquote>
+                            </div>
+
+                            <!-- Photo Evidence -->
+                            <div>
+                                <p class="text-sm font-medium text-[#8b7355] mb-2 flex items-center gap-2">
+                                    <i class="fas fa-paperclip"></i>
+                                    Photo Evidence
+                                </p>
+                                <div class="flex gap-3">
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(0)">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=160&h=160&fit=crop" 
+                                            alt="Damage photo 1" 
+                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
+                                        />
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <i class="fas fa-expand text-white text-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(1)">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=160&h=160&fit=crop" 
+                                            alt="Damage photo 2" 
+                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
+                                        />
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <i class="fas fa-expand text-white text-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(2)">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=160&h=160&fit=crop" 
+                                            alt="Packaging photo" 
+                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
+                                        />
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <i class="fas fa-expand text-white text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Artisan's Response -->
+                            <div>
+                                <p class="text-sm font-medium text-[#8b7355] mb-2">Artisan's Decision & Comment:</p>
+                                <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="status-badge bg-red-100 text-red-700">
+                                            <i class="fas fa-times-circle"></i>
+                                            Declined
+                                        </span>
+                                        <span class="text-xs text-[#8b7355]">March 18, 2025 at 3:30 PM</span>
+                                    </div>
+                                    <p class="text-sm text-[#5c4a3d]">
+                                        "The item was carefully packaged before shipping. The damage likely occurred during transit. I recommend the customer file a claim with the shipping carrier. However, I'm willing to accept a partial refund if the admin decides so."
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Admin Action Buttons -->
+                            <div class="space-y-3 pt-4">
+                                <button onclick="handleAdminAction('approve')" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-check-circle"></i>
+                                    Approve Refund
+                                </button>
+                                <button onclick="handleAdminAction('reject')" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-times-circle"></i>
+                                    Reject Refund
+                                </button>
+                                <button onclick="handleAdminAction('contact')" class="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-comments"></i>
+                                    Contact Both Parties
+                                </button>
+                            </div>
+
+                            <!-- Internal Note -->
+                            <div class="pt-4 border-t border-[#e5e0d8]">
+                                <label class="block text-sm font-medium text-[#8b7355] mb-2">Internal Note</label>
+                                <textarea 
+                                    id="internalNote"
+                                    rows="3" 
+                                    placeholder="Add an internal note about your decision..." 
+                                    class="w-full border border-[#e5e0d8] rounded-lg px-4 py-3 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a] resize-none"
+                                ></textarea>
+                                <button onclick="saveInternalNote()" class="mt-2 text-sm text-[#c17c5f] hover:text-[#a5664d] font-medium">
+                                    Save Note
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation active state handling
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active class from all links
+                document.querySelectorAll('.sidebar-link').forEach(l => {
+                    l.classList.remove('active');
+                    l.classList.add('text-[#d4c5b5]');
+                });
+
+                // Add active class to clicked link
+                this.classList.add('active');
+                this.classList.remove('text-[#d4c5b5]');
+            });
+        });
+
+        // Evidence photos for lightbox
+        const evidencePhotos = [
+            'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=600&fit=crop'
+        ];
+
+        // Open lightbox with image
+        function openLightbox(index) {
+            const lightbox = document.createElement('div');
+            lightbox.id = 'lightbox';
+            lightbox.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center cursor-pointer';
+            lightbox.onclick = closeLightbox;
+
+            const img = document.createElement('img');
+            img.src = evidencePhotos[index];
+            img.alt = 'Evidence photo';
+            img.className = 'max-w-full max-h-full w-auto h-auto object-contain p-4';
+            img.onclick = (e) => e.stopPropagation();
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'absolute top-4 right-4 text-white hover:text-gray-300 transition-colors';
+            closeBtn.innerHTML = '<i class="fas fa-times text-3xl"></i>';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                closeLightbox();
+            };
+
+            lightbox.appendChild(closeBtn);
+            lightbox.appendChild(img);
+            document.body.appendChild(lightbox);
+        }
+
+        // Close lightbox
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            if (lightbox) {
+                lightbox.style.opacity = '0';
+                lightbox.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => {
+                    lightbox.remove();
+                }, 200);
+            }
+        }
+
+        // Handle admin action
+        function handleAdminAction(action) {
+            const internalNote = document.getElementById('internalNote').value.trim();
+
+            if (action === 'approve') {
+                showNotification('Refund approved. Customer will be notified and funds will be returned.', 'success');
+            } else if (action === 'reject') {
+                if (!internalNote) {
+                    showNotification('Please add an internal note explaining the rejection reason.', 'error');
+                    return;
+                }
+                showNotification('Refund rejected. Customer and artisan have been notified.', 'info');
+            } else if (action === 'contact') {
+                showNotification('Opening communication channel with both parties...', 'info');
+            }
+        }
+
+        // Save internal note
+        function saveInternalNote() {
+            const note = document.getElementById('internalNote').value.trim();
+
+            if (!note) {
+                showNotification('Please enter a note before saving.', 'error');
+                return;
+            }
+
+            showNotification('Internal note saved successfully.', 'success');
+        }
+
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+
+            // Determine color based on type
+            let bgColor = '#c17c5f'; // terracotta for info
+            if (type === 'success') {
+                bgColor = '#16a34a'; // green for success
+            } else if (type === 'error') {
+                bgColor = '#dc2626'; // red for error
+            }
+
+            notification.className = 'fixed bottom-4 right-4 text-white px-6 py-3 rounded-xl shadow-lg z-50 transition-opacity duration-300';
+            notification.style.backgroundColor = bgColor;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
