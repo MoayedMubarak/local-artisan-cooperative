@@ -4,6 +4,13 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    if (!window.location.search.includes('id=')) {
+        const uid = sessionStorage.getItem('userId');
+        if (uid) {
+            window.location.replace(window.location.pathname + "?id=" + uid);
+            return;
+        }
+    }
     // ----------------------------------------------------------
     // 1. User Menu Dropdown (hover + click, with outside-click close)
     // ----------------------------------------------------------
@@ -101,24 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 4. Stat Cards — animated count-up on load
     // ----------------------------------------------------------
-    const statValues = [
-        { selector: '.stat-card:nth-child(1) h3', end: 24,   suffix: '',     duration: 800 },
-        { selector: '.stat-card:nth-child(2) h3', end: 8,    suffix: '',     duration: 600 },
-        { selector: '.stat-card:nth-child(3) h3', end: 5,    suffix: '',     duration: 600 },
-        { selector: '.stat-card:nth-child(4) h3', end: 3245, suffix: ' BD',  duration: 1200 },
-    ];
+    document.querySelectorAll('.stat-val').forEach(el => {
+        let endValText = el.getAttribute('data-end') || '0';
+        let end = parseFloat(endValText.replace(/[^0-9.]/g, '')) || 0;
+        let isFloat = endValText.includes('.');
+        let suffix = endValText.replace(/[0-9.,]/g, '').trim();
+        if (suffix) suffix = ' ' + suffix;
 
-    statValues.forEach(({ selector, end, suffix, duration }) => {
-        const el = document.querySelector(selector);
-        if (!el) return;
-
-        let start     = 0;
-        const step    = Math.ceil(end / (duration / 16)); // ~60fps
+        let start = 0;
+        let duration = 800; // ms
+        const step = Math.max(end / (duration / 16), 1); // ~60fps
         el.textContent = '0' + suffix;
 
         const timer = setInterval(() => {
             start = Math.min(start + step, end);
-            el.textContent = start.toLocaleString() + suffix;
+            if (isFloat) {
+                el.textContent = start.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + suffix;
+            } else {
+                el.textContent = Math.floor(start).toLocaleString() + suffix;
+            }
             if (start >= end) clearInterval(timer);
         }, 16);
     });

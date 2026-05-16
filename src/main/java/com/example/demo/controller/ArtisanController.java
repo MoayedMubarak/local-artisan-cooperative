@@ -93,6 +93,7 @@ public class ArtisanController {
                     .toList();
             model.addAttribute("pendingOrders", orders.stream().filter(o -> "pending".equalsIgnoreCase(o.getOrder().getStatus())).count());
             model.addAttribute("totalRevenue", orders.stream().mapToDouble(o -> o.getPrice() * o.getQuantity()).sum());
+            model.addAttribute("totalOrders", orders.size());
         });
 
         return "artisanAnalytics";

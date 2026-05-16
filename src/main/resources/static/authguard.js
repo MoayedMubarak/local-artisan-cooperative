@@ -273,6 +273,13 @@
   };
 
   function runAuthGuardInit() {
+    if (window.location.pathname.startsWith('/artisan') && !window.location.search.includes('id=')) {
+        const uid = sessionStorage.getItem('userId');
+        if (uid) {
+            window.location.replace(window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'id=' + uid);
+            return;
+        }
+    }
     window.updateNavAuthState();
     window.updateNotificationBadge();
     window.updateCartBadge();
