@@ -216,17 +216,13 @@ public class CartService {
         orderRepository.save(cart);
 
         // Send order confirmation notification
-        try {
-            notificationService.sendNotification(
-                customer,
-                "Order Confirmed!",
-                "Your order #" + cart.getOrderId() + " has been confirmed and is being processed.",
-                "ORDER_CONFIRM",
-                "/orders"
-            );
-        } catch (Exception e) {
-            System.err.println("Failed to send order notification: " + e.getMessage());
-        }
+        notificationService.sendNotification(
+            customer,
+            "Order Confirmed!",
+            "Your order #" + cart.getOrderId() + " has been confirmed and is being processed.",
+            "ORDER_CONFIRM",
+            "/orders"
+        );
 
         int orders = customer.getTotalOrders() != null ? customer.getTotalOrders() : 0;
         double spent = customer.getTotalSpent() != null ? customer.getTotalSpent() : 0.0;

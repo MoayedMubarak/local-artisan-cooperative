@@ -144,17 +144,13 @@ public class AuctionService {
 
         // Notify previous highest bidder
         if (auction.getHighestBidder() != null && !auction.getHighestBidder().getUserId().equals(bidderId)) {
-            try {
-                notificationService.sendNotification(
-                    auction.getHighestBidder(),
-                    "Outbid!",
-                    "Someone has placed a higher bid of " + bidAmount + " BD on " + auction.getProduct().getTitle(),
-                    "BID_OUTBID",
-                    "/auctions" // Link to auctions page
-                );
-            } catch (Exception e) {
-                System.err.println("Failed to send outbid notification: " + e.getMessage());
-            }
+            notificationService.sendNotification(
+                auction.getHighestBidder(),
+                "Outbid!",
+                "Someone has placed a higher bid of " + bidAmount + " BD on " + auction.getProduct().getTitle(),
+                "BID_OUTBID",
+                "/auctions" // Link to auctions page
+            );
         }
 
         boolean extended = false;
@@ -213,17 +209,13 @@ public class AuctionService {
                 } else if (DISPLAY_ENDED.equals(resolved) && DISPLAY_LIVE.equals(normalized)) {
                     // Auction Ended
                     if (auction.getHighestBidder() != null) {
-                        try {
-                            notificationService.sendNotification(
-                                auction.getHighestBidder(),
-                                "Auction Won!",
-                                "Congratulations! You won the auction for " + auction.getProduct().getTitle() + " with a bid of " + auction.getCurrentHighestBid() + " BD",
-                                "AUCTION_WON",
-                                "/orders"
-                            );
-                        } catch (Exception e) {
-                            System.err.println("Failed to send auction win notification: " + e.getMessage());
-                        }
+                        notificationService.sendNotification(
+                            auction.getHighestBidder(),
+                            "Auction Won!",
+                            "Congratulations! You won the auction for " + auction.getProduct().getTitle() + " with a bid of " + auction.getCurrentHighestBid() + " BD",
+                            "AUCTION_WON",
+                            "/orders"
+                        );
                     }
                 }
                 

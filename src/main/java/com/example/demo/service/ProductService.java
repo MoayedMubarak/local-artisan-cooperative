@@ -53,17 +53,13 @@ public class ProductService {
         List<WishlistItem> items = wishlistItemRepository.findByProduct(product);
         for (WishlistItem item : items) {
             if (item.getWishlist() != null && item.getWishlist().getCustomer() != null) {
-                try {
-                    notificationService.sendNotification(
-                        item.getWishlist().getCustomer(),
-                        title,
-                        message,
-                        "WISHLIST_UPDATE",
-                        "/product-details?id=" + product.getId()
-                    );
-                } catch (Exception e) {
-                    System.err.println("Failed to send wishlist notification: " + e.getMessage());
-                }
+                notificationService.sendNotification(
+                    item.getWishlist().getCustomer(),
+                    title,
+                    message,
+                    "WISHLIST_UPDATE",
+                    "/product-details?id=" + product.getId()
+                );
             }
         }
     }
