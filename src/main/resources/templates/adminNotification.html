@@ -221,11 +221,11 @@
             
             <!-- Right Side - Notifications and User -->
             <div class="flex items-center space-x-4">
-                <!-- Notification Bell -->
-                <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
+                 <!-- Notification Bell -->
+                <a href="/adminNotification"><button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
                     <i class="fas fa-bell text-xl"></i>
                     <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
-                </button>
+                </button></a>
                 
                 <!-- User Profile -->
                 <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
@@ -322,7 +322,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/adminNotification" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                        <a href="/adminReports" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-file-alt w-5"></i>
                             <span>Reports</span>
                         </a>
@@ -652,53 +652,10 @@
     </div>
 
     <script>
-        // Sidebar navigation active state handling
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-// Remove active state from all links
-                document.querySelectorAll('.sidebar-link').forEach(l => {
-                    l.classList.remove('active');
-                    l.classList.remove('text-white');
-                    l.classList.add('text-[#d4c5b5]');
-                });
-
-                // Add active state to clicked link
-                this.classList.add('active');
-                this.classList.remove('text-[#d4c5b5]');
-            });
-        });
+        /* Sidebar handled by adminDashboard.js */
 
         // User profile logout dropdown
-        const userMenuButton = document.getElementById('userMenuButton');
-        const userMenuDropdown = document.getElementById('userMenuDropdown');
-        const chevronIcon = document.getElementById('chevronIcon');
-        const logoutButton = document.getElementById('logoutButton');
-        const userMenu = document.querySelector('.user-menu');
-        let hideTimeout;
-
-        const showUserMenu = () => {
-            clearTimeout(hideTimeout);
-            userMenuDropdown.classList.add('show');
-            chevronIcon.classList.add('rotated');
-        };
-
-        const hideUserMenu = () => {
-            hideTimeout = setTimeout(() => {
-                userMenuDropdown.classList.remove('show');
-                chevronIcon.classList.remove('rotated');
-            }, 150);
-        };
-
-        userMenu.addEventListener('mouseenter', showUserMenu);
-        userMenu.addEventListener('mouseleave', hideUserMenu);
-
-        logoutButton.addEventListener('click', () => {
-            const confirmed = window.confirm('Are you sure you want to logout?');
-            if (confirmed) {
-                sessionStorage.clear();
-                window.location.replace('/index');
-            }
-        });
+        /* User menu handled by adminDashboard.js */
 
         // Tab switching
         function switchTab(tab) {
@@ -792,5 +749,6 @@
             });
         }
     </script>
+    <script src="/adminDashboard.js"></script>
 </body>
 </html>
