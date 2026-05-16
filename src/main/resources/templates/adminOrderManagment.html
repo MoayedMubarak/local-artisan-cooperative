@@ -155,6 +155,7 @@
             font-weight: 500;
         }
     </style>
+    <script src="/authguard.js"></script>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Top Navigation Bar -->
@@ -862,7 +863,8 @@
         logoutButton.addEventListener('click', () => {
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
-                sessionStorage.clear(); window.location.href = '/index';
+                sessionStorage.clear();
+                window.location.replace('/index');
             }
         });
                 // Remove active class from all links
@@ -876,6 +878,14 @@
                 this.classList.remove('text-[#d4c5b5]');
             });
         });
+    </script>
+    <script>
+        if (window.initAuthGuard) {
+            initAuthGuard({
+                redirectTo: "/login",
+                message: "Administrator access required. Please login."
+            });
+        }
     </script>
 </body>
 </html>

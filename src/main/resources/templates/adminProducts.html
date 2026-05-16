@@ -195,6 +195,7 @@
             box-shadow: 0 0 0 2px #c17c5f;
         }
     </style>
+    <script src="/authguard.js"></script>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Top Navigation Bar -->
@@ -1120,6 +1121,14 @@
                     notification.remove();
                 }, 300);
             }, 3000);
+        }
+    </script>
+    <script>
+        if (window.initAuthGuard) {
+            initAuthGuard({
+                redirectTo: "/login",
+                message: "Administrator access required. Please login."
+            });
         }
     </script>
 </body>

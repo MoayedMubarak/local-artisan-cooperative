@@ -326,6 +326,7 @@
             overflow-x: auto;
         }
     </style>
+    <script src="/authguard.js"></script>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Top Navigation Bar -->
@@ -1261,7 +1262,8 @@ Reviews: 15,284 records
         logoutButton.addEventListener('click', () => {
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
-                sessionStorage.clear(); window.location.href = '/index';
+                sessionStorage.clear();
+                window.location.replace('/index');
             }
         });
 
@@ -1463,6 +1465,14 @@ Reviews: 15,284 records
                     notification.remove();
                 }, 300);
             }, 3000);
+        }
+    </script>
+    <script>
+        if (window.initAuthGuard) {
+            initAuthGuard({
+                redirectTo: "/login",
+                message: "Administrator access required. Please login."
+            });
         }
     </script>
 </body>

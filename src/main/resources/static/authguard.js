@@ -137,6 +137,16 @@
     const userMenuBtn = document.getElementById('user-menu-button') || document.getElementById('userMenuButton') || document.querySelector('a[href="/profile"]');
     const loggedIn = getLoggedIn();
     const storedEmail = sessionStorage.getItem('userEmail');
+    const userRole = (sessionStorage.getItem('userRole') || '').toUpperCase();
+
+    // Protection for admin pages
+    const isUnderAdminPath = window.location.pathname.toLowerCase().includes('admin');
+    if (isUnderAdminPath && userRole !== 'ADMIN') {
+        console.warn("Unauthorized admin access attempt.");
+        sessionStorage.clear();
+        window.location.replace('/login?message=Unauthorized');
+        return;
+    }
 
     if (loggedIn && storedEmail) {
       // Sync with server in background
@@ -285,6 +295,7 @@
         if (userRole === 'ADMIN') {
             const isAdminPage = path.includes('admin');
             const isLoginPage = path.includes('login');
+            // If an Admin is on a public page (like /index), force them back to the dashboard.
             if (!isAdminPage && !isLoginPage) {
                 window.location.replace('/adminDashboard');
                 return;

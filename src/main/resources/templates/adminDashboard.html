@@ -158,6 +158,7 @@
             transition: height 0.5s ease;
         }
     </style>
+    <script src="/authguard.js"></script>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Top Navigation Bar -->
@@ -673,9 +674,18 @@
         logoutButton.addEventListener('click', () => {
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
-                window.location.href = '/index';
+                sessionStorage.clear();
+                window.location.replace('/index');
             }
         });
+    </script>
+    <script>
+        if (window.initAuthGuard) {
+            initAuthGuard({
+                redirectTo: "/login",
+                message: "Administrator access required. Please login."
+            });
+        }
     </script>
 </body>
 </html>
