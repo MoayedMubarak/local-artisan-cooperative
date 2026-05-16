@@ -328,7 +328,8 @@
                         <label th:each="cat : ${categories}" class="flex items-center cursor-pointer group">
                             <div class="relative">
                                 <input type="radio" name="category" th:value="${#strings.toLowerCase(cat)}" class="custom-radio sr-only" 
-                                       th:onclick="'_activeCategory=\'' + ${#strings.toLowerCase(cat)} + '\'; applyFilters();'">
+                                       th:data-cat="${#strings.toLowerCase(cat)}"
+                                       onclick="_activeCategory=this.getAttribute('data-cat'); applyFilters();">
                                 <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
                             </div>
                             <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors" th:text="${cat}">Category</span>
@@ -378,7 +379,8 @@
                         <button th:each="cat : ${categories}" 
                                 class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm whitespace-nowrap" 
                                 th:text="${cat}"
-                                th:onclick="'filterCategory(this, \'' + ${#strings.toLowerCase(cat)} + '\')'">
+                                th:data-cat="${#strings.toLowerCase(cat)}"
+                                onclick="filterCategory(this, this.getAttribute('data-cat'))">
                             Category
                         </button>
                     </div>
