@@ -286,9 +286,55 @@
                         </div>
                     </div>
                 </div>
-                
+                <!-- Status Filter -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Status</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" class="custom-checkbox sr-only">
+                            <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded flex items-center justify-center mr-3 group-hover:border-[#c17c5f] transition-colors">
+                                <i class="fas fa-check text-xs text-white opacity-0 checkbox-icon"></i>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Live Now</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" class="custom-checkbox sr-only">
+                            <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded flex items-center justify-center mr-3 group-hover:border-[#c17c5f] transition-colors">
+                                <i class="fas fa-check text-xs text-white opacity-0 checkbox-icon"></i>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Upcoming</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" class="custom-checkbox sr-only">
+                            <div class="w-5 h-5 border-2 border-[#e5e0d8] rounded flex items-center justify-center mr-3 group-hover:border-[#c17c5f] transition-colors">
+                                <i class="fas fa-check text-xs text-white opacity-0 checkbox-icon"></i>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">Ended</span>
+                        </label>
+                    </div>
+                </div>
 
-            </div>
+                <!-- Category Filter -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Categories</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" value="all" class="custom-radio sr-only" checked onclick="_activeCategory='all'; applyFilters();">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors">All</span>
+                        </label>
+                        <label th:each="cat : ${categories}" class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="radio" name="category" th:value="${#strings.toLowerCase(cat)}" class="custom-radio sr-only" 
+                                       th:onclick="'_activeCategory=\'' + ${#strings.toLowerCase(cat)} + '\'; applyFilters();'">
+                                <div class="w-4 h-4 border-2 border-[#e5e0d8] rounded-full mr-3 group-hover:border-[#c17c5f] transition-colors"></div>
+                            </div>
+                            <span class="text-[#5c4a3d] group-hover:text-[#c17c5f] transition-colors" th:text="${cat}">Category</span>
+                        </label>
+                    </div>
+                </div>
         </aside>
 
         <!-- Main Content: Auctions Browse -->
@@ -324,27 +370,17 @@
             <div class="bg-white rounded-xl p-4 card-shadow mb-6">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <!-- Category Pills -->
-                    <div class="flex items-center cursor-pointer group gap-2">
-                        <button class="filter-pill active px-4 py-2 rounded-full border-2 font-medium text-sm" onclick="filterCategory(this, 'all')">
+                    <div class="flex items-center cursor-pointer group gap-2 overflow-x-auto pb-2 no-scrollbar">
+                        <button class="filter-pill active px-4 py-2 rounded-full border-2 font-medium text-sm whitespace-nowrap" 
+                                onclick="filterCategory(this, 'all')">
                             All
                         </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm" onclick="filterCategory(this, 'ceramics')">
-                            Ceramics
+                        <button th:each="cat : ${categories}" 
+                                class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm whitespace-nowrap" 
+                                th:text="${cat}"
+                                th:onclick="'filterCategory(this, \'' + ${#strings.toLowerCase(cat)} + '\')'">
+                            Category
                         </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm" onclick="filterCategory(this, 'jewelry')">
-                            Jewelry
-                        </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm" onclick="filterCategory(this, 'paintings')">
-                            Paintings
-                        </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm" onclick="filterCategory(this, 'textiles')">
-                            Textiles
-                        </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 font-medium text-sm" onclick="filterCategory(this, 'woodwork')">
-                            Woodwork
-                        </button>
-
-                        
                     </div>
                     
                     <!-- Sort Dropdown -->
@@ -364,14 +400,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="auction-grid">
                 <!-- Dynamic Auction Cards -->
                 <div th:each="auction : ${auctions}" 
+                     th:if="${auction.product != null}"
                      class="auction-card bg-white rounded-xl card-shadow overflow-hidden" 
-                     th:with="displayStatus=${@auctionService.resolveDisplayStatus(auction)}"
+                     th:with="displayStatus=${@auctionService.resolveDisplayStatus(auction)}, catName=${auction.product.productCategory != null ? auction.product.productCategory.name : (auction.product.category != null ? auction.product.category : 'other')}"
                      th:classappend="${displayStatus == 'ENDED' ? 'ended' : ''}"
-                     th:attr="data-category=${#strings.toLowerCase(auction.product.category)}, data-auction-id=${auction.id}, data-auction-status=${displayStatus}">
+                     th:attr="data-category=${#strings.toLowerCase(catName)}, data-auction-id=${auction.id}, data-auction-status=${displayStatus}">
                     
                     <div class="relative">
                         <img 
-                            th:src="${auction.product.imageUrl}" 
+                            th:src="${auction.product.imageUrl != null ? auction.product.imageUrl : '/images/placeholder.png'}" 
                             th:alt="${auction.product.title}" 
                             class="w-full h-48 object-cover cursor-pointer"
                         />
@@ -414,7 +451,7 @@
                             <span th:if="${displayStatus == 'LIVE'}" 
                                   class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
                                 <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" 
+                                <span class="countdown" th:if="${auction.endTime != null}"
                                       th:attr="data-hours=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toHours()}, 
                                                data-minutes=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toMinutesPart()}, 
                                                data-seconds=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toSecondsPart()}"
