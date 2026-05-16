@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Auction;
+import com.example.demo.model.Customer;
+import com.example.demo.model.User;
 import com.example.demo.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
