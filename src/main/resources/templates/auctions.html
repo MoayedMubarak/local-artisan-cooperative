@@ -8,92 +8,92 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap');
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #faf9f6;
         }
-        
+
         h1, h2, h3, h4 {
             font-family: 'Playfair Display', serif;
         }
-        
+
         .terracotta {
             color: #c17c5f;
         }
-        
+
         .bg-terracotta {
             background-color: #c17c5f;
         }
-        
+
         .bg-terracotta-dark {
             background-color: #a5664d;
         }
-        
+
         .hover\:bg-terracotta-dark:hover {
             background-color: #a5664d;
         }
-        
+
         .border-terracotta {
             border-color: #c17c5f;
         }
-        
+
         .text-earth {
             color: #8b7355;
         }
-        
+
         .bg-earth {
             background-color: #8b7355;
         }
-        
+
         .card-shadow {
             box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
         }
-        
+
         .card-shadow:hover {
             box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15), 0 4px 6px -2px rgba(139, 115, 85, 0.1);
         }
-        
+
         .filter-pill {
             transition: all 0.2s ease;
         }
-        
+
         .filter-pill.active {
             background-color: #c17c5f;
             color: white;
             border-color: #c17c5f;
         }
-        
+
         .filter-pill:not(.active) {
             background-color: white;
             color: #8b7355;
             border-color: #e5e0d8;
         }
-        
+
         .filter-pill:not(.active):hover {
             border-color: #c17c5f;
             color: #c17c5f;
         }
-        
+
         .tab-pill {
             transition: all 0.2s ease;
             cursor: pointer;
         }
-        
+
         .tab-pill.active {
             background-color: #c17c5f;
             color: white;
         }
-        
+
         .tab-pill:not(.active) {
             background-color: transparent;
             color: #8b7355;
         }
-        
+
         .tab-pill:not(.active):hover {
             color: #c17c5f;
         }
-        
+
         /* Pulsing animation for LIVE badge */
         @keyframes pulse-red {
             0%, 100% {
@@ -105,30 +105,30 @@
                 transform: scale(1.05);
             }
         }
-        
+
         .live-badge {
             animation: pulse-red 2s infinite;
         }
-        
+
         .form-input {
             transition: all 0.2s ease;
         }
-        
+
         .form-input:focus {
             border-color: #c17c5f;
             outline: none;
             box-shadow: 0 0 0 3px rgba(193, 124, 95, 0.1);
         }
-        
+
         .auction-card {
             transition: all 0.3s ease;
         }
-        
+
         .auction-card.ended {
             opacity: 0.7;
             filter: grayscale(0.5);
         }
-        
+
         .auction-card.ended:hover {
             box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1);
         }
@@ -273,7 +273,7 @@
                         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#b8a99a]"></i>
                     </div>
                 </div>
-                
+
                 <!-- Price Range Slider -->
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-[#5c4a3d] mb-3">Bid Range</h3>
@@ -384,7 +384,7 @@
                             Category
                         </button>
                     </div>
-                    
+
                     <!-- Sort Dropdown -->
                     <div class="flex items-center gap-3">
                         <label class="text-[#5c4a3d] font-medium text-sm whitespace-nowrap">Sort by:</label>
@@ -407,14 +407,14 @@
                      th:with="displayStatus=${@auctionService.resolveDisplayStatus(auction)}, catName=${auction.product.productCategory != null ? auction.product.productCategory.name : (auction.product.category != null ? auction.product.category : 'other')}"
                      th:classappend="${displayStatus == 'ENDED' ? 'ended' : ''}"
                      th:attr="data-category=${#strings.toLowerCase(catName)}, data-auction-id=${auction.id}, data-auction-status=${displayStatus}">
-                    
+
                     <div class="relative">
                         <img 
                             th:src="${auction.product.imageUrl != null ? auction.product.imageUrl : '/images/placeholder.png'}" 
                             th:alt="${auction.product.title}" 
                             class="w-full h-48 object-cover cursor-pointer"
                         />
-                        
+
                         <!-- Status Badge -->
                         <span th:if="${displayStatus == 'LIVE'}" 
                               class="live-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
@@ -430,13 +430,13 @@
                             ENDED
                         </span>
                     </div>
-                    
+
                     <div class="p-4">
                         <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1 truncate cursor-pointer hover:text-[#c17c5f] transition-colors"
                             th:text="${auction.product.title}">Handcrafted Ceramic Vase</h3>
                         <p class="text-sm text-[#8b7355] mb-3 truncate" 
                            th:text="'by ' + ${auction.product.artisanName}">by Elena Martinez</p>
-                        
+
                         <div class="flex items-end justify-between mb-3">
                             <div>
                                 <p class="text-xs text-[#8b7355] uppercase tracking-wide" 
@@ -446,7 +446,7 @@
                                    th:text="${#numbers.formatDecimal(auction.currentHighestBid, 0, 0)} + ' BD'">53 BD</p>
                             </div>
                         </div>
-                        
+
                         <!-- Time/Status Info -->
                         <div class="flex items-center justify-between mb-4">
                             <!-- Countdown for Live -->
@@ -454,31 +454,35 @@
                                   class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
                                 <i class="far fa-clock mr-1.5"></i>
                                 <span class="countdown" th:if="${auction.endTime != null}"
-                                      th:attr="data-hours=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toHours()}, 
-                                               data-minutes=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toMinutesPart()}, 
-                                               data-seconds=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toSecondsPart()}"
-                                      th:text="${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toHours()} + 'h ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime).toMinutesPart()} + 'm'">
+                                      th:with="dur=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime)},
+                                               hrs=${dur.isNegative() ? 0 : dur.toHours()},
+                                               mins=${dur.isNegative() ? 0 : dur.toMinutesPart()},
+                                               secs=${dur.isNegative() ? 0 : dur.toSecondsPart()}"
+                                      th:attr="data-hours=${hrs}, data-minutes=${mins}, data-seconds=${secs}"
+                                      th:text="${hrs} + 'h ' + ${mins} + 'm'">
                                     2h 34m
                                 </span>
                             </span>
-                            
+
                             <!-- Starts in for Upcoming -->
                             <span th:if="${displayStatus == 'UPCOMING'}" 
                                   class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full">
                                 <i class="far fa-calendar mr-1.5"></i>
-                                <span th:text="'Starts in ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + 'd'">Starts in 1d</span>
+                                <span th:if="${auction.startTime != null}"
+                                      th:text="'Starts in ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + 'd'">Starts in 1d</span>
+                                <span th:if="${auction.startTime == null}">Upcoming</span>
                             </span>
-                            
+
                             <!-- Sold for Ended -->
                             <span th:if="${displayStatus == 'ENDED'}" 
                                   class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm font-semibold rounded-full">
                                 <i class="fas fa-check mr-1.5"></i>
                                 Sold
                             </span>
-                            
+
                             <span class="text-xs text-[#8b7355]">12 bids</span>
                         </div>
-                        
+
                         <!-- Action Buttons -->
                         <div class="flex flex-col gap-2" th:if="${displayStatus == 'LIVE'}">
                             <a th:href="@{/ProductDetailsAuction(id=${auction.id})}" 
@@ -520,7 +524,7 @@
     </div>
 
     <script src="/authguard.js"></script>
-    
+
     <!-- All JS logic is handled by auctions.js -->
     <script src="/auctions.js?v=4"></script>
 </body>
