@@ -48,7 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logout confirmation
     logoutButton?.addEventListener('click', () => {
         if (confirm('Are you sure you want to logout?')) {
-            window.location.href = '/';
+            if (typeof window.artisanLogout === 'function') {
+                window.artisanLogout();
+            } else {
+                window.location.href = '/login';
+            }
         }
     });
 
@@ -99,32 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 4. Stat Cards — animated count-up on load
-    // ----------------------------------------------------------
-    const statValues = [
-        { selector: '.stat-card:nth-child(1) h3', end: 24,   suffix: '',     duration: 800 },
-        { selector: '.stat-card:nth-child(2) h3', end: 8,    suffix: '',     duration: 600 },
-        { selector: '.stat-card:nth-child(3) h3', end: 5,    suffix: '',     duration: 600 },
-        { selector: '.stat-card:nth-child(4) h3', end: 3245, suffix: ' BD',  duration: 1200 },
-    ];
-
-    statValues.forEach(({ selector, end, suffix, duration }) => {
-        const el = document.querySelector(selector);
-        if (!el) return;
-
-        let start     = 0;
-        const step    = Math.ceil(end / (duration / 16)); // ~60fps
-        el.textContent = '0' + suffix;
-
-        const timer = setInterval(() => {
-            start = Math.min(start + step, end);
-            el.textContent = start.toLocaleString() + suffix;
-            if (start >= end) clearInterval(timer);
-        }, 16);
-    });
-
-    // ----------------------------------------------------------
-    // 5. Recent Orders — "View" buttons → /artisanOrderDetail?id=
+    // 4. Recent Orders — "View" buttons → /artisanOrderDetail?id=
     // ----------------------------------------------------------
     document.querySelectorAll('tbody .table-row').forEach(row => {
         const viewBtn = row.querySelector('button');
@@ -196,8 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (text) text.textContent = 'Get your sales summary';
 
             // Trigger download (in production this would be a real API endpoint)
+            const revenueEl = document.querySelector('.stat-card:nth-child(4) h3');
+            const productsEl = document.querySelector('.stat-card:nth-child(1) h3');
+            const auctionsEl = document.querySelector('.stat-card:nth-child(2) h3');
+            const pendingEl = document.querySelector('.stat-card:nth-child(3) h3');
             const blob = new Blob(
-                [`Artisan Sales Report\nGenerated: ${new Date().toLocaleString()}\n\nTotal Revenue: 3,245 BD\nTotal Products: 24\nActive Auctions: 8\nPending Orders: 5`],
+                [`Artisan Sales Report\nGenerated: ${new Date().toLocaleString()}\n\nTotal Revenue: ${revenueEl?.textContent?.trim() || '0 BD'}\nTotal Products: ${productsEl?.textContent?.trim() || '0'}\nActive Auctions: ${auctionsEl?.textContent?.trim() || '0'}\nPending Orders: ${pendingEl?.textContent?.trim() || '0'}`],
                 { type: 'text/plain' }
             );
             const url = URL.createObjectURL(blob);

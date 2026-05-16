@@ -328,7 +328,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Total Revenue</h3>
-                    <p class="text-3xl font-bold text-[#5c4a3d]">BD 2,847.50</p>
+                    <p class="text-3xl font-bold text-[#5c4a3d]">BD <span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span></p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
@@ -344,7 +344,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Total Orders</h3>
-                    <p class="text-3xl font-bold text-[#5c4a3d]">47</p>
+                    <p class="text-3xl font-bold text-[#5c4a3d]" th:text="${ordersCount}">0</p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
@@ -356,8 +356,8 @@
                         </div>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Top Product</h3>
-                    <p class="text-lg font-bold text-[#5c4a3d] truncate">Handcrafted Ceramic Vase</p>
-                    <p class="text-xs text-[#8b7355] mt-2">23 units sold</p>
+                    <p class="text-lg font-bold text-[#5c4a3d] truncate" th:text="${productsCount != null and productsCount > 0 ? '—' : 'No products yet'}">No products yet</p>
+                    <p class="text-xs text-[#8b7355] mt-2" th:text="${productsCount != null and productsCount > 0 ? (productsCount + ' products listed') : 'Add products to see stats'}">Add products to see stats</p>
                 </div>
 
                 <!-- Average Rating -->
@@ -373,7 +373,7 @@
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Average Rating</h3>
                     <div class="flex items-center gap-2">
-                        <p class="text-3xl font-bold text-[#5c4a3d]">4.8</p>
+                        <p class="text-3xl font-bold text-[#5c4a3d]">—</p>
                         <div class="flex star-rating">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -759,5 +759,6 @@
             }
         });
     </script>
+    <script src="/artisan-common.js"></script>
 </body>
 </html>

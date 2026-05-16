@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const userRole = (data.user.role || '').toUpperCase();
                 if (!next && userRole === 'ARTISAN') {
-                    window.location.href = '/artisanDashboard';
+                    window.location.href = `/artisanDashboard?id=${data.user.userId}`;
                 } else {
                     window.location.href = next || '/index';
                 }
@@ -175,6 +175,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = passwords[0].value;
             const shopName = form.querySelectorAll('input[type="text"]')[1]?.value;
             const biography = form.querySelector('textarea')?.value;
+            const profileInput = document.getElementById('artisan-profile-picture') ||
+                form.querySelector('#artisan-profile-upload input[type="file"]') ||
+                form.querySelectorAll('input[type="file"]')[0];
+
+            let profilePicture = null;
+            if (profileInput?.files?.length) {
+                try {
+                    profilePicture = await readFileAsDataUrl(profileInput.files[0]);
+                } catch (err) {
+                    showFormError(form, err.message || 'Could not read profile picture.');
+                    resetButtonLoading(submitBtn, 'Send Request to Create Artisan Account');
+                    return;
+                }
+            }
 
             payload = {
                 name: fullName,
@@ -184,6 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 shopName: shopName,
                 biography: biography
             };
+            if (profilePicture) {
+                payload.profilePicture = profilePicture;
+            }
             endpoint = '/api/auth/register/artisan';
         } else {
             const fullName = inputs[0].value;
@@ -211,9 +228,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok && data.success) {
                 if (isArtisan) {
-                    showToast('Your artisan account request has been submitted for review!', 'success');
-                    resetButtonLoading(submitBtn, 'Send Request to Create Artisan Account');
-                    form.reset();
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userEmail', data.user.email);
+                    sessionStorage.setItem('userName', data.user.name);
+                    sessionStorage.setItem('userRole', data.user.role);
+                    sessionStorage.setItem('userId', data.user.userId);
+                    sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+
+                    showToast('Artisan account created! Welcome to ArtsyVibe.', 'success');
+                    setTimeout(() => {
+                        window.location.href = `/artisanDashboard?id=${data.user.userId}`;
+                    }, 1200);
                 } else {
                     sessionStorage.setItem('loggedIn', 'true');
                     sessionStorage.setItem('isLoggedIn', 'true');
@@ -351,6 +377,19 @@ function resetButtonLoading(btn, text) {
 function updateFileLabel(area, filename) {
     const para = area.querySelector('p');
     if (para) para.textContent = `Selected: ${filename}`;
+}
+
+function readFileAsDataUrl(file) {
+    const maxBytes = 2 * 1024 * 1024;
+    if (file.size > maxBytes) {
+        return Promise.reject(new Error('Profile picture must be 2MB or smaller.'));
+    }
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Could not read profile picture.'));
+        reader.readAsDataURL(file);
+    });
 }
 
 function showToast(message, type = 'info') {

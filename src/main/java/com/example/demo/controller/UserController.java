@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Artisan;
 import com.example.demo.model.Customer;
 import com.example.demo.model.User;
+import com.example.demo.repository.ArtisanRepository;
 import com.example.demo.repository.CustomerRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class UserController {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private ArtisanRepository artisanRepository;
+
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@RequestParam String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
@@ -31,6 +36,11 @@ public class UserController {
         if (user instanceof Customer) {
             return customerRepository.findByEmail(email)
                     .map(customer -> ResponseEntity.ok(Map.of("success", true, "user", customer)))
+                    .orElse(ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found")));
+        }
+        if (user instanceof Artisan || "ARTISAN".equalsIgnoreCase(user.getRole())) {
+            return artisanRepository.findByEmail(email)
+                    .map(artisan -> ResponseEntity.ok(Map.of("success", true, "user", artisan)))
                     .orElse(ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found")));
         }
         return ResponseEntity.ok(Map.of("success", true, "user", user));
@@ -49,6 +59,11 @@ public class UserController {
             if (user instanceof Customer) {
                 return customerRepository.findByEmail(email)
                         .map(customer -> ResponseEntity.ok(Map.of("success", true, "user", customer)))
+                        .orElse(ResponseEntity.ok(Map.of("success", true, "user", user)));
+            }
+            if (user instanceof Artisan || "ARTISAN".equalsIgnoreCase(user.getRole())) {
+                return artisanRepository.findByEmail(email)
+                        .map(artisan -> ResponseEntity.ok(Map.of("success", true, "user", artisan)))
                         .orElse(ResponseEntity.ok(Map.of("success", true, "user", user)));
             }
             return ResponseEntity.ok(Map.of("success", true, "user", user));

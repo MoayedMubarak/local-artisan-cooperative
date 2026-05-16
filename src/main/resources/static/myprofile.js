@@ -90,6 +90,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (shopNameInput) shopNameInput.value = userProfile.shopName || '';
                 if (bioTextarea) bioTextarea.value = userProfile.biography || '';
             }
+
+            const customerTabs = document.getElementById('customer-account-tabs');
+            if (customerTabs) {
+                customerTabs.innerHTML = `
+                    <div class="flex flex-wrap gap-2">
+                        <a href="/artisanDashboard?id=${sessionStorage.getItem('userId') || ''}" class="px-4 py-2 bg-[#faf9f6] text-[#8b7355] hover:text-[#c17c5f] rounded-lg font-medium transition-colors">
+                            <i class="fas fa-chart-line mr-2"></i>Artisan Dashboard
+                        </a>
+                        <a href="/profile" class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium transition-colors">
+                            <i class="fas fa-user mr-2"></i>My Profile
+                        </a>
+                    </div>`;
+            }
+
+            const cartLink = document.getElementById('cart-link');
+            if (cartLink) cartLink.classList.add('hidden');
+
+            const notificationsLink = document.getElementById('notifications-link');
+            if (notificationsLink) notificationsLink.href = '/artisanNotification?id=' + (sessionStorage.getItem('userId') || '');
         }
 
         const statsSection = document.getElementById('profile-stats-section');

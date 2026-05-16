@@ -320,140 +320,10 @@
 
                 <!-- Notification Cards -->
                 <div class="divide-y divide-[#e5e0d8]">
-                    <!-- Notification 1: New Order (Unread) -->
-                    <div class="notification-card unread p-4 flex items-start gap-4 cursor-pointer" data-type="orders" data-read="false" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#fef3c7] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-shopping-bag text-xl text-[#c17c5f]"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">New Order Received</h3>
-                            <p class="text-sm text-[#8b7355]">John Doe placed an order for Handcrafted Ceramic Vase — BD 85.000</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            10 minutes ago
-                        </div>
-                    </div>
-
-                    <!-- Notification 2: New Bid (Unread) -->
-                    <div class="notification-card unread p-4 flex items-start gap-4 cursor-pointer" data-type="auctions" data-read="false" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#fef3c7] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-gavel text-xl text-amber-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">New Bid Placed on Your Auction</h3>
-                            <p class="text-sm text-[#8b7355]">Sarah Miller bid BD 150.000 on your Ceramic Bowl Set auction</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            25 minutes ago
-                        </div>
-                    </div>
-
-                    <!-- Notification 3: New Review (Unread) -->
-                    <div class="notification-card unread p-4 flex items-start gap-4 cursor-pointer" data-type="reviews" data-read="false" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#d1fae5] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-star text-xl text-green-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">New Review Posted on Your Product</h3>
-                            <p class="text-sm text-[#8b7355]">Michael Kim gave 5 stars to Artisan Tea Set — "Beautiful craftsmanship!"</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            1 hour ago
-                        </div>
-                    </div>
-
-                    <!-- Notification 4: Order Shipped (Read) -->
-                    <div class="notification-card p-4 flex items-start gap-4 cursor-pointer" data-type="orders" data-read="true" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-transparent rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#fef3c7] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-shipping-fast text-xl text-[#c17c5f]"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">Order Shipped Successfully</h3>
-                            <p class="text-sm text-[#8b7355]">Your order #ORD-2831 has been marked as shipped and is on its way to Emily Watson</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            3 hours ago
-                        </div>
-                    </div>
-
-                    <!-- Notification 5: Auction Ended (Unread) -->
-                    <div class="notification-card unread p-4 flex items-start gap-4 cursor-pointer" data-type="auctions" data-read="false" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#fef3c7] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-trophy text-xl text-amber-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">Auction Ended with Winner</h3>
-                            <p class="text-sm text-[#8b7355]">Congratulations! David Lee won your Decorative Plant Pot auction with BD 65.000</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            5 hours ago
-                        </div>
-                    </div>
-
-                    <!-- Notification 6: Refund Request (Read) -->
-                    <div class="notification-card p-4 flex items-start gap-4 cursor-pointer" data-type="orders" data-read="true" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-transparent rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#fee2e2] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-undo text-xl text-red-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">Refund Request Received</h3>
-                            <p class="text-sm text-[#8b7355]">Anna Brown requested a refund for Rustic Mug Set — Order #ORD-2789</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            Yesterday
-                        </div>
-                    </div>
-
-                    <!-- Notification 7: System Maintenance (Read) -->
-                    <div class="notification-card p-4 flex items-start gap-4 cursor-pointer" data-type="system" data-read="true" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-transparent rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#dbeafe] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-info-circle text-xl text-blue-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">Scheduled Maintenance Notice</h3>
-                            <p class="text-sm text-[#8b7355]">The platform will undergo maintenance on March 20th from 2:00 AM to 4:00 AM AST</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            2 days ago
-                        </div>
-                    </div>
-
-                    <!-- Notification 8: New Order (Read) -->
-                    <div class="notification-card p-4 flex items-start gap-4 cursor-pointer" data-type="orders" data-read="true" onclick="markAsRead(this)">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 bg-transparent rounded-full"></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#fef3c7] rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-shopping-bag text-xl text-[#c17c5f]"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-[#5c4a3d] mb-1">New Order Received</h3>
-                            <p class="text-sm text-[#8b7355]">Robert Johnson placed an order for Ceramic Serving Platter — BD 110.000</p>
-                        </div>
-                        <div class="flex-shrink-0 text-sm text-[#8b7355]">
-                            3 days ago
-                        </div>
+                    <div class="p-12 text-center text-[#8b7355]">
+                        <i class="fas fa-bell-slash text-4xl mb-3 text-[#d4c5b5] block"></i>
+                        <p class="font-medium text-[#5c4a3d]">No notifications yet</p>
+                        <p class="text-sm mt-1">You will be notified about orders, auctions, and reviews here.</p>
                     </div>
                 </div>
             </div>
@@ -580,5 +450,6 @@
             }
         });
     </script>
+    <script src="/artisan-common.js"></script>
 </body>
 </html>

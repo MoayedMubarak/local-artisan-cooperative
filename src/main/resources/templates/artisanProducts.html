@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -354,193 +354,41 @@
                                 <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#e5e0d8]">
-                            <!-- Product 1 -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <img 
-                                        src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop" 
-                                        alt="Handcrafted Ceramic Vase" 
-                                        class="w-16 h-16 rounded-lg object-cover"
-                                    />
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div>
-                                        <h3 class="font-semibold text-[#5c4a3d]">Handcrafted Ceramic Vase</h3>
-                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">85.00 BD</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">12 in stock</td> 
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active">Active</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
+                                                <tbody class="divide-y divide-[#e5e0d8]">
+                            <tr th:if="${products == null or products.isEmpty()}" class="table-row">
+                                <td colspan="6" class="px-6 py-12 text-center text-[#8b7355]">
+                                    <i class="fas fa-box-open text-4xl mb-3 text-[#d4c5b5] block"></i>
+                                    <p class="font-medium text-[#5c4a3d]">No products yet</p>
+                                    <p class="text-sm mt-1">Add your first product to start selling.</p>
                                 </td>
                             </tr>
-
-                            <!-- Product 2 -->
-                            <tr class="table-row">
+                            <tr th:each="product : ${products}" class="table-row">
                                 <td class="px-6 py-4">
-                                    <img 
-                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f925f40?w=80&h=80&fit=crop" 
-                                        alt="Ceramic Bowl Set" 
-                                        class="w-16 h-16 rounded-lg object-cover"
-                                    />
+                                    <img th:src="${product.imageUrl != null and !product.imageUrl.isEmpty() ? product.imageUrl : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
+                                         th:alt="${product.title}"
+                                         class="w-16 h-16 rounded-lg object-cover" />
                                 </td>
                                 <td class="px-6 py-4">
                                     <div>
-                                        <h3 class="font-semibold text-[#5c4a3d]">Ceramic Bowl Set</h3>
-                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
+                                        <h3 class="font-semibold text-[#5c4a3d]" th:text="${product.title}">Product</h3>
+                                        <p class="text-sm text-[#8b7355]" th:text="${product.category}">Category</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">120.00 BD</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">8 in stock</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">
+                                    <span th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' BD'">0.00 BD</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${product.stockQuantity} + ' in stock'">0 in stock</td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge status-active">Active</span>
+                                    <span class="status-badge"
+                                          th:classappend="${product.stockQuantity > 0 ? ' status-active' : ' status-inactive'}"
+                                          th:text="${product.stockQuantity > 0 ? 'Active' : 'Inactive'}">Inactive</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
+                                        <button type="button" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Product 3 -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <img 
-                                        src="https://images.unsplash.com/photo-1565193566173-033e4e379cda?w=80&h=80&fit=crop" 
-                                        alt="Decorative Plant Pot" 
-                                        class="w-16 h-16 rounded-lg object-cover"
-                                    />
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div>
-                                        <h3 class="font-semibold text-[#5c4a3d]">Decorative Plant Pot</h3>
-                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">45.00 BD</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">0 in stock</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-inactive">Inactive</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Product 4 -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <img 
-                                        src="https://images.unsplash.com/photo-1590422749830-674860a6e4d4?w=80&h=80&fit=crop" 
-                                        alt="Artisan Tea Set" 
-                                        class="w-16 h-16 rounded-lg object-cover"
-                                    />
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div>
-                                        <h3 class="font-semibold text-[#5c4a3d]">Artisan Tea Set</h3>
-                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">195.00 BD</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">5 in stock</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active">Active</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Product 5 -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <img 
-                                        src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop" 
-                                        alt="Ceramic Dinner Plates" 
-                                        class="w-16 h-16 rounded-lg object-cover"
-                                    />
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div>
-                                        <h3 class="font-semibold text-[#5c4a3d]">Ceramic Dinner Plates (Set of 4)</h3>
-                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">150.00 BD</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">15 in stock</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active">Active</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Product 6 -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <img 
-                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f925f40?w=80&h=80&fit=crop" 
-                                        alt="Rustic Mug Set" 
-                                        class="w-16 h-16 rounded-lg object-cover"
-                                    />
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div>
-                                        <h3 class="font-semibold text-[#5c4a3d]">Rustic Mug Set</h3>
-                                        <p class="text-sm text-[#8b7355]">Ceramics</p>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]">65.00 BD</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">20 in stock</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active">Active</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-2" onclick="openModal()">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
+                                        <button type="button" class="text-[#8b7355] hover:text-red-500 transition-colors p-2" onclick="confirmDelete()">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -552,7 +400,7 @@
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
-                    <p class="text-sm text-[#8b7355]">Showing 1-6 of 24 products</p>
+                    <p class="text-sm text-[#8b7355]" th:text="${productsCount != null and productsCount > 0} ? ('Showing ' + productsCount + ' product(s)') : 'No products'">No products</p>
                     <div class="flex items-center gap-2">
                         <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors" disabled>
                             Previous
@@ -816,6 +664,6 @@
             }
         });
     </script>
-    <script src="/authguard.js"></script>
+    <script src="/artisan-common.js"></script>
 </body>
 </html>

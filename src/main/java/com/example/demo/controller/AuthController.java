@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Artisan;
 import com.example.demo.model.Customer;
 import com.example.demo.model.User;
+import com.example.demo.repository.ArtisanRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class AuthController {
     private com.example.demo.repository.CustomerRepository customerRepository;
 
     @Autowired
+    private ArtisanRepository artisanRepository;
+
+    @Autowired
     private com.example.demo.repository.WishlistRepository wishlistRepository;
 
     @PostMapping("/login")
@@ -42,6 +46,9 @@ public class AuthController {
                 if (user instanceof Customer) {
                     customerRepository.findByEmail(email)
                             .ifPresentOrElse(c -> response.put("user", c), () -> response.put("user", user));
+                } else if ("ARTISAN".equalsIgnoreCase(user.getRole())) {
+                    artisanRepository.findByEmail(email)
+                            .ifPresentOrElse(a -> response.put("user", a), () -> response.put("user", user));
                 } else {
                     response.put("user", user);
                 }
@@ -77,8 +84,11 @@ public class AuthController {
         }
         artisan.setRole("ARTISAN");
         artisan.setPassword(BCrypt.hashpw(artisan.getPassword(), BCrypt.gensalt()));
-        userRepository.save(artisan);
-        return ResponseEntity.ok(Map.of("success", true, "user", artisan));
+        if (artisan.getProfilePicture() == null || artisan.getProfilePicture().isBlank()) {
+            artisan.setProfilePicture("https://cdn-icons-png.flaticon.com/512/149/149071.png");
+        }
+        Artisan saved = artisanRepository.save(artisan);
+        return ResponseEntity.ok(Map.of("success", true, "user", saved));
     }
 
     @DeleteMapping("/delete-account")

@@ -344,7 +344,8 @@
                         <!-- Avatar Upload -->
                         <div class="flex flex-col items-center">
                             <img
-                                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face"
+                                th:src="${artisan != null ? artisan.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
+                                th:alt="${artisan != null ? artisan.name : 'Profile Photo'}"
                                 alt="Profile Photo"
                                 class="w-32 h-32 rounded-full object-cover border-4 border-[#e5e0d8] mb-4"
                             />
@@ -364,8 +365,9 @@
                                 >
                                 <input
                                     type="text"
-                                    value="Elena Martinez"
+                                    th:value="${artisan != null ? artisan.name : ''}"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                    readonly
                                 />
                             </div>
 
@@ -376,8 +378,9 @@
                                 >
                                 <input
                                     type="email"
-                                    value="elena@artisan.com"
+                                    th:value="${artisan != null ? artisan.email : ''}"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                    readonly
                                 />
                             </div>
 
@@ -388,21 +391,23 @@
                                 >
                                 <input
                                     type="tel"
-                                    value="+973 3312 3456"
+                                    th:value="${artisan != null ? artisan.phone : ''}"
                                     placeholder="+973 XXXX XXXX"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
+                                    readonly
                                 />
                             </div>
 
                             <div>
                                 <label
                                     class="block text-[#5c4a3d] font-semibold mb-2"
-                                    >Specialty/Title</label
+                                    >Shop Name</label
                                 >
                                 <input
                                     type="text"
-                                    value="Ceramics Artist"
+                                    th:value="${artisan != null ? artisan.shopName : ''}"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                    readonly
                                 />
                             </div>
 
@@ -429,8 +434,9 @@
                             >
                             <input
                                 type="text"
-                                value="Elena's Ceramics Studio"
+                                th:value="${artisan != null ? artisan.shopName : ''}"
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                readonly
                             />
                         </div>
 
@@ -441,10 +447,10 @@
                             >
                             <textarea
                                 rows="4"
+                                th:text="${artisan != null ? artisan.biography : ''}"
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white resize-none"
-                            >
-Passionate ceramics artist with over 10 years of experience creating handcrafted pottery. Each piece is uniquely designed and made with love in my home studio. I specialize in functional ware and decorative pieces inspired by nature.</textarea
-                            >
+                                readonly
+                            ></textarea>
                         </div>
 
                         <div>
@@ -1009,9 +1015,14 @@ Passionate ceramics artist with over 10 years of experience creating handcrafted
         logoutButton.addEventListener('click', () => {
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
-                window.location.href = '/index';
+                if (typeof window.artisanLogout === 'function') {
+                    window.artisanLogout();
+                } else {
+                    window.location.href = '/login';
+                }
             }
         });
         </script>
-    </body>
+        <script src="/artisan-common.js"></script>
+</body>
 </html>
