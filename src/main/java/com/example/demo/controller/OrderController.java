@@ -94,7 +94,11 @@ public class OrderController {
             }
 
             if (!title.isEmpty()) {
-                notificationService.sendNotification(order.getCustomer(), title, message, type, "/orders");
+                try {
+                    notificationService.sendNotification(order.getCustomer(), title, message, type, "/orders");
+                } catch (Exception e) {
+                    System.err.println("Failed to send order status notification: " + e.getMessage());
+                }
             }
 
             return ResponseEntity.ok(Map.of("success", true));

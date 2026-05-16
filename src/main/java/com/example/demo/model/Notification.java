@@ -20,7 +20,7 @@ public class Notification {
     private String message;
     private String type; // e.g., AUCTION_START, BID_OUTBID, ORDER_SHIPPED
     private LocalDateTime timestamp;
-    private boolean isRead = false;
+    private boolean read = false;
     private String link; // Optional link to redirect user (e.g., to order or auction page)
 
     public Notification() {
@@ -34,6 +34,6 @@ public class Notification {
         this.type = type;
         this.link = link;
         this.timestamp = LocalDateTime.now();
-        this.isRead = false;
+        this.read = false;
     }
 }

@@ -24,7 +24,7 @@ public class NotificationService {
     }
 
     public long getUnreadCount(User user) {
-        return notificationRepository.countByUserAndIsReadFalse(user);
+        return notificationRepository.countByUserAndReadFalse(user);
     }
 
     public void markAsRead(Long notificationId) {
