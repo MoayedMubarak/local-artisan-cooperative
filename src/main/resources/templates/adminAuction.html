@@ -55,16 +55,77 @@
         }
 
         .sidebar-link {
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            color: #d4c5b5;
         }
-
+        
         .sidebar-link:hover {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
         }
-
+        
+        .sidebar-link:hover i,
+        .sidebar-link:hover span {
+            color: #ffffff;
+        }
+        
         .sidebar-link.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-left: 3px solid white;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-left: 3px solid #ffffff;
+            color: #ffffff;
+        }
+        
+        .sidebar-link.active i,
+        .sidebar-link.active span {
+            color: #ffffff;
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-menu-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.5rem);
+            width: 200px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 1rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            display: none;
+            z-index: 50;
+        }
+        
+        .user-menu-dropdown.show {
+            display: block;
+        }
+        
+        .user-menu-item {
+            display: block;
+            padding: 0.85rem 1rem;
+            color: #5c4a3d;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f5ebe0;
+        }
+        
+        .user-menu-item.logout:hover {
+            color: #b91c1c;
+            background-color: #fee2e2;
+        }
+        
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .chevron-icon.rotated {
+            transform: rotate(180deg);
         }
 
         .table-row-hover:hover {
@@ -139,12 +200,21 @@
     <!-- Top Navigation Bar -->
     <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-hands text-2xl terracotta"></i>
-                <span class="text-2xl font-semibold" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
+            <div class="flex items-center">
+                <a href="/adminDashboard" class="flex items-center gap-3 group">
+                    <!-- Logo -->
+                    <img src="/images/Logo.png" alt="ArtsyVibe Logo"
+                        class="h-10 w-auto object-contain"
+                        style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
+                    
+                    <!-- Brand Name -->
+                    <span class="text-2xl font-semibold" 
+                        style="font-family: 'Playfair Display', serif;">
+                        ArtsyVibe
+                    </span>
+                </a>
             </div>
-
+            
             <!-- Right Side - Notifications and User -->
             <div class="flex items-center space-x-4">
                 <!-- Notification Bell -->
@@ -152,19 +222,26 @@
                     <i class="fas fa-bell text-xl"></i>
                     <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
                 </button>
-
+                
                 <!-- User Profile -->
-                <div class="flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
-                    <img 
-                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-                        alt="Admin User" 
-                        class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
-                    />
-                    <div class="hidden md:block">
-                        <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
-                        <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
+                    <button id="userMenuButton" type="button" class="flex items-center gap-3 text-left focus:outline-none">
+                        <img 
+                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
+                            alt="Admin User" 
+                            class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
+                        />
+                        <div class="hidden md:block">
+                            <p class="font-semibold text-[#5c4a3d] text-sm">Admin User</p>
+                            <p class="text-xs text-[#8b7355]">admin@artisancoop.com</p>
+                        </div>
+                        <i id="chevronIcon" class="chevron-icon fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
+                    </button>
+                    <div id="userMenuDropdown" class="user-menu-dropdown">
+                        <button id="logoutButton" class="user-menu-item logout w-full text-left">
+                            <i class="fas fa-sign-out-alt mr-3"></i>Logout
+                        </button>
                     </div>
-                    <i class="fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
                 </div>
             </div>
         </div>
@@ -174,14 +251,8 @@
     <div class="flex flex-1">
         <!-- Left Sidebar -->
         <aside class="w-64 bg-[#5c4a3d] min-h-[calc(100vh-80px)] fixed left-0 top-20 overflow-y-auto">
-            <!-- Logo at Top -->
+            <!-- Admin Profile -->
             <div class="p-6 border-b border-[#7a6655]">
-                <div class="flex items-center space-x-2 mb-4">
-                    <i class="fas fa-hands text-2xl text-[#c17c5f]"></i>
-                    <span class="text-xl font-semibold text-white" style="font-family: 'Playfair Display', serif;">Artisan Co-op</span>
-                </div>
-
-                <!-- Admin Profile -->
                 <div class="flex items-center gap-3">
                     <img 
                         src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
@@ -194,9 +265,9 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Navigation Menu -->
-            <nav class="p-4">
+            <nav class="p-4 mt-4">
                 <ul class="space-y-1">
                     <li>
                         <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
@@ -205,7 +276,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="admin-user-management.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-users w-5"></i>
                             <span>User Management</span>
                         </a>
@@ -217,25 +288,25 @@
                         </a>
                     </li>
                     <li>
-                        <a href="admin-products.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-box w-5"></i>
                             <span>Products</span>
                         </a>
                     </li>
                     <li>
-                        <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-shopping-bag w-5"></i>
                             <span>Orders</span>
                         </a>
                     </li>
                     <li>
-                        <a href="admin-auctions.html" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                        <a href="#" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
                             <i class="fas fa-gavel w-5"></i>
                             <span>Auctions</span>
                         </a>
                     </li>
                     <li>
-                        <a href="admin-refunds.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
+                        <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-undo w-5"></i>
                             <span>Refunds</span>
                         </a>
@@ -252,22 +323,16 @@
                             <span>Reports</span>
                         </a>
                     </li>
+                </ul>
+            </nav>
+            
+            <!-- Systems Log Section -->
+            <div class="p-4 mt-2 border-t border-[#7a6655]">
+                <ul class="space-y-1">
                     <li>
                         <a href="#" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-history w-5"></i>
                             <span>System Logs</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Logout Section -->
-            <div class="p-4 mt-8 border-t border-[#7a6655]">
-                <ul class="space-y-1">
-                    <li>
-                        <a href="index.html" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
-                            <i class="fas fa-sign-out-alt w-5"></i>
-                            <span>Logout</span>
                         </a>
                     </li>
                 </ul>
@@ -1007,14 +1072,48 @@
         // Sidebar navigation active state handling
         document.querySelectorAll('.sidebar-link').forEach(link => {
             link.addEventListener('click', function(e) {
+// Remove active state from all links
                 document.querySelectorAll('.sidebar-link').forEach(l => {
                     l.classList.remove('active');
+                    l.classList.remove('text-white');
                     l.classList.add('text-[#d4c5b5]');
                 });
 
+                // Add active state to clicked link
                 this.classList.add('active');
                 this.classList.remove('text-[#d4c5b5]');
             });
+        });
+
+        // User profile logout dropdown
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+        const chevronIcon = document.getElementById('chevronIcon');
+        const logoutButton = document.getElementById('logoutButton');
+        const userMenu = document.querySelector('.user-menu');
+        let hideTimeout;
+
+        const showUserMenu = () => {
+            clearTimeout(hideTimeout);
+            userMenuDropdown.classList.add('show');
+            chevronIcon.classList.add('rotated');
+        };
+
+        const hideUserMenu = () => {
+            hideTimeout = setTimeout(() => {
+                userMenuDropdown.classList.remove('show');
+                chevronIcon.classList.remove('rotated');
+            }, 150);
+        };
+
+        userMenu.addEventListener('mouseenter', showUserMenu);
+        userMenu.addEventListener('mouseleave', hideUserMenu);
+
+        logoutButton.addEventListener('click', () => {
+            const confirmed = window.confirm('Are you sure you want to logout?');
+            if (confirmed) {
+                window.location.href = 'index.html';
+            }
         });
 
         // Tab switching

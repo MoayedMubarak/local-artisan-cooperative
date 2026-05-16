@@ -285,7 +285,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/artisanAuction" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                        <a href="/artisanAuction" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-gavel w-5"></i>
                             <span>My Auctions</span>
                         </a>
@@ -384,7 +384,7 @@
                                 <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]"><span th:text="${#numbers.formatDecimal(auction.currentHighestBid, 1, 2)} + ' BD'">0 BD</span></td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${auction.endTime}">End</td>
                                 <td class="px-6 py-4"><span class="status-badge status-active" th:text="${auction.status}">Status</span></td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${auction.highestBidderName != null ? auction.highestBidderName : '—'}">—</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${auction.highestBidderName != null ? auction.highestBidderName : 'ï¿½'}">ï¿½</td>
                                 <td class="px-6 py-4"><button type="button" class="text-[#c17c5f] font-medium text-sm">View</button></td>
                             </tr>
                         </tbody>
