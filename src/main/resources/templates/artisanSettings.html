@@ -373,9 +373,9 @@
                                 >
                                 <input
                                     type="text"
+                                    id="artisan-name"
                                     th:value="${artisan != null ? artisan.name : ''}"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
-                                    readonly
                                 />
                             </div>
 
@@ -386,8 +386,9 @@
                                 >
                                 <input
                                     type="email"
+                                    id="artisan-email"
                                     th:value="${artisan != null ? artisan.email : ''}"
-                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-[#f5f2eb]"
                                     readonly
                                 />
                             </div>
@@ -399,10 +400,10 @@
                                 >
                                 <input
                                     type="tel"
+                                    id="artisan-phone"
                                     th:value="${artisan != null ? artisan.phone : ''}"
                                     placeholder="+973 XXXX XXXX"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
-                                    readonly
                                 />
                             </div>
 
@@ -413,13 +414,15 @@
                                 >
                                 <input
                                     type="text"
+                                    id="artisan-shopName"
                                     th:value="${artisan != null ? artisan.shopName : ''}"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
-                                    readonly
                                 />
                             </div>
 
                             <button
+                                type="button"
+                                onclick="saveProfileSettings()"
                                 class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg"
                             >
                                 Save Profile
@@ -442,9 +445,9 @@
                             >
                             <input
                                 type="text"
+                                id="shop-info-name"
                                 th:value="${artisan != null ? artisan.shopName : ''}"
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
-                                readonly
                             />
                         </div>
 
@@ -455,9 +458,9 @@
                             >
                             <textarea
                                 rows="4"
+                                id="shop-info-biography"
                                 th:text="${artisan != null ? artisan.biography : ''}"
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white resize-none"
-                                readonly
                             ></textarea>
                         </div>
 
@@ -471,9 +474,12 @@
                             >
                                 <div class="mb-4">
                                     <img
+                                        id="shopBannerImg"
+                                        th:src="${artisan != null and artisan.shopBanner != null ? artisan.shopBanner : 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&h=300&fit=crop'}"
                                         src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&h=300&fit=crop"
                                         alt="Shop Banner"
-                                        class="w-full h-48 object-cover rounded-lg"
+                                        class="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                        onclick="document.getElementById('shop-banner-file-input').click()"
                                     />
                                 </div>
                                 <div class="flex items-center justify-center">
@@ -486,6 +492,7 @@
                                         </span>
                                         <input
                                             type="file"
+                                            id="shop-banner-file-input"
                                             accept="image/*"
                                             class="hidden"
                                         />
@@ -495,6 +502,8 @@
                         </div>
 
                         <button
+                            type="button"
+                            onclick="saveShopSettings()"
                             class="bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg"
                         >
                             Save Shop Info
@@ -511,6 +520,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="addresses-grid">
                         <!-- Add New Address Card -->
                         <div
+                            id="add-address-card"
                             onclick="openAddAddressModal()"
                             class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#c17c5f] hover:bg-[#f5ebe0] transition-all min-h-[120px]"
                         >
@@ -946,37 +956,39 @@
 
             function addressCardHtml(addr) {
                 const defaultBadge = addr.default ? `
-                    <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">Default</span>
+                    <span class="bg-[#e6f4ea] text-[#137333] text-xs px-2.5 py-1 rounded-full font-semibold border border-[#ceead6]">Default</span>
                 ` : '';
 
                 return `
-                    <div class="border border-[#e5e0d8] rounded-xl p-4 relative address-card" data-id="${addr.id}">
-                        <div class="absolute top-4 right-4 flex gap-2">
+                    <div class="border border-[#e5e0d8] rounded-xl p-5 relative address-card bg-white shadow-sm hover:shadow-md transition-shadow" data-id="${addr.id}">
+                        <div class="absolute top-5 right-5 flex gap-2">
                             <button
                                 class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-1"
                                 onclick="editAddress(${addr.id})"
+                                title="Edit Address"
                             >
                                 <i class="fas fa-pen text-sm"></i>
                             </button>
                             <button
                                 class="text-[#8b7355] hover:text-red-500 transition-colors p-1"
                                 onclick="deleteAddress(${addr.id})"
+                                title="Delete Address"
                             >
                                 <i class="fas fa-trash text-sm"></i>
                             </button>
                         </div>
-                        <div class="flex items-start gap-3 mb-2">
+                        <div class="flex items-start gap-4">
                             <div
-                                class="w-10 h-10 bg-[#f5ebe0] rounded-lg flex items-center justify-center flex-shrink-0"
+                                class="w-12 h-12 bg-[#f5ebe0] rounded-xl flex items-center justify-center flex-shrink-0"
                             >
-                                <i class="fas fa-map-marker-alt text-[#c17c5f]"></i>
+                                <i class="fas fa-map-marker-alt text-[#c17c5f] text-lg"></i>
                             </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h3 class="font-semibold text-[#5c4a3d]">${escapeHtml(addr.label)}</h3>
+                            <div class="pr-12">
+                                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                    <h3 class="font-bold text-[#5c4a3d] text-base">${escapeHtml(addr.label)}</h3>
                                     ${defaultBadge}
                                 </div>
-                                <p class="text-sm text-[#8b7355]">
+                                <p class="text-sm text-[#8b7355] leading-relaxed">
                                     ${escapeHtml(addr.street)}<br />
                                     ${escapeHtml(addr.city)}, ${escapeHtml(addr.zip)}<br />
                                     ${escapeHtml(addr.country)}
@@ -1005,7 +1017,7 @@
                         grid.querySelectorAll('.address-card').forEach(card => card.remove());
 
                         // Render each address card before the Add card
-                        const addCard = grid.querySelector('.fa-plus')?.closest('div');
+                        const addCard = document.getElementById('add-address-card');
                         addresses.forEach(addr => {
                             if (addCard) {
                                 addCard.insertAdjacentHTML('beforebegin', addressCardHtml(addr));
@@ -1164,6 +1176,127 @@
                         .catch(err => {
                             console.error('Failed to update profile picture', err);
                             showNotification("Failed to save profile picture to server.");
+                        });
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Save Profile Settings (Name, Phone, Shop Name)
+            window.saveProfileSettings = function() {
+                const email = sessionStorage.getItem('userEmail');
+                const name = document.getElementById('artisan-name').value.trim();
+                const phone = document.getElementById('artisan-phone').value.trim();
+                const shopName = document.getElementById('artisan-shopName').value.trim();
+
+                if (!email) {
+                    showNotification("Please log in again.");
+                    return;
+                }
+
+                fetch('/api/user/update-artisan-settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        name: name,
+                        phone: phone,
+                        shopName: shopName
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification("Profile settings saved successfully!");
+                        // Sync other shop name field if present
+                        const shopInfoNameInput = document.getElementById('shop-info-name');
+                        if (shopInfoNameInput) shopInfoNameInput.value = shopName;
+                    } else {
+                        showNotification("Failed to save profile settings.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showNotification("Error saving profile settings.");
+                });
+            };
+
+            // Save Shop Settings (Shop Name, Biography)
+            window.saveShopSettings = function() {
+                const email = sessionStorage.getItem('userEmail');
+                const shopName = document.getElementById('shop-info-name').value.trim();
+                const biography = document.getElementById('shop-info-biography').value.trim();
+
+                if (!email) {
+                    showNotification("Please log in again.");
+                    return;
+                }
+
+                fetch('/api/user/update-artisan-settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        shopName: shopName,
+                        biography: biography
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification("Shop information saved successfully!");
+                        // Sync other shop name field if present
+                        const artisanShopNameInput = document.getElementById('artisan-shopName');
+                        if (artisanShopNameInput) artisanShopNameInput.value = shopName;
+                    } else {
+                        showNotification("Failed to save shop settings.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showNotification("Error saving shop settings.");
+                });
+            };
+
+            // Shop Banner Upload Handler
+            document.getElementById('shop-banner-file-input')?.addEventListener('change', function () {
+                if (!this.files.length) return;
+                const file = this.files[0];
+                
+                // Max size check: 2MB
+                const maxBytes = 2 * 1024 * 1024;
+                if (file.size > maxBytes) {
+                    showNotification("Banner image must be 2MB or smaller.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const bannerUrl = e.target.result;
+                    
+                    // Update preview immediately
+                    const img = document.getElementById('shopBannerImg');
+                    if (img) img.src = bannerUrl;
+
+                    // Save to database permanently
+                    const userEmail = sessionStorage.getItem('userEmail');
+                    if (userEmail) {
+                        fetch('/api/user/update-shop-banner', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail, bannerUrl: bannerUrl })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                showNotification("Shop banner updated permanently!");
+                            } else {
+                                showNotification("Failed to update shop banner.");
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Failed to update shop banner', err);
+                            showNotification("Failed to save banner to server.");
                         });
                     }
                 };

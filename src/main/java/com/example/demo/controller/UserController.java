@@ -70,4 +70,40 @@ public class UserController {
         }
         return ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found"));
     }
+
+    @PostMapping("/update-artisan-settings")
+    public ResponseEntity<?> updateArtisanSettings(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String name = payload.get("name");
+        String phone = payload.get("phone");
+        String shopName = payload.get("shopName");
+        String biography = payload.get("biography");
+
+        Optional<Artisan> artisanOpt = artisanRepository.findByEmail(email);
+        if (artisanOpt.isPresent()) {
+            Artisan artisan = artisanOpt.get();
+            if (name != null) artisan.setName(name);
+            if (phone != null) artisan.setPhone(phone);
+            if (shopName != null) artisan.setShopName(shopName);
+            if (biography != null) artisan.setBiography(biography);
+            artisanRepository.save(artisan);
+            return ResponseEntity.ok(Map.of("success", true, "user", artisan));
+        }
+        return ResponseEntity.status(404).body(Map.of("success", false, "message", "Artisan not found"));
+    }
+
+    @PostMapping("/update-shop-banner")
+    public ResponseEntity<?> updateShopBanner(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String bannerUrl = payload.get("bannerUrl");
+
+        Optional<Artisan> artisanOpt = artisanRepository.findByEmail(email);
+        if (artisanOpt.isPresent()) {
+            Artisan artisan = artisanOpt.get();
+            artisan.setShopBanner(bannerUrl);
+            artisanRepository.save(artisan);
+            return ResponseEntity.ok(Map.of("success", true, "user", artisan));
+        }
+        return ResponseEntity.status(404).body(Map.of("success", false, "message", "Artisan not found"));
+    }
 }
