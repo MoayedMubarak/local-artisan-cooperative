@@ -229,6 +229,9 @@
                         <i id="chevronIcon" class="chevron-icon fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
                     </button>
                     <div id="userMenuDropdown" class="user-menu-dropdown">
+                        <a href="/artisanSettings" class="user-menu-item block">
+                            <i class="fas fa-user mr-2"></i> My Profile
+                        </a>
                         <button id="logoutButton" class="user-menu-item logout w-full text-left">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </button>
@@ -755,7 +758,12 @@
         logoutButton.addEventListener('click', () => {
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
-                window.location.href = '/index';
+                if (typeof window.artisanLogout === 'function') {
+                    window.artisanLogout();
+                } else {
+                    sessionStorage.clear();
+                    window.location.href = '/login';
+                }
             }
         });
     </script>
