@@ -98,6 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof window.syncCartCountFromServer === 'function') {
                     await window.syncCartCountFromServer();
                 }
+                if (typeof window.syncNotificationCountFromServer === 'function') {
+                    await window.syncNotificationCountFromServer();
+                }
 
                 // Redirect back to the originally requested page (if any)
                 const url = new URL(window.location.href);

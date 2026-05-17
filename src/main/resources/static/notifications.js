@@ -182,10 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateBadgeCount(count) {
         sessionStorage.setItem('notificationCount', count.toString());
-        const badge = document.getElementById('notification-badge');
-        if (badge) {
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'flex' : 'none';
+        if (typeof window.updateNotificationBadge === 'function') {
+            window.updateNotificationBadge();
         }
     }
 

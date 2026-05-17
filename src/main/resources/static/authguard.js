@@ -157,7 +157,7 @@
             sessionStorage.setItem('userProfile', JSON.stringify(data.user));
             sessionStorage.setItem('userName', data.user.name);
             applyNavState(data.user);
-            updateNotificationBadge();
+            window.syncNotificationCountFromServer();
             updateCartBadge();
             // Also update any other profile images on the page (e.g. sidebar)
             document.querySelectorAll('img[alt="' + data.user.name + '"], aside img.w-14.h-14').forEach(img => {
@@ -211,6 +211,49 @@
     badge.textContent = count;
     badge.style.display = count > 0 ? 'flex' : 'none';
   };
+
+  /**
+   * Sync unread notification count from the database. Safe to call when logged out (no-op).
+   */
+  window.syncNotificationCountFromServer = async function syncNotificationCountFromServer() {
+    try {
+      const userId = sessionStorage.getItem('userId');
+      const loggedIn = sessionStorage.getItem('loggedIn') === 'true' || sessionStorage.getItem('isLoggedIn') === 'true';
+      if (!userId || !loggedIn) {
+        sessionStorage.setItem('notificationCount', '0');
+        window.updateNotificationBadge();
+        return 0;
+      }
+      const res = await fetch(`/api/notifications/${userId}/unread-count`);
+      if (!res.ok) {
+        sessionStorage.setItem('notificationCount', '0');
+        window.updateNotificationBadge();
+        return 0;
+      }
+      const count = await res.json();
+      const n = typeof count === 'number' ? count : 0;
+      sessionStorage.setItem('notificationCount', String(n));
+      window.updateNotificationBadge();
+      return n;
+    } catch (e) {
+      console.warn('syncNotificationCountFromServer failed', e);
+      return parseInt(sessionStorage.getItem('notificationCount') ?? '0', 10);
+    }
+  };
+
+  let notificationPollInterval = null;
+
+  function startNotificationPolling() {
+    if (notificationPollInterval || !getLoggedIn()) return;
+    notificationPollInterval = setInterval(function () {
+      if (!getLoggedIn()) {
+        clearInterval(notificationPollInterval);
+        notificationPollInterval = null;
+        return;
+      }
+      window.syncNotificationCountFromServer();
+    }, 30000);
+  }
 
   window.updateCartBadge = function updateCartBadge() {
     document.querySelectorAll('.fa-shopping-cart').forEach(icon => {
@@ -324,6 +367,8 @@
     window.updateNotificationBadge();
     window.updateCartBadge();
     window.syncCartCountFromServer();
+    window.syncNotificationCountFromServer();
+    startNotificationPolling();
   }
 
   if (document.readyState === 'loading') {
