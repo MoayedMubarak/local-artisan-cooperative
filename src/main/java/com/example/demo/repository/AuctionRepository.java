@@ -8,4 +8,5 @@ import java.util.List;
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
     List<Auction> findByProductArtisanUserId(Long artisanId);
     long countByProductArtisanUserIdAndStatus(Long artisanId, String status);
+    List<Auction> findByProductArtisanUserIdAndStatus(Long artisanId, String status);
 }

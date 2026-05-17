@@ -59,17 +59,39 @@ public class ArtisanController {
                 .toList();
     }
 
+    /**
+     * Total revenue = sum of (price × qty) for regular order items
+     *               + sum of currentHighestBid for ENDED auctions belonging to this artisan
+     */
+    private double computeTotalRevenue(Long artisanId, List<OrderItem> orders) {
+        // Revenue from standard product orders (exclude auction-item order lines to avoid double-counting)
+        double orderRevenue = orders.stream()
+                .filter(o -> o.getProduct() != null && !o.getProduct().isAuctionItem())
+                .mapToDouble(o -> o.getPrice() * o.getQuantity())
+                .sum();
+
+        // Revenue from ended auctions: use the highest bid (actual sale price)
+        double auctionRevenue = auctionRepository
+                .findByProductArtisanUserIdAndStatus(artisanId, "ENDED")
+                .stream()
+                .filter(a -> a.getHighestBidder() != null)   // only sold auctions
+                .mapToDouble(a -> a.getCurrentHighestBid())
+                .sum();
+
+        return orderRevenue + auctionRevenue;
+    }
+
     @GetMapping("/artisanDashboard")
     public String dashboard(@RequestParam(required = false) Long id, Model model) {
         initEmptyModel(model);
         loadArtisan(id, model);
         if (id != null) {
             model.addAttribute("productsCount", productRepository.countByArtisanUserId(id));
-            model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(id, "active"));
+            model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(id, "LIVE"));
             List<OrderItem> orders = getArtisanOrderItems(id);
             model.addAttribute("pendingOrders", orders.stream()
                     .filter(o -> "pending".equalsIgnoreCase(o.getOrder().getStatus())).count());
-            model.addAttribute("totalRevenue", orders.stream().mapToDouble(o -> o.getPrice() * o.getQuantity()).sum());
+            model.addAttribute("totalRevenue", computeTotalRevenue(id, orders));
             model.addAttribute("recentOrders", orders);
         }
         return "artisanDashboard";
@@ -114,11 +136,11 @@ public class ArtisanController {
         loadArtisan(id, model);
         if (id != null) {
             model.addAttribute("productsCount", productRepository.countByArtisanUserId(id));
-            model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(id, "active"));
+            model.addAttribute("activeAuctions", auctionRepository.countByProductArtisanUserIdAndStatus(id, "LIVE"));
             List<OrderItem> orders = getArtisanOrderItems(id);
             model.addAttribute("pendingOrders", orders.stream()
                     .filter(o -> "pending".equalsIgnoreCase(o.getOrder().getStatus())).count());
-            model.addAttribute("totalRevenue", orders.stream().mapToDouble(o -> o.getPrice() * o.getQuantity()).sum());
+            model.addAttribute("totalRevenue", computeTotalRevenue(id, orders));
             model.addAttribute("ordersCount", (long) orders.size());
         }
         return "artisanAnalytics";
