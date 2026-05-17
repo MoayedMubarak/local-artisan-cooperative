@@ -505,92 +505,10 @@
                         My Addresses
                     </h2>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Address Card 1 - Default -->
-                        <div
-                            class="border border-[#e5e0d8] rounded-xl p-4 relative"
-                        >
-                            <div class="absolute top-4 right-4 flex gap-2">
-                                <button
-                                    class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-1"
-                                >
-                                    <i class="fas fa-pen text-sm"></i>
-                                </button>
-                                <button
-                                    class="text-[#8b7355] hover:text-red-500 transition-colors p-1"
-                                >
-                                    <i class="fas fa-trash text-sm"></i>
-                                </button>
-                            </div>
-                            <div class="flex items-start gap-3 mb-2">
-                                <div
-                                    class="w-10 h-10 bg-[#f5ebe0] rounded-lg flex items-center justify-center flex-shrink-0"
-                                >
-                                    <i
-                                        class="fas fa-map-marker-alt text-[#c17c5f]"
-                                    ></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <h3
-                                            class="font-semibold text-[#5c4a3d]"
-                                        >
-                                            Studio
-                                        </h3>
-                                        <span
-                                            class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium"
-                                            >Default</span
-                                        >
-                                    </div>
-                                    <p class="text-sm text-[#8b7355]">
-                                        Block 312, Road 2815<br />Seef District,
-                                        Manama<br />Bahrain
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Address Card 2 -->
-                        <div
-                            class="border border-[#e5e0d8] rounded-xl p-4 relative"
-                        >
-                            <div class="absolute top-4 right-4 flex gap-2">
-                                <button
-                                    class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-1"
-                                >
-                                    <i class="fas fa-pen text-sm"></i>
-                                </button>
-                                <button
-                                    class="text-[#8b7355] hover:text-red-500 transition-colors p-1"
-                                >
-                                    <i class="fas fa-trash text-sm"></i>
-                                </button>
-                            </div>
-                            <div class="flex items-start gap-3 mb-2">
-                                <div
-                                    class="w-10 h-10 bg-[#f5ebe0] rounded-lg flex items-center justify-center flex-shrink-0"
-                                >
-                                    <i
-                                        class="fas fa-map-marker-alt text-[#c17c5f]"
-                                    ></i>
-                                </div>
-                                <div>
-                                    <h3
-                                        class="font-semibold text-[#5c4a3d] mb-1"
-                                    >
-                                        Home
-                                    </h3>
-                                    <p class="text-sm text-[#8b7355]">
-                                        Building 45, Road 1204<br />Juffair,
-                                        Manama<br />Bahrain
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="addresses-grid">
                         <!-- Add New Address Card -->
                         <div
-                            onclick="openModal()"
+                            onclick="openAddAddressModal()"
                             class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#c17c5f] hover:bg-[#f5ebe0] transition-all min-h-[120px]"
                         >
                             <div
@@ -801,6 +719,7 @@
                     class="flex items-center justify-between p-6 border-b border-[#e5e0d8] sticky top-0 bg-white rounded-t-2xl"
                 >
                     <h3
+                        id="modal-title"
                         class="text-xl font-bold text-[#5c4a3d]"
                         style="font-family: &quot;Playfair Display&quot;, serif"
                     >
@@ -824,6 +743,7 @@
                                     >Address Label</label
                                 >
                                 <input
+                                    id="address-label"
                                     type="text"
                                     placeholder="e.g., Home, Studio, Warehouse"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
@@ -837,6 +757,7 @@
                                     >Street Address</label
                                 >
                                 <input
+                                    id="address-street"
                                     type="text"
                                     placeholder="Building number, Road number"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
@@ -851,6 +772,7 @@
                                         >City</label
                                     >
                                     <input
+                                        id="address-city"
                                         type="text"
                                         placeholder="Manama"
                                         class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
@@ -863,6 +785,7 @@
                                         >ZIP Code</label
                                     >
                                     <input
+                                        id="address-zip"
                                         type="text"
                                         placeholder="12345"
                                         class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white placeholder-[#b8a99a]"
@@ -876,6 +799,7 @@
                                     >Country</label
                                 >
                                 <select
+                                    id="address-country"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white"
                                     required
                                 >
@@ -894,6 +818,7 @@
                             <div>
                                 <label class="flex items-center cursor-pointer">
                                     <input
+                                        id="address-default"
                                         type="checkbox"
                                         class="w-5 h-5 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f]"
                                     />
@@ -945,8 +870,34 @@
                 });
             });
 
-            // Modal functions
-            function openModal() {
+                        // --- Address Management ---
+            let currentEditAddressId = null;
+
+            function getUserEmail() {
+                return sessionStorage.getItem('userEmail') || '';
+            }
+
+            function openAddAddressModal() {
+                currentEditAddressId = null;
+                document.getElementById("modal-title").textContent = "Add New Address";
+                document.getElementById("address-form").reset();
+                document.getElementById("address-default").checked = false;
+                
+                const modal = document.getElementById("address-modal");
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            }
+
+            function openEditAddressModal(addr) {
+                currentEditAddressId = addr.id;
+                document.getElementById("modal-title").textContent = "Edit Address";
+                document.getElementById("address-label").value = addr.label || '';
+                document.getElementById("address-street").value = addr.street || '';
+                document.getElementById("address-city").value = addr.city || '';
+                document.getElementById("address-zip").value = addr.zip || '';
+                document.getElementById("address-country").value = getCountryCode(addr.country);
+                document.getElementById("address-default").checked = addr.default || false;
+
                 const modal = document.getElementById("address-modal");
                 modal.classList.remove("hidden");
                 modal.classList.add("flex");
@@ -957,15 +908,187 @@
                 modal.classList.add("hidden");
                 modal.classList.remove("flex");
                 document.getElementById("address-form").reset();
+                currentEditAddressId = null;
             }
 
-            // Save address
-            function saveAddress(event) {
-                event.preventDefault();
-                // In a real application, you would submit the form data to a server
-                showNotification("Address saved successfully!");
-                closeModal();
+            function getCountryCode(countryName) {
+                const map = {
+                    'Saudi Arabia / Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©': 'SA',
+                    'Saudi Arabia': 'SA',
+                    'United Arab Emirates / Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ù…ØªØ­Ø¯Ø©': 'AE',
+                    'United Arab Emirates': 'AE',
+                    'Egypt / Ù…ØµØ±': 'EG',
+                    'Egypt': 'EG',
+                    'Qatar / Ù‚Ø·Ø±': 'QA',
+                    'Qatar': 'QA',
+                    'Kuwait / Ø§Ù„ÙƒÙˆÙŠØª': 'KW',
+                    'Kuwait': 'KW',
+                    'Oman / Ø³Ù„Ø·Ù†Ø© Ø¹Ù…Ø§Ù†': 'OM',
+                    'Oman': 'OM',
+                    'Bahrain / Ø§Ù„Ø¨Ø­Ø±ÙŠÙ†': 'BH',
+                    'Bahrain': 'BH',
+                    'Jordan / Ø§Ù„Ø£Ø±Ø¯Ù†': 'JO',
+                    'Morocco / Ø§Ù„Ù…ØºØ±Ø¨': 'MA',
+                    'Algeria / Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±': 'DZ',
+                    'Iraq / Ø§Ù„Ø¹Ø±Ø§Ù‚': 'IQ',
+                    'Lebanon / Ù„Ø¨Ù†Ø§Ù†': 'LB',
+                };
+                return map[countryName] ?? countryName ?? '';
             }
+
+            function escapeHtml(str) {
+                return String(str).replace(/[&<>"']/g, c =>
+                    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            }
+
+            function addressCardHtml(addr) {
+                const defaultBadge = addr.default ? `
+                    <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">Default</span>
+                ` : '';
+
+                return `
+                    <div class="border border-[#e5e0d8] rounded-xl p-4 relative address-card" data-id="${addr.id}">
+                        <div class="absolute top-4 right-4 flex gap-2">
+                            <button
+                                class="text-[#8b7355] hover:text-[#c17c5f] transition-colors p-1"
+                                onclick="editAddress(${addr.id})"
+                            >
+                                <i class="fas fa-pen text-sm"></i>
+                            </button>
+                            <button
+                                class="text-[#8b7355] hover:text-red-500 transition-colors p-1"
+                                onclick="deleteAddress(${addr.id})"
+                            >
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-start gap-3 mb-2">
+                            <div
+                                class="w-10 h-10 bg-[#f5ebe0] rounded-lg flex items-center justify-center flex-shrink-0"
+                            >
+                                <i class="fas fa-map-marker-alt text-[#c17c5f]"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-[#5c4a3d]">${escapeHtml(addr.label)}</h3>
+                                    ${defaultBadge}
+                                </div>
+                                <p class="text-sm text-[#8b7355]">
+                                    ${escapeHtml(addr.street)}<br />
+                                    ${escapeHtml(addr.city)}, ${escapeHtml(addr.zip)}<br />
+                                    ${escapeHtml(addr.country)}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Cache of loaded addresses
+            let loadedAddressesList = [];
+
+            function loadAddresses() {
+                const email = getUserEmail();
+                if (!email) return;
+
+                fetch(`/api/addresses?email=${encodeURIComponent(email)}`)
+                    .then(r => r.json())
+                    .then(addresses => {
+                        loadedAddressesList = addresses;
+                        const grid = document.getElementById('addresses-grid');
+                        if (!grid) return;
+
+                        // Remove existing address cards, leaving only the "Add New Address" dashed card
+                        grid.querySelectorAll('.address-card').forEach(card => card.remove());
+
+                        // Render each address card before the Add card
+                        const addCard = grid.querySelector('.fa-plus')?.closest('div');
+                        addresses.forEach(addr => {
+                            if (addCard) {
+                                addCard.insertAdjacentHTML('beforebegin', addressCardHtml(addr));
+                            }
+                        });
+                    })
+                    .catch(err => console.error('Failed to load addresses', err));
+            }
+
+            window.editAddress = function(id) {
+                const addr = loadedAddressesList.find(a => a.id === id);
+                if (addr) {
+                    openEditAddressModal(addr);
+                }
+            };
+
+            window.deleteAddress = function(id) {
+                if (!confirm("Are you sure you want to delete this address?")) return;
+
+                fetch(`/api/addresses/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification("Address deleted successfully!");
+                        loadAddresses();
+                    } else {
+                        showNotification("Failed to delete address.");
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to delete address', err);
+                    showNotification("Failed to delete address.");
+                });
+            };
+
+            window.saveAddress = function(event) {
+                event.preventDefault();
+
+                const email = getUserEmail();
+                if (!email) {
+                    showNotification("Error: User email not found. Please log in again.");
+                    return;
+                }
+
+                const label = document.getElementById("address-label").value.trim();
+                const street = document.getElementById("address-street").value.trim();
+                const city = document.getElementById("address-city").value.trim();
+                const zip = document.getElementById("address-zip").value.trim();
+                const countrySelect = document.getElementById("address-country");
+                const country = countrySelect.options[countrySelect.selectedIndex].text;
+                const isDefault = document.getElementById("address-default").checked;
+
+                const payload = {
+                    userEmail: email,
+                    label: label,
+                    street: street,
+                    city: city,
+                    zip: zip,
+                    country: country,
+                    default: isDefault
+                };
+
+                const method = currentEditAddressId ? 'PUT' : 'POST';
+                const url = currentEditAddressId ? `/api/addresses/${currentEditAddressId}` : '/api/addresses';
+
+                fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(r => r.json())
+                .then(data => {
+                    showNotification(currentEditAddressId ? "Address updated successfully!" : "Address added successfully!");
+                    closeModal();
+                    loadAddresses();
+                })
+                .catch(err => {
+                    console.error('Failed to save address', err);
+                    showNotification("Failed to save address.");
+                });
+            };
+
+            // Initialize loaded addresses
+            loadAddresses();
 
             // Show notification
             function showNotification(message) {
