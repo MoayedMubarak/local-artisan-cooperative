@@ -239,6 +239,23 @@ public class CartService {
         cart.setPayment(payment);
         orderRepository.save(cart);
 
+        // Notify artisans about received orders
+        lines.stream()
+            .map(line -> line.getProduct().getArtisan())
+            .filter(java.util.Objects::nonNull)
+            .distinct()
+            .forEach(artisan -> {
+                String title = "New Order Received";
+                String msg = "You have received a new order #" + cart.getOrderId() + " containing your products.";
+                notificationService.sendNotification(
+                    artisan,
+                    title,
+                    msg,
+                    "ORDER",
+                    "/artisanOrders?id=" + artisan.getUserId()
+                );
+            });
+
         // Send order confirmation notification
         notificationService.sendNotification(
             customer,

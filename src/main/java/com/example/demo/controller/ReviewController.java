@@ -33,6 +33,9 @@ public class ReviewController {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private com.example.demo.service.NotificationService notificationService;
+
     @GetMapping("/product/{productId}")
     public ResponseEntity<?> getReviewsForProduct(@PathVariable Long productId) {
         List<Review> reviews = reviewRepository.findByProductIdOrderByDateDesc(productId);
@@ -83,6 +86,20 @@ public class ReviewController {
         review.setProduct(productOpt.get());
 
         reviewRepository.save(review);
+
+        // Notify the product's artisan about the new review
+        Product product = productOpt.get();
+        if (product.getArtisan() != null) {
+            String title = "New Customer Review";
+            String msg = "A customer wrote a " + rating + "-star review on your product \"" + product.getTitle() + "\"";
+            notificationService.sendNotification(
+                product.getArtisan(),
+                title,
+                msg,
+                "REVIEW",
+                "/artisanAnalytics?id=" + product.getArtisan().getUserId()
+            );
+        }
 
         Double newAvg = reviewRepository.findAverageRatingByProductId(productId);
         long newCount = reviewRepository.countByProductId(productId);
