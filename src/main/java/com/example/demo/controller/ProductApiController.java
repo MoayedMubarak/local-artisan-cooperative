@@ -4,6 +4,7 @@ import com.example.demo.model.Product;
 import com.example.demo.model.Artisan;
 import com.example.demo.model.Auction;
 import com.example.demo.service.ProductService;
+import com.example.demo.service.AuctionService;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.ArtisanRepository;
 import com.example.demo.repository.AuctionRepository;
@@ -33,6 +34,9 @@ public class ProductApiController {
 
     @Autowired
     private WishlistItemRepository wishlistItemRepository;
+
+    @Autowired
+    private AuctionService auctionService;
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody Map<String, Object> payload) {
@@ -77,7 +81,13 @@ public class ProductApiController {
                     auction.setEndTime(java.time.LocalDateTime.now().plusDays(7));
                 }
                 auction.setStatus("active");
-                auctionRepository.save(auction);
+                Auction savedAuction = auctionRepository.save(auction);
+                
+                try {
+                    auctionService.triggerAuctionStartNotification(savedAuction);
+                } catch (Exception ex) {
+                    // Ignore
+                }
             }
 
             return ResponseEntity.ok(Map.of("success", true, "product", saved));

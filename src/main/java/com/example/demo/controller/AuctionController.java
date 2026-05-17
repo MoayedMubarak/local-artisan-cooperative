@@ -17,6 +17,11 @@ public class AuctionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAuction(@PathVariable Long id) {
+        try {
+            auctionService.syncStoredStatuses();
+        } catch (Exception ex) {
+            // Ignore
+        }
         return auctionService.findById(id)
                 .map(auction -> ResponseEntity.ok(Map.of(
                         "success", true,
@@ -26,6 +31,11 @@ public class AuctionController {
 
     @PostMapping("/{id}/bid")
     public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        try {
+            auctionService.syncStoredStatuses();
+        } catch (Exception ex) {
+            // Ignore
+        }
         Object amountObj = body != null ? body.get("amount") : null;
         String bidderName = body != null && body.get("bidderName") != null
                 ? String.valueOf(body.get("bidderName")).trim()

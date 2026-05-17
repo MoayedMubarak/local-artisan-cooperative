@@ -44,6 +44,11 @@ public class MainController {
 
     @GetMapping("/auctions")
     public String auctions(Model model) {
+        try {
+            auctionService.syncStoredStatuses();
+        } catch (Exception ex) {
+            // Ignore
+        }
         model.addAttribute("auctions", auctionRepository.findAll());
         model.addAttribute("categories", productRepository.findAll().stream()
                 .map(p -> p.getProductCategory() != null ? p.getProductCategory().getName() : p.getCategory())
@@ -148,6 +153,11 @@ public class MainController {
 
     @GetMapping("/ProductDetailsAuction")
     public String productDetailsAuction(@RequestParam(required = false) Long id, Model model) {
+        try {
+            auctionService.syncStoredStatuses();
+        } catch (Exception ex) {
+            // Ignore
+        }
         if (id != null) {
             auctionRepository.findById(id).ifPresent(auction -> {
                 model.addAttribute("auction", auction);

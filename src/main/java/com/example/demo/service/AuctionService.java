@@ -195,6 +195,53 @@ public class AuctionService {
         }
     }
 
+    public void triggerAuctionStartNotification(Auction auction) {
+        if (auction == null || auction.getProduct() == null) return;
+        notifyAllUsers(
+            "Auction Started!",
+            "A new auction for " + auction.getProduct().getTitle() + " has just started!",
+            "AUCTION_START",
+            "/auctions"
+        );
+    }
+
+    public void triggerAuctionEndNotifications(Auction auction) {
+        if (auction == null || auction.getProduct() == null) return;
+
+        // 1. Send "Auction Won" notification to the winner
+        if (auction.getHighestBidder() != null) {
+            notificationService.sendNotification(
+                auction.getHighestBidder(),
+                "Auction Won!",
+                "Congratulations! You won the auction for " + auction.getProduct().getTitle() + " with a bid of " + auction.getCurrentHighestBid() + " BD",
+                "AUCTION_WON",
+                "/orders"
+            );
+        }
+
+        // 2. Send "Auction Ended" notification to the artisan (seller)
+        if (auction.getProduct().getArtisan() != null) {
+            String artisanMsg = auction.getHighestBidder() != null 
+                ? "Your auction for " + auction.getProduct().getTitle() + " has ended! Winner: " + auction.getHighestBidder().getName() + " with a bid of " + auction.getCurrentHighestBid() + " BD."
+                : "Your auction for " + auction.getProduct().getTitle() + " has ended with no bids.";
+            notificationService.sendNotification(
+                auction.getProduct().getArtisan(),
+                "Auction Ended",
+                artisanMsg,
+                "AUCTION_ENDED",
+                "/artisanAuction"
+            );
+        }
+
+        // 3. Send general "Auction Ended" notification to all other users
+        notifyAllUsers(
+            "Auction Ended",
+            "The auction for " + auction.getProduct().getTitle() + " has ended.",
+            "AUCTION_ENDED",
+            "/auctions"
+        );
+    }
+
     public void syncStoredStatuses() {
         LocalDateTime now = LocalDateTime.now();
         for (Auction auction : auctionRepository.findAll()) {
@@ -204,19 +251,9 @@ public class AuctionService {
             if (!resolved.equals(normalized)) {
                 // Trigger notifications based on status change
                 if (DISPLAY_LIVE.equals(resolved) && DISPLAY_UPCOMING.equals(normalized)) {
-                    // Auction Started
-                    notifyAllUsers("Auction Started!", "A new auction for " + auction.getProduct().getTitle() + " has just started!", "AUCTION_START", "/auctions");
-                } else if (DISPLAY_ENDED.equals(resolved) && DISPLAY_LIVE.equals(normalized)) {
-                    // Auction Ended
-                    if (auction.getHighestBidder() != null) {
-                        notificationService.sendNotification(
-                            auction.getHighestBidder(),
-                            "Auction Won!",
-                            "Congratulations! You won the auction for " + auction.getProduct().getTitle() + " with a bid of " + auction.getCurrentHighestBid() + " BD",
-                            "AUCTION_WON",
-                            "/orders"
-                        );
-                    }
+                    triggerAuctionStartNotification(auction);
+                } else if (DISPLAY_ENDED.equals(resolved) && (DISPLAY_LIVE.equals(normalized) || DISPLAY_UPCOMING.equals(normalized))) {
+                    triggerAuctionEndNotifications(auction);
                 }
                 
                 auction.setStatus(resolved);
