@@ -187,7 +187,7 @@
                 <a id="notifications-link" href="/artisanNotification" class="relative">
                     <button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
                         <i class="fas fa-bell text-xl"></i>
-                        <span id="header-notification-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[9px] font-bold rounded-full border-2 border-[#faf9f6] flex items-center justify-center hidden">0</span>
+                        <span id="header-notification-badge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#faf9f6] hidden"></span>
                     </button>
                 </a>
 
@@ -407,7 +407,20 @@
                 const unreadClass = notif.read ? 'read' : 'unread';
                 const blueDot = notif.read ? '' : '<span class="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0"></span>';
                 const dateStr = new Date(notif.timestamp).toLocaleString();
-                const linkAttr = notif.link ? `href="${notif.link}"` : `href="#"`;
+
+                let finalLink = notif.link;
+                if (finalLink) {
+                    if (finalLink.startsWith('/artisan/products')) finalLink = '/artisanProducts';
+                    if (finalLink.startsWith('/artisan/orders')) finalLink = '/artisanOrders';
+                    if (finalLink.startsWith('/artisan/auctions') || finalLink.startsWith('/artisan/auction')) finalLink = '/artisanAuction';
+                }
+                if (finalLink && finalLink.startsWith('/artisan') && !finalLink.includes('?id=')) {
+                    const userId = sessionStorage.getItem('userId');
+                    if (userId) {
+                        finalLink += (finalLink.includes('?') ? '&' : '?') + 'id=' + userId;
+                    }
+                }
+                const linkAttr = finalLink ? `href="${finalLink}"` : `href="#"`;
 
                 return `
                     <div class="notification-card p-6 flex items-start gap-4 hover:bg-gray-50 transition-colors ${unreadClass} cursor-pointer" 
@@ -459,7 +472,6 @@
             const badge = document.getElementById('header-notification-badge');
             if (badge) {
                 if (unreadCount > 0) {
-                    badge.textContent = unreadCount;
                     badge.classList.remove('hidden');
                 } else {
                     badge.classList.add('hidden');

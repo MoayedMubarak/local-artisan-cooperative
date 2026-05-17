@@ -220,7 +220,7 @@ public class CartService {
                     "Product Out of Stock",
                     "Your product '" + product.getTitle() + "' has become out of stock.",
                     "OUT_OF_STOCK",
-                    "/artisan/products"
+                    "/artisanProducts"
                 );
             }
         }

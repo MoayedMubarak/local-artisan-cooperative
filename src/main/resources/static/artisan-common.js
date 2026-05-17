@@ -121,22 +121,21 @@
                 const link = document.getElementById('notifications-link');
                 if (!link) return;
                 
-                let badge = document.getElementById('header-notification-badge') || link.querySelector('.bg-red-500, #notification-badge, span.absolute');
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.id = 'header-notification-badge';
-                    badge.className = 'absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[9px] font-bold rounded-full border-2 border-[#faf9f6] flex items-center justify-center hidden';
-                    const btn = link.querySelector('button');
-                    if (btn) btn.appendChild(badge);
-                    else link.appendChild(badge);
-                }
-                
-                if (count > 0) {
-                    badge.textContent = count;
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
+                 let badge = document.getElementById('header-notification-badge') || link.querySelector('.bg-red-500, #notification-badge, span.absolute');
+                 if (!badge) {
+                     badge = document.createElement('span');
+                     badge.id = 'header-notification-badge';
+                     badge.className = 'absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#faf9f6] hidden';
+                     const btn = link.querySelector('button');
+                     if (btn) btn.appendChild(badge);
+                     else link.appendChild(badge);
+                 }
+                 
+                 if (count > 0) {
+                     badge.classList.remove('hidden');
+                 } else {
+                     badge.classList.add('hidden');
+                 }
             })
             .catch(err => console.error('Failed to sync notification count', err));
     }

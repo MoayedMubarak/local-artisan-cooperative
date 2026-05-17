@@ -268,6 +268,9 @@ public class AuctionService {
 
     private void notifyAllUsers(String title, String message, String type, String link) {
         userRepository.findAll().forEach(user -> {
+            if ("ARTISAN".equalsIgnoreCase(user.getRole())) {
+                return;
+            }
             notificationService.sendNotification(user, title, message, type, link);
         });
     }
