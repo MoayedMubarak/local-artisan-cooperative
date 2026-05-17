@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Artisan;
+import com.example.demo.model.Order;
 import com.example.demo.model.OrderItem;
 import com.example.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +29,9 @@ public class ArtisanController {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     private void initEmptyModel(Model model) {
         model.addAttribute("productsCount", 0L);
@@ -154,9 +160,49 @@ public class ArtisanController {
     }
 
     @GetMapping("/artisanOrderDetail")
-    public String ordersDetail(@RequestParam(required = false) Long id, Model model) {
+    public String ordersDetail(@RequestParam(required = false) Long id,
+                               @RequestParam(required = false) Long orderId,
+                               Model model) {
         initEmptyModel(model);
         loadArtisan(id, model);
+
+        if (orderId != null) {
+            orderRepository.findById(orderId).ifPresent(order -> {
+                model.addAttribute("order", order);
+
+                // Format date
+                if (order.getDate() != null) {
+                    model.addAttribute("orderDate",
+                        order.getDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+                }
+
+                // Customer initials for avatar
+                if (order.getCustomer() != null && order.getCustomer().getName() != null) {
+                    String[] parts = order.getCustomer().getName().trim().split("\\s+");
+                    String initials = parts.length >= 2
+                        ? String.valueOf(parts[0].charAt(0)) + parts[parts.length - 1].charAt(0)
+                        : String.valueOf(parts[0].charAt(0));
+                    model.addAttribute("customerInitials", initials.toUpperCase());
+                }
+
+                // Filter order items to only this artisan's products
+                final Long artisanId = id;
+                List<OrderItem> artisanItems = (order.getOrderItems() != null && artisanId != null)
+                    ? order.getOrderItems().stream()
+                        .filter(oi -> oi.getProduct() != null
+                            && oi.getProduct().getArtisan() != null
+                            && oi.getProduct().getArtisan().getUserId().equals(artisanId))
+                        .toList()
+                    : (order.getOrderItems() != null ? order.getOrderItems() : Collections.emptyList());
+
+                model.addAttribute("orderItems", artisanItems);
+
+                double subtotal = artisanItems.stream()
+                    .mapToDouble(oi -> oi.getPrice() * oi.getQuantity()).sum();
+                model.addAttribute("orderSubtotal", subtotal);
+            });
+        }
+
         return "artisanOrderDetail";
     }
 

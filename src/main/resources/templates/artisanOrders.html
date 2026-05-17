@@ -463,8 +463,26 @@
                                 <td class="px-6 py-4 text-sm font-semibold text-[#c17c5f]"><span th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 2)} + ' BD'">0.00 BD</span></td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${item.order.date}">Date</td>
                                 <td class="px-6 py-4"><span class="status-badge status-processing" th:text="${item.order.status}">Status</span></td>
-                                <td class="px-6 py-4"><button type="button" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button></td>
+                                <td class="px-6 py-4"><a th:href="@{/artisanOrderDetail(orderId=${item.order.orderId})}" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</a></td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
+                    <p class="text-sm text-[#8b7355]">Showing 1-8 of 24 orders</p>
+                    <div class="flex items-center gap-2">
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors" disabled>
+                            Previous
+                        </button>
+                        <button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium">1</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors">2</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors">3</button>
+                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors">
+                            Next
+                        </button>
+                    </div>
                         </tbody>
                     </table>
                 </div>
@@ -492,24 +510,25 @@
         // Sidebar navigation active state handling
         document.querySelectorAll('.sidebar-link').forEach(link => {
             link.addEventListener('click', function(e) {
-                // Remove active state from all links
                 document.querySelectorAll('.sidebar-link').forEach(l => {
                     l.classList.remove('active');
                     l.classList.remove('text-white');
                     l.classList.add('text-[#d4c5b5]');
                 });
-
-                // Add active state to clicked link
                 this.classList.add('active');
-                this.classList.remove('text-[#d4c5b5]');
             });
         });
 
-        // Make table rows clickable
+        // Make table rows clickable (but let anchor tags navigate themselves)
         document.querySelectorAll('.table-row').forEach(row => {
-            row.addEventListener('click', function() {
-                // Navigate to order detail page
-                window.location.href = 'artisan-order-detail.html';
+            row.addEventListener('click', function(e) {
+                if (e.target.closest('a')) return;
+                const orderId = this.getAttribute('data-order-id');
+                const urlParams = new URLSearchParams(window.location.search);
+                const artisanId = urlParams.get('id') || sessionStorage.getItem('userId');
+                if (orderId) {
+                    window.location.href = `/artisanOrderDetail?id=${artisanId}&orderId=${orderId}`;
+                }
             });
         });
 
@@ -540,7 +559,9 @@
         logoutButton.addEventListener('click', () => {
             const confirmed = window.confirm('Are you sure you want to logout?');
             if (confirmed) {
-                window.location.href = '/index';
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.href = '/login';
             }
         });
     </script>
