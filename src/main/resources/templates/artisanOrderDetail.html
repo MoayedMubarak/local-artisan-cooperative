@@ -233,7 +233,7 @@
                     <img src="/images/Logo.png" alt="ArtsyVibe Logo"
                         class="h-10 w-auto object-contain"
                         style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
-                    
+
                     <!-- Brand Name -->
                     <span class="text-2xl font-semibold" 
                         style="font-family: 'Playfair Display', serif;">
@@ -352,9 +352,9 @@
             </a>
 
             <!-- Page Header -->
-            <div class="flex items-center justify-between mb-8">
-                <h1 class="text-3xl font-bold text-[#5c4a3d]">Order #ORD-2847</h1>
-                <p class="text-[#8b7355]">March 15, 2025</p>
+            <div class="flex items-center justify-between mb-8" th:if="${order != null}">
+                <h1 class="text-3xl font-bold text-[#5c4a3d]" th:text="'Order #ORD-' + ${order.orderId}">Order #ORD-0</h1>
+                <p class="text-[#8b7355]" th:text="${order.date}">Date</p>
             </div>
 
             <!-- Two Column Layout -->
@@ -377,68 +377,24 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[#e5e0d8]">
-                                    <tr>
+                                    <tr th:each="item : ${orderItems}">
                                         <td class="py-4">
                                             <div class="flex items-center gap-3">
                                                 <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                                                     <img 
-                                                        src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop" 
-                                                        alt="Handcrafted Ceramic Vase" 
+                                                        th:src="${item.product != null and item.product.imageUrl != null ? item.product.imageUrl : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
+                                                        th:alt="${item.product != null ? item.product.title : 'Product'}"
                                                         class="w-full h-full object-cover"
-                                                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-300 text-gray-500\'><i class=\'fas fa-image text-xl\'></i></div>'"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <p class="font-medium text-[#5c4a3d]">Handcrafted Ceramic Vase</p>
-                                                    <p class="text-sm text-[#8b7355]">SKU: CER-VASE-001</p>
+                                                    <p class="font-medium text-[#5c4a3d]" th:text="${item.product != null ? item.product.title : 'Product'}">Product</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-4 text-center text-[#5c4a3d]">2</td>
-                                        <td class="py-4 text-right text-[#5c4a3d]">BD 85.000</td>
-                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 170.000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                                                    <img 
-                                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=80&h=80&fit=crop" 
-                                                        alt="Artisan Tea Set" 
-                                                        class="w-full h-full object-cover"
-                                                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-300 text-gray-500\'><i class=\'fas fa-image text-xl\'></i></div>'"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <p class="font-medium text-[#5c4a3d]">Artisan Tea Set</p>
-                                                    <p class="text-sm text-[#8b7355]">SKU: CER-TEA-003</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 text-center text-[#5c4a3d]">1</td>
-                                        <td class="py-4 text-right text-[#5c4a3d]">BD 120.000</td>
-                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 120.000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                                                    <img 
-                                                        src="https://images.unsplash.com/photo-1565193566173-034e40b7c3f8?w=80&h=80&fit=crop" 
-                                                        alt="Rustic Mug Set" 
-                                                        class="w-full h-full object-cover"
-                                                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-300 text-gray-500\'><i class=\'fas fa-image text-xl\'></i></div>'"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <p class="font-medium text-[#5c4a3d]">Rustic Mug Set (4pcs)</p>
-                                                    <p class="text-sm text-[#8b7355]">SKU: CER-MUG-007</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 text-center text-[#5c4a3d]">3</td>
-                                        <td class="py-4 text-right text-[#5c4a3d]">BD 45.000</td>
-                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 135.000</td>
+                                        <td class="py-4 text-center text-[#5c4a3d]" th:text="${item.quantity}">0</td>
+                                        <td class="py-4 text-right text-[#5c4a3d]" th:text="${#numbers.formatDecimal(item.price, 1, 3) + ' BD'}">0.000 BD</td>
+                                        <td class="py-4 text-right font-medium text-[#5c4a3d]" th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 3) + ' BD'}">0.000 BD</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -446,16 +402,8 @@
                             <!-- Order Totals -->
                             <div class="mt-6 pt-6 border-t border-[#e5e0d8] space-y-2">
                                 <div class="flex justify-between text-[#8b7355]">
-                                    <span>Subtotal</span>
-                                    <span>BD 425.000</span>
-                                </div>
-                                <div class="flex justify-between text-[#8b7355]">
-                                    <span>Shipping Fee</span>
-                                    <span>BD 15.000</span>
-                                </div>
-                                <div class="flex justify-between text-lg font-semibold text-[#5c4a3d] pt-2 border-t border-[#e5e0d8]">
-                                    <span>Total</span>
-                                    <span>BD 440.000</span>
+                                    <span>Subtotal (Your Items)</span>
+                                    <span th:text="${artisanSubtotal != null ? #numbers.formatDecimal(artisanSubtotal, 1, 3) + ' BD' : '0.000 BD'}">0.000 BD</span>
                                 </div>
                             </div>
                         </div>
@@ -560,43 +508,37 @@
                 <!-- Right Column (Narrower) -->
                 <div class="space-y-6">
                     <!-- Customer Information Card -->
-                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden" th:if="${order != null and order.customer != null}">
                         <div class="p-6 border-b border-[#e5e0d8]">
                             <h2 class="text-xl font-semibold text-[#5c4a3d]">Customer Information</h2>
                         </div>
                         <div class="p-6">
                             <div class="flex items-center gap-4 mb-4">
-                                <div class="w-14 h-14 rounded-full bg-[#c17c5f] flex items-center justify-center text-white text-xl font-semibold">
-                                    JD
+                                <div class="w-14 h-14 rounded-full bg-[#c17c5f] flex items-center justify-center text-white text-xl font-semibold" th:text="${#strings.substring(order.customer.name, 0, 1)}">
+                                    C
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">John Doe</h3>
-                                    <p class="text-sm text-[#8b7355]">john.doe@email.com</p>
+                                    <h3 class="font-semibold text-[#5c4a3d]" th:text="${order.customer.name}">Customer Name</h3>
+                                    <p class="text-sm text-[#8b7355]" th:text="${order.customer.email}">customer@email.com</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 text-[#8b7355]">
                                 <i class="fas fa-phone"></i>
-                                <span class="text-sm" id="customerPhone">+973 3344 5566</span>
-                                <span id="phoneWarning" class="tooltip hidden" data-tooltip="Phone number format may be incorrect.">
-                                    <i class="fas fa-exclamation-triangle text-amber-500"></i>
-                                </span>
+                                <span class="text-sm" th:text="${order.customer.phone}">+973 0000 0000</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Shipping Address Card -->
-                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden" th:if="${order != null}">
                         <div class="p-6 border-b border-[#e5e0d8]">
                             <h2 class="text-xl font-semibold text-[#5c4a3d]">Shipping Address</h2>
                         </div>
                         <div class="p-6">
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-map-marker-alt text-[#c17c5f] mt-1"></i>
-                                <div class="text-[#5c4a3d] text-sm leading-relaxed">
-                                    <p>Building 1234, Road 5678</p>
-                                    <p>Block 901, Seef District</p>
-                                    <p>Manama, Bahrain</p>
-                                    <p class="text-[#8b7355] mt-2">Postal Code: 35678</p>
+                                <div class="text-[#5c4a3d] text-sm leading-relaxed" th:text="${order.shippingAddress}">
+                                    Shipping Address
                                 </div>
                             </div>
                         </div>
@@ -624,30 +566,27 @@
                     </div>
 
                     <!-- Payment Information Card -->
-                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden" th:if="${order != null and order.payment != null}">
                         <div class="p-6 border-b border-[#e5e0d8]">
                             <h2 class="text-xl font-semibold text-[#5c4a3d]">Payment Information</h2>
                         </div>
                         <div class="p-6 space-y-3">
                             <div class="flex justify-between items-center">
                                 <span class="text-[#8b7355]">Payment Method</span>
-                                <span class="font-medium text-[#5c4a3d]">PayPal</span>
+                                <span class="font-medium text-[#5c4a3d]" th:text="${order.payment.paymentMethod}">Method</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-[#8b7355]">Payment Status</span>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                    <i class="fas fa-check-circle"></i>
-                                    Paid
-                                </span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700" th:text="${order.payment.status}">Status</span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex justify-between items-center" th:if="${order.payment.transactionDetails != null}">
                                 <span class="text-[#8b7355]">Transaction ID</span>
-                                <span class="text-sm text-[#8b7355]">TXN-8472639105</span>
+                                <span class="text-sm text-[#8b7355]" th:text="${order.payment.transactionDetails}">TXN-0</span>
                             </div>
                             <div class="pt-3 border-t border-[#e5e0d8]">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#8b7355]">Amount Paid</span>
-                                    <span class="font-semibold text-[#5c4a3d]">BD 440.000</span>
+                                    <span class="font-semibold text-[#5c4a3d]" th:text="${#numbers.formatDecimal(order.payment.amount, 1, 3) + ' BD'}">0.000 BD</span>
                                 </div>
                             </div>
                         </div>

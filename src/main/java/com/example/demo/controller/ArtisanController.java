@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Artisan;
 import com.example.demo.model.OrderItem;
 import com.example.demo.repository.*;
+import com.example.demo.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,12 @@ public class ArtisanController {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private AuctionService auctionService;
 
     private void initEmptyModel(Model model) {
         model.addAttribute("productsCount", 0L);
@@ -112,6 +119,8 @@ public class ArtisanController {
     public String auctions(@RequestParam(required = false) Long id, Model model) {
         initEmptyModel(model);
         loadArtisan(id, model);
+        // Sync auction statuses so ENDED auctions are correctly marked
+        try { auctionService.syncStoredStatuses(); } catch (Exception ignored) {}
         if (id != null) {
             model.addAttribute("auctions", auctionRepository.findByProductArtisanUserId(id));
         }
@@ -154,9 +163,30 @@ public class ArtisanController {
     }
 
     @GetMapping("/artisanOrderDetail")
-    public String ordersDetail(@RequestParam(required = false) Long id, Model model) {
+    public String ordersDetail(@RequestParam(required = false) Long id,
+                               @RequestParam(required = false) Long orderId,
+                               Model model) {
         initEmptyModel(model);
         loadArtisan(id, model);
+
+        if (id != null && orderId != null) {
+            orderRepository.findById(orderId).ifPresent(order -> {
+                model.addAttribute("order", order);
+
+                List<OrderItem> allItems = orderItemRepository.findByOrderIdWithProduct(orderId);
+                List<OrderItem> artisanItems = allItems.stream()
+                        .filter(item -> item.getProduct() != null
+                                && item.getProduct().getArtisan() != null
+                                && item.getProduct().getArtisan().getUserId().equals(id))
+                        .toList();
+                model.addAttribute("orderItems", artisanItems);
+
+                double artisanSubtotal = artisanItems.stream()
+                        .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                        .sum();
+                model.addAttribute("artisanSubtotal", artisanSubtotal);
+            });
+        }
         return "artisanOrderDetail";
     }
 

@@ -110,12 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!viewBtn) return;
 
         viewBtn.addEventListener('click', () => {
-            // Prefer data-order-id set by Thymeleaf; fall back to parsing the text
-            const orderId = row.getAttribute('data-order-id')
-                ?? row.querySelector('td:first-child')?.textContent.trim().replace(/[^0-9]/g, '');
+            const orderId = row.getAttribute('data-order-id');
+            const artisanId = sessionStorage.getItem('userId');
 
-            if (orderId) {
-                window.location.href = `/artisanOrderDetail?id=${orderId}`;
+            if (orderId && artisanId) {
+                window.location.href = `/artisanOrderDetail?id=${artisanId}&orderId=${orderId}`;
             } else {
                 showToast('Could not load order details.', 'error');
             }
