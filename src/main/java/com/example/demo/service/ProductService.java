@@ -29,6 +29,8 @@ public class ProductService {
 
         double oldPrice = product.getPrice();
         int oldStock = product.getStockQuantity();
+        String oldStatus = product.getStatus();
+        boolean wasAvailable = (oldStock > 0 && !"out of stock".equalsIgnoreCase(oldStatus));
 
         product.setTitle(updatedDetails.getTitle());
         product.setDescription(updatedDetails.getDescription());
@@ -46,11 +48,27 @@ public class ProductService {
 
         productRepository.save(product);
 
+        boolean isAvailable = (product.getStockQuantity() > 0 && !"out of stock".equalsIgnoreCase(product.getStatus()));
+
         // Check for discount or restock to notify wishlist users
         if (product.getPrice() < oldPrice) {
             notifyWishlistUsers(product, "Price Drop!", "An item in your wishlist, " + product.getTitle() + ", is now cheaper! Only " + product.getPrice() + " BD");
-        } else if (oldStock == 0 && product.getStockQuantity() > 0) {
+        }
+        
+        if (!wasAvailable && isAvailable) {
             notifyWishlistUsers(product, "Back in Stock!", "Good news! " + product.getTitle() + " is back in stock.");
+        }
+
+        // Notify artisan if product became out of stock
+        boolean becameOutOfStock = (wasAvailable && !isAvailable);
+        if (becameOutOfStock && product.getArtisan() != null) {
+            notificationService.sendNotification(
+                product.getArtisan(),
+                "Product Out of Stock",
+                "Your product '" + product.getTitle() + "' has become out of stock.",
+                "OUT_OF_STOCK",
+                "/artisan/products"
+            );
         }
 
         return product;
@@ -65,7 +83,7 @@ public class ProductService {
                     title,
                     message,
                     "WISHLIST_UPDATE",
-                    "/product-details?id=" + product.getId()
+                    "/ProductDetailsStandard?id=" + product.getId()
                 );
             }
         }

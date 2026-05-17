@@ -197,6 +197,10 @@ public class CartService {
         for (OrderItem line : lines) {
             Product product = productRepository.findById(line.getProduct().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            int oldStock = product.getStockQuantity();
+            String oldStatus = product.getStatus();
+            boolean wasAvailable = (oldStock > 0 && !"out of stock".equalsIgnoreCase(oldStatus));
+
             int newStock = product.getStockQuantity() - line.getQuantity();
             if (newStock < 0) {
                 newStock = 0;
@@ -206,6 +210,19 @@ public class CartService {
                 product.setStatus("out of stock");
             }
             productRepository.save(product);
+
+            boolean isAvailable = (product.getStockQuantity() > 0 && !"out of stock".equalsIgnoreCase(product.getStatus()));
+            boolean becameOutOfStock = (wasAvailable && !isAvailable);
+
+            if (becameOutOfStock && product.getArtisan() != null) {
+                notificationService.sendNotification(
+                    product.getArtisan(),
+                    "Product Out of Stock",
+                    "Your product '" + product.getTitle() + "' has become out of stock.",
+                    "OUT_OF_STOCK",
+                    "/artisan/products"
+                );
+            }
         }
 
         cart.setStatus(STATUS_PENDING);
