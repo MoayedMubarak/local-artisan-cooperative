@@ -319,18 +319,19 @@
             <div class="bg-white rounded-xl p-4 card-shadow mb-6">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex flex-wrap gap-2">
-                        <button class="filter-pill active px-4 py-2 rounded-full border-2 border-[#c17c5f] bg-[#c17c5f] text-white font-medium text-sm">
+                        <button id="filter-all" data-filter="all" class="filter-pill active px-4 py-2 rounded-full border-2 border-[#c17c5f] bg-[#c17c5f] text-white font-medium text-sm">
                             All
                         </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
+                        <button id="filter-active" data-filter="active" class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
                             Active
                         </button>
-                        <button class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
+                        <button id="filter-inactive" data-filter="inactive" class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
                             Inactive
                         </button>
                     </div>
                     <div class="relative">
                         <input 
+                            id="product-search"
                             type="text" 
                             placeholder="Search products..." 
                             class="w-full md:w-64 px-4 py-2 pl-10 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
@@ -768,6 +769,37 @@
             });
         });
 
+        // ── Filtering helpers ──────────────────────────────────────────────
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        function applyFilters() {
+            const rows = document.querySelectorAll('.product-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const name = (row.querySelector('h3')?.textContent || '').toLowerCase();
+                const statusBadge = row.querySelector('.status-badge');
+                const status = (statusBadge?.textContent || '').trim().toLowerCase(); // 'active' or 'inactive'
+
+                const matchesSearch = name.includes(currentSearch);
+                const matchesFilter = currentFilter === 'all' || status === currentFilter;
+
+                if (matchesSearch && matchesFilter) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update the footer count
+            const countEl = document.querySelector('[th\\:text]') || document.querySelector('.flex.items-center.justify-between.px-6.py-4 p');
+            if (countEl) {
+                countEl.textContent = visibleCount > 0 ? `Showing ${visibleCount} product(s)` : 'No products match your filter';
+            }
+        }
+
         // Filter pill functionality
         document.querySelectorAll('.filter-pill').forEach(pill => {
             pill.addEventListener('click', function() {
@@ -778,7 +810,16 @@
 
                 this.classList.remove('border-[#e5e0d8]', 'text-[#8b7355]');
                 this.classList.add('active', 'bg-[#c17c5f]', 'text-white', 'border-[#c17c5f]');
+
+                currentFilter = this.getAttribute('data-filter') || 'all';
+                applyFilters();
             });
+        });
+
+        // Search input functionality
+        document.getElementById('product-search').addEventListener('input', function() {
+            currentSearch = this.value.trim().toLowerCase();
+            applyFilters();
         });
 
         // File upload click handler
