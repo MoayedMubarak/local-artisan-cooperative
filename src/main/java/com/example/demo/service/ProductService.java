@@ -34,6 +34,13 @@ public class ProductService {
         product.setDescription(updatedDetails.getDescription());
         product.setPrice(updatedDetails.getPrice());
         product.setStockQuantity(updatedDetails.getStockQuantity());
+        if (updatedDetails.getStockQuantity() <= 0) {
+            product.setStatus("out of stock");
+        } else if (updatedDetails.getStatus() != null) {
+            product.setStatus(updatedDetails.getStatus());
+        } else {
+            product.setStatus("active");
+        }
         product.setCategory(updatedDetails.getCategory());
         product.setImageUrl(updatedDetails.getImageUrl());
 

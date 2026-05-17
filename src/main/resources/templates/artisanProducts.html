@@ -328,8 +328,8 @@
                         <button id="filter-active" data-filter="active" class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
                             Active
                         </button>
-                        <button id="filter-inactive" data-filter="inactive" class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
-                            Inactive
+                        <button id="filter-inactive" data-filter="out of stock" class="filter-pill px-4 py-2 rounded-full border-2 border-[#e5e0d8] text-[#8b7355] font-medium text-sm hover:border-[#c17c5f] hover:text-[#c17c5f]">
+                            Out of stock
                         </button>
                     </div>
                     <div class="relative">
@@ -368,7 +368,7 @@
                             </tr>
                             <tr th:each="product : ${products}" 
                                 class="table-row product-row"
-                                th:attr="data-id=${product.id}, data-title=${product.title}, data-category=${product.category}, data-price=${product.price}, data-stock=${product.stockQuantity}, data-image=${product.imageUrl}, data-description=${product.description}, data-auction=${product.isAuctionItem}">
+                                th:attr="data-id=${product.id}, data-title=${product.title}, data-category=${product.category}, data-price=${product.price}, data-stock=${product.stockQuantity}, data-image=${product.imageUrl}, data-description=${product.description}, data-auction=${product.isAuctionItem}, data-status=${product.status}">
                                 <td class="px-6 py-4">
                                     <img th:src="${product.imageUrl != null and !product.imageUrl.isEmpty() ? product.imageUrl : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
                                          th:alt="${product.title}"
@@ -386,8 +386,8 @@
                                 <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${product.stockQuantity} + ' in stock'">0 in stock</td>
                                 <td class="px-6 py-4">
                                     <span class="status-badge"
-                                          th:classappend="${product.stockQuantity > 0 ? ' status-active' : ' status-inactive'}"
-                                          th:text="${product.stockQuantity > 0 ? 'Active' : 'Inactive'}">Inactive</span>
+                                          th:classappend="${#strings.toLowerCase(product.status) == 'active' ? ' status-active' : ' status-inactive'}"
+                                          th:text="${#strings.toLowerCase(product.status) == 'active' ? 'Active' : 'Out of stock'}">Out of stock</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
@@ -481,13 +481,26 @@
                         <div>
                             <label class="block text-[#5c4a3d] font-semibold mb-2">Stock Quantity</label>
                             <input 
-                                id="product-stock"
+                                id="product-stock" oninput="handleStockInput()"
                                 type="number" 
                                 placeholder="Enter quantity"
                                 min="0"
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a]"
                                 required
                             />
+                        </div>
+
+                        <!-- Status -->
+                        <div>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Status</label>
+                            <select 
+                                id="product-status"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white font-medium focus:border-[#c17c5f] focus:outline-none"
+                                onchange="handleStatusChange()"
+                            >
+                                <option value="active">Active</option>
+                                <option value="out of stock">Out of stock</option>
+                            </select>
                         </div>
 
                         <!-- Image Upload -->
@@ -603,6 +616,7 @@
             document.getElementById('product-category').value = prod.category || '';
             document.getElementById('product-price').value = prod.price || '0.00';
             document.getElementById('product-stock').value = prod.stock || '0';
+            document.getElementById('product-status').value = prod.status || (parseInt(prod.stock) > 0 ? 'active' : 'out of stock');
             document.getElementById('product-image-url').value = prod.image || '';
             document.getElementById('product-description').value = prod.description || '';
             
@@ -642,6 +656,27 @@
             }
         }
 
+        function handleStatusChange() {
+            const statusSelect = document.getElementById('product-status');
+            const stockInput = document.getElementById('product-stock');
+            if (statusSelect.value === 'out of stock') {
+                stockInput.value = '0';
+            } else if (statusSelect.value === 'active' && parseInt(stockInput.value) <= 0) {
+                stockInput.value = '1';
+            }
+        }
+
+        function handleStockInput() {
+            const statusSelect = document.getElementById('product-status');
+            const stockInput = document.getElementById('product-stock');
+            const qty = parseInt(stockInput.value) || 0;
+            if (qty > 0) {
+                statusSelect.value = 'active';
+            } else {
+                statusSelect.value = 'out of stock';
+            }
+        }
+
         // Save product
         function saveProduct(event) {
             event.preventDefault();
@@ -660,6 +695,11 @@
             const description = document.getElementById('product-description').value.trim();
             const isAuctionItem = document.getElementById('enable-auction').checked;
             const endTime = document.getElementById('auction-endtime').value;
+            const status = document.getElementById('product-status').value;
+            if (status === 'active' && stockQuantity <= 0) {
+                alert("Please specify a stock quantity greater than 0 for active status.");
+                return;
+            }
 
             const payload = {
                 artisanEmail: email,
@@ -667,6 +707,7 @@
                 category: category,
                 price: price,
                 stockQuantity: stockQuantity,
+                status: status,
                 imageUrl: imageUrl,
                 description: description,
                 isAuctionItem: isAuctionItem,
@@ -682,6 +723,7 @@
                 category: category,
                 price: price,
                 stockQuantity: stockQuantity,
+                status: status,
                 imageUrl: imageUrl,
                 description: description
             } : payload;
@@ -735,8 +777,9 @@
                     const image = row.getAttribute('data-image');
                     const description = row.getAttribute('data-description');
                     const isAuction = row.getAttribute('data-auction') === 'true';
+                    const status = row.getAttribute('data-status') || (parseInt(stock) > 0 ? 'active' : 'out of stock');
 
-                    openEditProductModal({ id, title, category, price, stock, image, description, isAuction });
+                    openEditProductModal({ id, title, category, price, stock, image, description, isAuction, status });
                 });
             });
 

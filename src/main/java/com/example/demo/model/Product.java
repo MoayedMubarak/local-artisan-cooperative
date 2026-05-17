@@ -19,6 +19,7 @@ public class Product {
     private String category;
     private String imageUrl;
     private int stockQuantity;
+    private String status = "active";
     private String artisanName;
     private boolean isAuctionItem;
     private LocalDate addingDate;

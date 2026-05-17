@@ -245,9 +245,17 @@
                 <div th:each="product : ${featuredProducts}"
                     class="product-card bg-white rounded-xl overflow-hidden card-shadow">
                     <div class="relative">
-                        <img th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-56 object-cover">
+                        <!-- Out of Stock Badge -->
+                        <span th:if="${product.stockQuantity <= 0 or product.status == 'out of stock'}" 
+                              class="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md z-10">
+                            Out of Stock
+                        </span>
+                        <img th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-56 object-cover" th:classappend="${product.stockQuantity <= 0 or product.status == 'out of stock' ? 'opacity-60 grayscale-[35%]' : ''}">
                     </div>
                     <div class="p-5">
+                        <div th:if="${product.stockQuantity <= 0 or product.status == 'out of stock'}" class="text-xs text-red-500 font-bold uppercase mb-2">
+                            (Out of Stock)
+                        </div>
                         <h3 class="text-xl font-semibold text-[#5c4a3d] mb-2" th:text="${product.title}">Handmade
                             Ceramic Vase</h3>
                         <p class="text-[#8b7355] mb-3" th:text="'by ' + ${product.artisanName}">by Elena Rodriguez</p>

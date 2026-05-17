@@ -109,12 +109,18 @@
 
                     <!-- Left: Product Image -->
                     <div>
-                        <div class="mb-4">
-                            <img id="mainImage"
-                                 th:src="${product != null ? product.imageUrl : 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600'}"
-                                 th:alt="${product != null ? product.title : 'Product Image'}"
-                                 class="w-full h-96 object-cover rounded-xl">
-                        </div>
+                            <div class="relative">
+                                <img id="mainImage"
+                                     th:src="${product != null ? product.imageUrl : 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600'}"
+                                     th:alt="${product != null ? product.title : 'Product Image'}"
+                                     class="w-full h-96 object-cover rounded-xl"
+                                     th:classappend="${product != null and (product.stockQuantity <= 0 or product.status == 'out of stock') ? 'opacity-70 grayscale-[25%]' : ''}">
+                                <!-- Out of Stock Badge overlay -->
+                                <span th:if="${product != null and (product.stockQuantity <= 0 or product.status == 'out of stock')}" 
+                                      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg z-10">
+                                    Out of Stock
+                                </span>
+                            </div>
                     </div>
 
                     <!-- Right: Product Info -->
@@ -136,9 +142,12 @@
                              th:text="${product != null ? #numbers.formatDecimal(product.price, 1, 2) + ' BD' : '—'}">85.00 BD</div>
 
                         <!-- Stock -->
-                        <p class="text-green-600 mb-4">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            <span th:text="${product != null ? product.stockQuantity : 0}">0</span> in stock
+                        <p th:if="${product != null and (product.stockQuantity <= 0 or product.status == 'out of stock')}" class="text-red-500 font-bold mb-4 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-2 text-lg"></i>Out of Stock
+                        </p>
+                        <p th:if="${product != null and product.stockQuantity > 0 and product.status != 'out of stock'}" class="text-green-600 mb-4 flex items-center">
+                            <i class="fas fa-check-circle mr-2 text-lg"></i>
+                            <span th:text="${product.stockQuantity}">0</span> in stock
                         </p>
 
                         <!-- Star Rating Summary -->
@@ -163,7 +172,13 @@
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button class="flex-1 bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg flex items-center justify-center">
+                            <button th:if="${product != null and (product.stockQuantity <= 0 or product.status == 'out of stock')}" 
+                                    disabled 
+                                    class="flex-1 bg-gray-300 text-gray-500 cursor-not-allowed px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2">
+                                <i class="fas fa-ban"></i>Out of Stock
+                            </button>
+                            <button th:if="${product != null and product.stockQuantity > 0 and product.status != 'out of stock'}" 
+                                    class="flex-1 bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg flex items-center justify-center">
                                 <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
                             </button>
                             <button class="flex-1 bg-white hover:bg-[#f5ebe0] text-[#c17c5f] border-2 border-[#c17c5f] px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">

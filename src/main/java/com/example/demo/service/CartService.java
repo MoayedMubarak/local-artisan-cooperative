@@ -71,7 +71,7 @@ public class CartService {
         if (product.isAuctionItem()) {
             throw new IllegalArgumentException("Auction items cannot be added to the cart");
         }
-        if (product.getStockQuantity() < 1) {
+        if (product.getStockQuantity() < 1 || "out of stock".equalsIgnoreCase(product.getStatus())) {
             throw new IllegalArgumentException("Product is out of stock");
         }
 
@@ -169,8 +169,8 @@ public class CartService {
 
         for (OrderItem line : lines) {
             Product product = line.getProduct();
-            if (product.getStockQuantity() < line.getQuantity()) {
-                throw new IllegalArgumentException("Not enough stock for: " + product.getTitle());
+            if ("out of stock".equalsIgnoreCase(product.getStatus()) || product.getStockQuantity() < line.getQuantity()) {
+                throw new IllegalArgumentException("Product is out of stock or does not have enough stock: " + product.getTitle());
             }
         }
 
@@ -197,7 +197,14 @@ public class CartService {
         for (OrderItem line : lines) {
             Product product = productRepository.findById(line.getProduct().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-            product.setStockQuantity(product.getStockQuantity() - line.getQuantity());
+            int newStock = product.getStockQuantity() - line.getQuantity();
+            if (newStock < 0) {
+                newStock = 0;
+            }
+            product.setStockQuantity(newStock);
+            if (newStock == 0) {
+                product.setStatus("out of stock");
+            }
             productRepository.save(product);
         }
 

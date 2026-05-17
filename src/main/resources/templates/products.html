@@ -311,11 +311,21 @@
                     </button>
 
                     <div class="relative">
-                        <img th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-56 object-cover">
+                        <img th:src="${product.imageUrl}" th:alt="${product.title}" 
+                             class="w-full h-56 object-cover"
+                             th:classappend="${product.stockQuantity <= 0 or product.status == 'out of stock' ? 'opacity-60 grayscale-[35%]' : ''}">
+                        <!-- Out of Stock Badge -->
+                        <span th:if="${product.stockQuantity <= 0 or product.status == 'out of stock'}" 
+                              class="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md z-10">
+                            Out of Stock
+                        </span>
                     </div>
 
                     <div class="p-5">
-                        <h3 class="text-lg font-semibold text-[#5c4a3d] mb-1" th:text="${product.title}">Product Title</h3>
+                        <div class="flex justify-between items-start mb-1 gap-2">
+                            <h3 class="text-lg font-semibold text-[#5c4a3d] truncate" th:text="${product.title}">Product Title</h3>
+                            <span th:if="${product.stockQuantity <= 0 or product.status == 'out of stock'}" class="text-xs text-red-500 font-bold uppercase shrink-0 mt-1">(Out of stock)</span>
+                        </div>
                         <p class="text-[#8b7355] text-sm mb-3" th:text="'by ' + ${product.artisanName}">by Artisan Name</p>
                             <div class="flex items-center justify-between">
                                 <span class="text-xl font-bold text-[#c17c5f]" th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' BD'">0.00 BD</span>

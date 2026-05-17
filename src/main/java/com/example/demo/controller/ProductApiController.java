@@ -62,6 +62,8 @@ public class ProductApiController {
             product.setCategory(category);
             product.setImageUrl(imageUrl);
             product.setStockQuantity(stockQuantity);
+            String status = payload.get("status") != null ? (String) payload.get("status") : (stockQuantity > 0 ? "active" : "out of stock");
+            product.setStatus(status);
             product.setAuctionItem(isAuctionItem);
             product.setAddingDate(java.time.LocalDate.now());
 
