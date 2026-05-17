@@ -65,11 +65,10 @@
                     el.textContent = data.user.name || 'Artisan';
                 });
 
-                document.querySelectorAll('aside .text-\\[\\#d4c5b5\\]').forEach((el) => {
-                    if (el.closest('aside') && el.textContent !== data.user.email) {
-                        el.textContent = data.user.shopName || '';
-                    }
-                });
+                const shopNameEl = document.querySelector('aside .border-b p.text-sm');
+                if (shopNameEl) {
+                    shopNameEl.textContent = data.user.shopName || '';
+                }
 
                 document.querySelectorAll('.user-menu .font-semibold.text-\\[\\#5c4a3d\\]').forEach((el) => {
                     el.textContent = data.user.name || 'Artisan';
