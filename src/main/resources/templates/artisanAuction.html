@@ -366,12 +366,12 @@
                                 <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">End Time</th>
                                 <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Status</th>
                                 <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Highest Bidder</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-[#5c4a3d]">Actions</th>
+                                <!-- Actions Header Removed -->
                             </tr>
                         </thead>
                                                 <tbody class="divide-y divide-[#e5e0d8]">
                             <tr th:if="${auctions == null or auctions.isEmpty()}" class="table-row">
-                                <td colspan="8" class="px-6 py-12 text-center text-[#8b7355]">
+                                <td colspan="7" class="px-6 py-12 text-center text-[#8b7355]">
                                     <i class="fas fa-gavel text-4xl mb-3 text-[#d4c5b5] block"></i>
                                     <p class="font-medium text-[#5c4a3d]">No auctions yet</p>
                                     <p class="text-sm mt-1">Create an auction to list items for bidding.</p>
@@ -393,9 +393,6 @@
                                           th:text="${auction.status}">Status</span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${auction.highestBidderName != null ? auction.highestBidderName : '—'}">—</td>
-                                <td class="px-6 py-4">
-                                    <a th:href="'/ProductDetailsAuction?auctionId=' + ${auction.id}" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</a>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
