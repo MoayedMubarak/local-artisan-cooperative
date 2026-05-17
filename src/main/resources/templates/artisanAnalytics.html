@@ -325,9 +325,9 @@
                         <div class="w-12 h-12 bg-[#fef3c7] rounded-xl flex items-center justify-center">
                             <i class="fas fa-coins text-2xl text-[#d97706]"></i>
                         </div>
-                        <span class="text-green-600 text-sm font-semibold flex items-center gap-1">
-                            <i class="fas fa-arrow-up"></i>
-                            12.5%
+                        <span th:classappend="${revenuePercentage >= 0 ? 'text-green-600' : 'text-red-500'}" class="text-sm font-semibold flex items-center gap-1">
+                            <i th:class="${revenuePercentage >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'}"></i>
+                            <span th:text="${#numbers.formatDecimal(revenuePercentage >= 0 ? revenuePercentage : -revenuePercentage, 1, 1)} + '%'">0.0%</span>
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Total Revenue</h3>
@@ -341,9 +341,9 @@
                         <div class="w-12 h-12 bg-[#dbeafe] rounded-xl flex items-center justify-center">
                             <i class="fas fa-shopping-bag text-2xl text-[#2563eb]"></i>
                         </div>
-                        <span class="text-green-600 text-sm font-semibold flex items-center gap-1">
-                            <i class="fas fa-arrow-up"></i>
-                            8.2%
+                        <span th:classappend="${ordersPercentage >= 0 ? 'text-green-600' : 'text-red-500'}" class="text-sm font-semibold flex items-center gap-1">
+                            <i th:class="${ordersPercentage >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'}"></i>
+                            <span th:text="${#numbers.formatDecimal(ordersPercentage >= 0 ? ordersPercentage : -ordersPercentage, 1, 1)} + '%'">0.0%</span>
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Total Orders</h3>
@@ -359,8 +359,8 @@
                         </div>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Top Product</h3>
-                    <p class="text-lg font-bold text-[#5c4a3d] truncate" th:text="${productsCount != null and productsCount > 0 ? '—' : 'No products yet'}">No products yet</p>
-                    <p class="text-xs text-[#8b7355] mt-2" th:text="${productsCount != null and productsCount > 0 ? (productsCount + ' products listed') : 'Add products to see stats'}">Add products to see stats</p>
+                    <p class="text-lg font-bold text-[#5c4a3d] truncate" th:text="${bestSellers != null and !bestSellers.isEmpty() ? bestSellers.get(0).title : 'No sales yet'}">No sales yet</p>
+                    <p class="text-xs text-[#8b7355] mt-2" th:text="${bestSellers != null and !bestSellers.isEmpty() ? (bestSellers.get(0).unitsSold + ' units sold') : 'Add products to see stats'}">Add products to see stats</p>
                 </div>
 
                 <!-- Average Rating -->
@@ -369,23 +369,23 @@
                         <div class="w-12 h-12 bg-[#fce7f3] rounded-xl flex items-center justify-center">
                             <i class="fas fa-heart text-2xl text-[#db2777]"></i>
                         </div>
-                        <span class="text-green-600 text-sm font-semibold flex items-center gap-1">
+                        <span class="hidden">
                             <i class="fas fa-arrow-up"></i>
                             0.3
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Average Rating</h3>
                     <div class="flex items-center gap-2">
-                        <p class="text-3xl font-bold text-[#5c4a3d]">—</p>
-                        <div class="flex star-rating">
+                        <p class="text-3xl font-bold text-[#5c4a3d]" th:text="${totalReviewsCount > 0 ? #numbers.formatDecimal(averageRating, 1, 1) : '—'}">—</p>
+                        <div class="flex star-rating"><i th:each="star : ${#numbers.sequence(1, 5)}" th:class="${averageRating >= star ? 'fas fa-star' : (averageRating >= star - 0.5 ? 'fas fa-star-half-alt' : 'far fa-star')}"></i><!--
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star-half-alt"></i>
-                        </div>
+                        --></div>
                     </div>
-                    <p class="text-xs text-[#8b7355] mt-2">Based on 89 reviews</p>
+                    <p class="text-xs text-[#8b7355] mt-2" th:text="'Based on ' + ${totalReviewsCount} + ' reviews'">Based on 0 reviews</p>
                 </div>
             </div>
 
@@ -449,7 +449,7 @@
                     </svg>
                     
                     <!-- X-axis Labels -->
-                    <div class="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-[#8b7355] pt-2 pl-12">
+                    <div id="x-axis-labels" class="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-[#8b7355] pt-2 pl-12">
                         <span>Week 1</span>
                         <span>Week 2</span>
                         <span>Week 3</span>
@@ -462,7 +462,7 @@
                 </div>
                 
                 <!-- Y-axis Labels -->
-                <div class="absolute left-0 top-10 bottom-8 flex flex-col justify-between text-xs text-[#8b7355] pr-2 -ml-10">
+                <div id="y-axis-labels" class="absolute left-0 top-10 bottom-8 flex flex-col justify-between text-xs text-[#8b7355] pr-2 -ml-10">
                     <span>BD 0</span>
                     <span>BD 100</span>
                     <span>BD 200</span>
@@ -487,6 +487,37 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e5e0d8]">
+                            <!-- Empty State for new artisan -->
+                            <tr th:if="${bestSellers == null or bestSellers.isEmpty()}" class="table-row">
+                                <td colspan="4" class="px-6 py-12 text-center text-[#8b7355]">
+                                    <i class="fas fa-box-open text-4xl mb-3 text-[#d4c5b5] block"></i>
+                                    <p class="font-medium text-[#5c4a3d]">No sales yet</p>
+                                    <p class="text-sm mt-1">Once you sell products, your best sellers will appear here.</p>
+                                </td>
+                            </tr>
+                            <!-- Dynamic Rows -->
+                            <tr th:each="prod : ${bestSellers}" class="table-row">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            th:src="${prod.imageUrl != null ? prod.imageUrl : 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=60&h=60&fit=crop'}" 
+                                            th:alt="${prod.title}" 
+                                            class="w-12 h-12 rounded-lg object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]" th:text="${prod.title}">Product Title</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm text-[#8b7355]" th:text="${prod.category}">Category</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]" th:text="${prod.unitsSold}">0</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-[#c17c5f]" th:text="'BD ' + ${#numbers.formatDecimal(prod.revenue, 1, 2)}">BD 0.00</span>
+                                </td>
+                            </tr>
+                            <!--<!--
                             <tr class="table-row">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
@@ -592,7 +623,7 @@
                                     <span class="font-bold text-[#c17c5f]">BD 450.00</span>
                                 </td>
                             </tr>
-                        </tbody>
+                        --></tbody>
                     </table>
                 </div>
             </div>
@@ -604,20 +635,30 @@
                 <div class="flex flex-col lg:flex-row gap-8">
                     <!-- Average Rating -->
                     <div class="flex flex-col items-center justify-center lg:w-1/3">
-                        <div class="text-6xl font-bold text-[#5c4a3d] mb-2">4.8</div>
-                        <div class="flex star-rating text-2xl mb-3">
+                        <div class="text-6xl font-bold text-[#5c4a3d] mb-2" th:text="${totalReviewsCount > 0 ? #numbers.formatDecimal(averageRating, 1, 1) : '0.0'}">0.0</div>
+                        <div class="flex star-rating text-2xl mb-3"><i th:each="star : ${#numbers.sequence(1, 5)}" th:class="${averageRating >= star ? 'fas fa-star' : (averageRating >= star - 0.5 ? 'fas fa-star-half-alt' : 'far fa-star')}"></i><!--
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <p class="text-[#8b7355] text-sm">Based on 89 reviews</p>
+                        --></div>
+                        <p class="text-[#8b7355] text-sm" th:text="'Based on ' + ${totalReviewsCount} + ' reviews'">Based on 0 reviews</p>
                     </div>
                     
                     <!-- Rating Distribution Bar Chart -->
                     <div class="lg:w-2/3">
                         <div class="space-y-4">
+                            <div th:each="starIdx : ${#numbers.sequence(5, 1)}" class="flex items-center gap-4">
+                                <span class="text-sm font-medium text-[#5c4a3d] w-16" th:text="${starIdx} + ' Star'">5 Star</span>
+                                <div class="flex-1 h-5 bg-[#f5ebe0] rounded-full overflow-hidden">
+                                    <div class="h-full rating-bar rounded-full" 
+                                         th:classappend="${starIdx == 5 ? 'bg-[#c17c5f]' : (starIdx == 4 ? 'bg-[#d97706]' : (starIdx == 3 ? 'bg-[#fbbf24]' : (starIdx == 2 ? 'bg-[#fcd34d]' : 'bg-[#fde68a]')))}"
+                                         th:style="'width: ' + ${starPercent.get(starIdx - 1)} + '%'"></div>
+                                </div>
+                                <span class="text-sm text-[#8b7355] w-12 text-right" th:text="${starDistribution[starIdx - 1]}">0</span>
+                            </div>
+                            <div class="hidden">
                             <!-- 5 Star -->
                             <div class="flex items-center gap-4">
                                 <span class="text-sm font-medium text-[#5c4a3d] w-16">5 Star</span>
@@ -662,14 +703,104 @@
                                 </div>
                                 <span class="text-sm text-[#8b7355] w-12 text-right">1</span>
                             </div>
-                        </div>
+                            </div></div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const weeklyRevenueData = /*[[${weeklyRevenue}]]*/ [0,0,0,0,0,0,0,0];
+        const monthlyRevenueData = /*[[${monthlyRevenue}]]*/ [0,0,0,0,0,0];
+        /*]]>*/
+
+        function renderRevenueChart(data, timeframe) {
+            const svg = document.querySelector('svg');
+            if (!svg) return;
+
+            const maxVal = Math.max(...data, 100); // default to 100 max if all are 0
+            const n = data.length;
+            const width = 800;
+            const height = 200; // Y goes from 40 to 240 (height 200)
+            const startY = 240;
+            const startX = 50; // padding for labels
+            const endX = 750;
+            const stepX = (endX - startX) / (n - 1);
+
+            // Compute points
+            const points = [];
+            for (let i = 0; i < n; i++) {
+                const x = startX + i * stepX;
+                const y = startY - (data[i] / maxVal) * height;
+                points.push({x, y, val: data[i]});
+            }
+
+            // 1. Build line path
+            let lineD = `M ${points[0].x},${points[0].y}`;
+            for (let i = 1; i < points.length; i++) {
+                lineD += ` L ${points[i].x},${points[i].y}`;
+            }
+
+            // 2. Build area path
+            const areaD = lineD + ` L ${points[points.length - 1].x},240 L ${points[0].x},240 Z`;
+
+            // Update SVG elements
+            const chartLine = svg.querySelector('.chart-line');
+            const chartArea = svg.querySelector('.chart-area');
+            if (chartLine) chartLine.setAttribute('d', lineD);
+            if (chartArea) chartArea.setAttribute('d', areaD);
+
+            // Remove existing circles
+            svg.querySelectorAll('circle').forEach(c => c.remove());
+
+            // Add new dynamic circles with hover titles (tooltips!)
+            points.forEach((pt, idx) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', pt.x);
+                circle.setAttribute('cy', pt.y);
+                circle.setAttribute('r', '6');
+                circle.setAttribute('fill', '#c17c5f');
+                circle.setAttribute('class', 'cursor-pointer hover:r-8 transition-all');
+                
+                // Add simple SVG title element for hover tooltip
+                const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                title.textContent = `${timeframe === 'weekly' ? 'Week' : 'Month'} ${idx + 1}: BD ${pt.val.toFixed(2)}`;
+                circle.appendChild(title);
+                
+                svg.appendChild(circle);
+            });
+
+            // Update X-axis Labels
+            const xAxisContainer = document.getElementById('x-axis-labels');
+            if (xAxisContainer) {
+                xAxisContainer.innerHTML = '';
+                points.forEach((pt, idx) => {
+                    const span = document.createElement('span');
+                    span.textContent = timeframe === 'weekly' ? `Week ${idx + 1}` : `Month ${idx + 1}`;
+                    xAxisContainer.appendChild(span);
+                });
+            }
+
+            // Update Y-axis Labels
+            const yAxisContainer = document.getElementById('y-axis-labels');
+            if (yAxisContainer) {
+                yAxisContainer.innerHTML = '';
+                const steps = 5;
+                for (let i = steps - 1; i >= 0; i--) {
+                    const val = (maxVal / (steps - 1)) * i;
+                    const span = document.createElement('span');
+                    span.textContent = `BD ${Math.round(val)}`;
+                    yAxisContainer.appendChild(span);
+                }
+            }
+        }
+
+        // Render weekly chart on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderRevenueChart(weeklyRevenueData, 'weekly');
+        });
         // Sidebar navigation active state handling
         document.querySelectorAll('.sidebar-link').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -693,7 +824,7 @@
             });
             button.classList.add('active');
             
-            // In a real application, you would fetch new data based on the timeframe
+            if (timeframe === 'weekly') { renderRevenueChart(weeklyRevenueData, 'weekly'); } else { renderRevenueChart(monthlyRevenueData, 'monthly'); }
             // For demo purposes, we'll just show a notification
             const message = timeframe === 'weekly' ? 'Showing weekly revenue data' : 'Showing monthly revenue data';
             showNotification(message);
