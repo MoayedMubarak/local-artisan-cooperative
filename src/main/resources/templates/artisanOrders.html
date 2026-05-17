@@ -459,7 +459,7 @@
                                     <p class="text-sm mt-1">Customer orders will appear here.</p>
                                 </td>
                             </tr>
-                            <tr th:each="item : ${orders}" class="table-row cursor-pointer" th:attr="data-order-id=${item.orderItemId}">
+                            <tr th:each="item : ${orders}" class="table-row cursor-pointer" th:attr="data-order-id=${item.order.orderId}">
                                 <td class="px-6 py-4"><span class="font-mono text-sm font-semibold text-[#5c4a3d]" th:text="'#ORD-' + ${item.order.orderId}">#ORD-0</span></td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${item.order.customer != null ? item.order.customer.name : 'Customer'}">Customer</td>
                                 <td class="px-6 py-4 text-sm text-[#8b7355]" th:text="${item.product != null ? item.product.title : 'Product'}">Product</td>
@@ -511,8 +511,11 @@
         // Make table rows clickable
         document.querySelectorAll('.table-row').forEach(row => {
             row.addEventListener('click', function() {
-                // Navigate to order detail page
-                window.location.href = 'artisan-order-detail.html';
+                const orderId = this.getAttribute('data-order-id');
+                const artisanId = sessionStorage.getItem('userId');
+                if (orderId && artisanId) {
+                    window.location.href = `/artisanOrderDetail?id=${artisanId}&orderId=${orderId}`;
+                }
             });
         });
 
