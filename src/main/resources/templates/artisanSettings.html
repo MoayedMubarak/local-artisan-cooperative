@@ -343,17 +343,22 @@
                     <div class="flex flex-col md:flex-row gap-8">
                         <!-- Avatar Upload -->
                         <div class="flex flex-col items-center">
-                            <img
+                                                        <img
+                                id="artisanProfileImg"
                                 th:src="${artisan != null ? artisan.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
                                 th:alt="${artisan != null ? artisan.name : 'Profile Photo'}"
                                 alt="Profile Photo"
-                                class="w-32 h-32 rounded-full object-cover border-4 border-[#e5e0d8] mb-4"
+                                class="w-32 h-32 rounded-full object-cover border-4 border-[#e5e0d8] mb-4 cursor-pointer hover:opacity-90 transition-opacity"
+                                onclick="document.getElementById('artisan-profile-file-input').click()"
                             />
                             <button
+                                type="button"
+                                onclick="document.getElementById('artisan-profile-file-input').click()"
                                 class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm transition-colors"
                             >
                                 Change Photo
                             </button>
+                            <input type="file" id="artisan-profile-file-input" accept="image/*" class="hidden" />
                         </div>
 
                         <!-- Form Fields -->
@@ -980,13 +985,64 @@
             }
 
             // Close modal when clicking outside
-            document
-                .getElementById("address-modal")
-                .addEventListener("click", function (e) {
+            document.getElementById("address-modal").addEventListener("click", function (e) {
                     if (e.target === this) {
                         closeModal();
                     }
                 });
+
+            // Profile Picture Upload Handler
+            document.getElementById('artisan-profile-file-input')?.addEventListener('change', function () {
+                if (!this.files.length) return;
+                const file = this.files[0];
+                
+                // Max size check: 2MB
+                const maxBytes = 2 * 1024 * 1024;
+                if (file.size > maxBytes) {
+                    showNotification("Profile picture must be 2MB or smaller.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageUrl = e.target.result;
+                    
+                    // Update preview immediately
+                    const img = document.getElementById('artisanProfileImg');
+                    if (img) img.src = imageUrl;
+
+                    // Save to database permanently
+                    const userEmail = sessionStorage.getItem('userEmail');
+                    if (userEmail) {
+                        fetch('/api/user/update-profile-picture', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail, imageUrl: imageUrl })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                showNotification("Profile picture updated permanently!");
+                                // Update session storage
+                                sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+                                
+                                // Sync other images on the page (top-right, sidebar)
+                                const profilePicture = data.user.profilePicture || imageUrl;
+                                document.querySelectorAll('aside img.rounded-full, .user-menu img.rounded-full').forEach((img) => {
+                                    img.src = profilePicture;
+                                });
+                            } else {
+                                showNotification("Failed to update profile picture.");
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Failed to update profile picture', err);
+                            showNotification("Failed to save profile picture to server.");
+                        });
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
 
         // User profile logout dropdown
         const userMenuButton = document.getElementById('userMenuButton');

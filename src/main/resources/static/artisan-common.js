@@ -56,7 +56,7 @@
                 const profilePicture = data.user.profilePicture ||
                     'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
-                document.querySelectorAll('aside img.rounded-full, .user-menu img.rounded-full').forEach((img) => {
+                document.querySelectorAll('aside img.rounded-full, .user-menu img.rounded-full, #artisanProfileImg').forEach((img) => {
                     img.src = profilePicture;
                     if (data.user.name) img.alt = data.user.name;
                 });
