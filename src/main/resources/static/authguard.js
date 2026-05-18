@@ -154,6 +154,12 @@
         .then(r => r.json())
         .then(data => {
           if (data.success) {
+            if (data.user.status === 'suspended') {
+              sessionStorage.clear();
+              localStorage.clear();
+              window.location.replace('/login?message=Suspended');
+              return;
+            }
             sessionStorage.setItem('userProfile', JSON.stringify(data.user));
             sessionStorage.setItem('userName', data.user.name);
             applyNavState(data.user);

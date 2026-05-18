@@ -317,6 +317,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (params.get('tab') === 'register') {
         switchTab('register');
     }
+    const message = params.get('message');
+    if (message === 'Suspended') {
+        showToast('Your account has been suspended because you violated our Terms of Service and Policies.', 'error');
+    } else if (message === 'Unauthorized') {
+        showToast('You are not authorized to access this page.', 'error');
+    } else if (message) {
+        showToast(message, 'info');
+    }
 });
 
 // ============================================================

@@ -151,7 +151,7 @@
       if (!userId) return;
 
       const actionsDiv = qs('td:last-child .flex', row);
-      const toggleBtn  = actionsDiv ? actionsDiv.children[2] : null;
+      const toggleBtn  = actionsDiv ? actionsDiv.children[1] : null;
       const statusBadge = qs('[class*="status-"]', row);
       if (!toggleBtn || !statusBadge) return;
 
@@ -193,7 +193,7 @@
     function wireToggleButtons() {
       getRows().forEach(row => {
         const actionsDiv = qs('td:last-child .flex', row);
-        const toggleBtn = actionsDiv ? actionsDiv.children[2] : null;
+        const toggleBtn = actionsDiv ? actionsDiv.children[1] : null;
         if (!toggleBtn || toggleBtn.dataset.wiredToggle) return;
         toggleBtn.dataset.wiredToggle = '1';
         toggleBtn.addEventListener('click', e => {

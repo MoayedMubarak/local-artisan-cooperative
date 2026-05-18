@@ -56,6 +56,10 @@ public class AuthController {
             }
 
             if (passwordMatch) {
+                if ("suspended".equalsIgnoreCase(user.getStatus())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of("success", false, "message", "Your account has been suspended because you violated our Terms of Service and Policies."));
+                }
                 user.setLastActive(java.time.LocalDateTime.now());
                 userRepository.save(user);
 
