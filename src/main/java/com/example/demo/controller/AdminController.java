@@ -194,7 +194,31 @@ public class AdminController {
     @GetMapping({"/adminOrderDetail", "/adminOrderDetail/{id}"})
     public String adminOrderDetail(@PathVariable(required = false) Long id, Model model) {
         if (id != null) {
-            orderRepository.findById(id).ifPresent(order -> model.addAttribute("order", order));
+            orderRepository.findById(id).ifPresent(order -> {
+                model.addAttribute("order", order);
+
+                // Customer info
+                com.example.demo.model.Customer customer = order.getCustomer();
+                model.addAttribute("customer", customer);
+
+                // Artisan info — derive from the first order item's product
+                com.example.demo.model.Artisan artisan = null;
+                if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                    for (com.example.demo.model.OrderItem item : order.getOrderItems()) {
+                        if (item.getProduct() != null && item.getProduct().getArtisan() != null) {
+                            artisan = item.getProduct().getArtisan();
+                            break;
+                        }
+                    }
+                }
+                model.addAttribute("artisan", artisan);
+
+                // Payment info
+                model.addAttribute("payment", order.getPayment());
+
+                // Order items list
+                model.addAttribute("orderItems", order.getOrderItems());
+            });
         }
         return "adminOrderDetail";
     }

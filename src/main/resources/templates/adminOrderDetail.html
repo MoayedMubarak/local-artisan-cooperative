@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -349,15 +349,20 @@
             </a>
 
             <!-- Page Header -->
-            <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center justify-between mb-8" th:if="${order != null}">
                 <div>
-                    <h1 class="text-3xl font-bold text-[#5c4a3d] mb-1">Order #ORD-2024-1549</h1>
-                    <p class="text-[#8b7355]">March 14, 2025</p>
+                    <h1 class="text-3xl font-bold text-[#5c4a3d] mb-1" th:text="'Order #ORD-' + ${order.orderId}">Order #ORD-1</h1>
+                    <p class="text-[#8b7355]" th:text="${order.date}">-</p>
                 </div>
-                <span class="status-badge bg-amber-100 text-amber-700 text-sm px-4 py-2">
-                    <i class="fas fa-exclamation-circle"></i>
-                    Refund Requested
-                </span>
+                <span th:text="${order.status}" th:classappend="${
+                    #strings.equalsIgnoreCase(order.status,'delivered') ? 'bg-green-100 text-green-700' :
+                    #strings.equalsIgnoreCase(order.status,'processing') ? 'bg-blue-100 text-blue-700' :
+                    #strings.equalsIgnoreCase(order.status,'shipped') ? 'bg-purple-100 text-purple-700' :
+                    #strings.equalsIgnoreCase(order.status,'pending') ? 'bg-gray-100 text-gray-700' :
+                    'bg-amber-100 text-amber-700'}" class="status-badge text-sm px-4 py-2">Status</span>
+            </div>
+            <div th:unless="${order != null}" class="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+                <p class="text-red-600 font-medium">Order not found.</p>
             </div>
 
             <!-- Two Column Layout -->
@@ -380,42 +385,30 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[#e5e0d8]">
-                                    <tr>
+                                    <tr th:each="item : ${orderItems}">
                                         <td class="py-4">
                                             <div class="flex items-center gap-3">
                                                 <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                                                    <img 
-                                                        src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=80&h=80&fit=crop" 
-                                                        alt="Artisan Tea Set" 
-                                                        class="w-full h-full object-cover"
-                                                    />
+                                                    <img th:src="${item.product != null and item.product.imageUrl != null ? item.product.imageUrl : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" th:alt="${item.product != null ? item.product.title : 'Product'}" class="w-full h-full object-cover"/>
                                                 </div>
                                                 <div>
-                                                    <p class="font-medium text-[#5c4a3d]">Artisan Tea Set</p>
-                                                    <p class="text-sm text-[#8b7355]">SKU: CER-TEA-003</p>
+                                                    <p class="font-medium text-[#5c4a3d]" th:text="${item.product != null ? item.product.title : 'Unknown Product'}">Product</p>
+                                                    <p class="text-sm text-[#8b7355]" th:text="${item.product != null ? item.product.category : ''}">Category</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-4 text-center text-[#5c4a3d]">1</td>
-                                        <td class="py-4 text-right text-[#5c4a3d]">BD 120.000</td>
-                                        <td class="py-4 text-right font-medium text-[#5c4a3d]">BD 120.000</td>
+                                        <td class="py-4 text-center text-[#5c4a3d]" th:text="${item.quantity}">1</td>
+                                        <td class="py-4 text-right text-[#5c4a3d]" th:text="'BD ' + ${#numbers.formatDecimal(item.price, 1, 3)}">BD 0.000</td>
+                                        <td class="py-4 text-right font-medium text-[#5c4a3d]" th:text="'BD ' + ${#numbers.formatDecimal(item.price * item.quantity, 1, 3)}">BD 0.000</td>
                                     </tr>
                                 </tbody>
                             </table>
 
                             <!-- Order Totals -->
-                            <div class="mt-6 pt-6 border-t border-[#e5e0d8] space-y-2">
-                                <div class="flex justify-between text-[#8b7355]">
-                                    <span>Subtotal</span>
-                                    <span>BD 120.000</span>
-                                </div>
-                                <div class="flex justify-between text-[#8b7355]">
-                                    <span>Shipping Fee</span>
-                                    <span>BD 10.000</span>
-                                </div>
-                                <div class="flex justify-between text-lg font-semibold text-[#5c4a3d] pt-2 border-t border-[#e5e0d8]">
-                                    <span>Total</span>
-                                    <span>BD 130.000</span>
+                            <div class="mt-6 pt-6 border-t border-[#e5e0d8] space-y-2" th:if="${order != null}">
+                                <div class="flex justify-between text-lg font-semibold text-[#5c4a3d] pt-2">
+                                    <span>Total Amount</span>
+                                    <span th:text="'BD ' + ${#numbers.formatDecimal(order.totalAmount, 1, 3)}">BD 0.000</span>
                                 </div>
                             </div>
                         </div>
@@ -427,76 +420,46 @@
                             <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Timeline</h2>
                         </div>
                         <div class="p-6">
-                            <div class="space-y-6">
-                                <!-- Order Placed - Completed -->
+                            <div class="space-y-6" th:if="${order != null}">
+                                <!-- Step 1: Order Placed -->
                                 <div class="timeline-step completed">
-                                    <div class="timeline-icon">
-                                        <i class="fas fa-check"></i>
-                                    </div>
+                                    <div class="timeline-icon"><i class="fas fa-check"></i></div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Order Placed</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 14, 2025 at 2:30 PM</p>
+                                        <p class="text-sm text-[#8b7355] mt-1" th:text="${order.date}">-</p>
                                         <p class="text-sm text-[#8b7355]">Customer placed the order successfully</p>
                                     </div>
                                 </div>
-
-                                <!-- Payment Confirmed - Completed -->
-                                <div class="timeline-step completed">
-                                    <div class="timeline-icon">
-                                        <i class="fas fa-credit-card"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-semibold text-[#5c4a3d]">Payment Confirmed</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 14, 2025 at 2:32 PM</p>
-                                        <p class="text-sm text-[#8b7355]">Payment received via Credit Card</p>
-                                    </div>
-                                </div>
-
-                                <!-- Processing - Completed -->
-                                <div class="timeline-step completed">
-                                    <div class="timeline-icon">
-                                        <i class="fas fa-box-open"></i>
-                                    </div>
+                                <!-- Step 2: Processing -->
+                                <div th:classappend="${#strings.equalsIgnoreCase(order.status,'processing') ? 'current' : (#strings.equalsIgnoreCase(order.status,'pending') ? 'pending' : 'completed')}" class="timeline-step">
+                                    <div class="timeline-icon"><i class="fas fa-box-open"></i></div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Processing</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 15, 2025 at 10:00 AM</p>
-                                        <p class="text-sm text-[#8b7355]">Artisan started preparing the order</p>
+                                        <p class="text-sm text-[#8b7355]">Artisan is preparing the order</p>
                                     </div>
                                 </div>
-
-                                <!-- Shipped - Completed -->
-                                <div class="timeline-step completed">
-                                    <div class="timeline-icon">
-                                        <i class="fas fa-shipping-fast"></i>
-                                    </div>
+                                <!-- Step 3: Shipped -->
+                                <div th:classappend="${#strings.equalsIgnoreCase(order.status,'shipped') ? 'current' : (#lists.contains({'pending','processing'}, #strings.toLowerCase(order.status)) ? 'pending' : 'completed')}" class="timeline-step">
+                                    <div class="timeline-icon"><i class="fas fa-shipping-fast"></i></div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Shipped</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 16, 2025 at 3:00 PM</p>
-                                        <p class="text-sm text-[#8b7355]">Tracking: BH78456123</p>
+                                        <p class="text-sm text-[#8b7355]">Order dispatched for delivery</p>
                                     </div>
                                 </div>
-
-                                <!-- Delivered - Completed -->
-                                <div class="timeline-step completed">
-                                    <div class="timeline-icon">
-                                        <i class="fas fa-home"></i>
-                                    </div>
+                                <!-- Step 4: Delivered -->
+                                <div th:classappend="${#strings.equalsIgnoreCase(order.status,'delivered') or #strings.toLowerCase(order.status).contains('refund') ? 'completed' : 'pending'}" class="timeline-step">
+                                    <div class="timeline-icon"><i class="fas fa-home"></i></div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Delivered</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 17, 2025 at 11:30 AM</p>
                                         <p class="text-sm text-[#8b7355]">Package delivered to customer</p>
                                     </div>
                                 </div>
-
-                                <!-- Refund Requested - Current -->
-                                <div class="timeline-step current">
-                                    <div class="timeline-icon">
-                                        <i class="fas fa-undo"></i>
-                                    </div>
+                                <!-- Step 5: Refund (shown only if refund status) -->
+                                <div th:if="${#strings.toLowerCase(order.status).contains('refund')}" th:classappend="${#strings.equalsIgnoreCase(order.status,'refund approved') or #strings.equalsIgnoreCase(order.status,'refund declined') ? 'completed' : 'current'}" class="timeline-step">
+                                    <div class="timeline-icon"><i class="fas fa-undo"></i></div>
                                     <div>
-                                        <h4 class="font-semibold text-[#5c4a3d]">Refund Requested</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 18, 2025 at 9:15 AM</p>
-                                        <p class="text-sm text-[#8b7355]">Customer requested refund - Item damaged</p>
+                                        <h4 class="font-semibold text-[#5c4a3d]" th:text="${order.status}">Refund</h4>
+                                        <p class="text-sm text-[#8b7355]">Refund process initiated</p>
                                     </div>
                                 </div>
                             </div>
@@ -513,17 +476,16 @@
                         </div>
                         <div class="p-6">
                             <div class="flex items-center gap-4 mb-4">
-                                <div class="w-14 h-14 rounded-full bg-[#c17c5f] flex items-center justify-center text-white text-xl font-semibold">
-                                    EW
-                                </div>
+                                <img th:if="${customer != null}" th:src="${customer.profilePicture != null ? customer.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" th:alt="${customer.name}" class="w-14 h-14 rounded-full object-cover border-2 border-[#c17c5f]"/>
+                                <div class="w-14 h-14 rounded-full bg-[#c17c5f] flex items-center justify-center text-white text-xl font-semibold" th:unless="${customer != null}">?</div>
                                 <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Emma Wilson</h3>
-                                    <p class="text-sm text-[#8b7355]">emma.wilson@email.com</p>
+                                    <h3 class="font-semibold text-[#5c4a3d]" th:text="${customer != null ? customer.name : 'Unknown Customer'}">Customer</h3>
+                                    <p class="text-sm text-[#8b7355]" th:text="${customer != null ? customer.email : '-'}">email</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 text-[#8b7355]">
+                            <div class="flex items-center gap-2 text-[#8b7355]" th:if="${customer != null}">
                                 <i class="fas fa-phone"></i>
-                                <span class="text-sm">+973 3678 9012</span>
+                                <span class="text-sm" th:text="${customer.phone != null ? customer.phone : 'N/A'}">phone</span>
                             </div>
                         </div>
                     </div>
@@ -535,19 +497,16 @@
                         </div>
                         <div class="p-6">
                             <div class="flex items-center gap-4 mb-4">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=56&h=56&fit=crop&crop=face" 
-                                    alt="Elena Rodriguez" 
-                                    class="w-14 h-14 rounded-full object-cover"
-                                />
+                                <img th:if="${artisan != null}" th:src="${artisan.profilePicture != null ? artisan.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" th:alt="${artisan.name}" class="w-14 h-14 rounded-full object-cover border-2 border-[#c17c5f]"/>
+                                <div class="w-14 h-14 rounded-full bg-[#8b7355] flex items-center justify-center text-white text-xl font-semibold" th:unless="${artisan != null}">?</div>
                                 <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Elena Rodriguez</h3>
-                                    <p class="text-sm text-[#8b7355]">Ceramics Artist</p>
+                                    <h3 class="font-semibold text-[#5c4a3d]" th:text="${artisan != null ? artisan.name : 'Unknown Artisan'}">Artisan</h3>
+                                    <p class="text-sm text-[#8b7355]" th:text="${artisan != null and artisan.shopName != null ? artisan.shopName : 'Independent Artisan'}">Shop</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 text-[#8b7355]">
+                            <div class="flex items-center gap-2 text-[#8b7355]" th:if="${artisan != null}">
                                 <i class="fas fa-envelope"></i>
-                                <span class="text-sm">elena@artisan.com</span>
+                                <span class="text-sm" th:text="${artisan.email}">email</span>
                             </div>
                         </div>
                     </div>
@@ -560,11 +519,8 @@
                         <div class="p-6">
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-map-marker-alt text-[#c17c5f] mt-1"></i>
-                                <div class="text-[#5c4a3d] text-sm leading-relaxed">
-                                    <p>Building 567, Road 234</p>
-                                    <p>Block 902, Juffair</p>
-                                    <p>Manama, Bahrain</p>
-                                    <p class="text-[#8b7355] mt-2">Postal Code: 35902</p>
+                                <div class="text-[#5c4a3d] text-sm leading-relaxed" th:if="${order != null}">
+                                    <p th:text="${order.shippingAddress != null ? order.shippingAddress : 'No shipping address provided.'}">Address</p>
                                 </div>
                             </div>
                         </div>
@@ -575,28 +531,28 @@
                         <div class="p-6 border-b border-[#e5e0d8]">
                             <h2 class="text-xl font-semibold text-[#5c4a3d]">Payment Information</h2>
                         </div>
-                        <div class="p-6 space-y-3">
+                        <div class="p-6 space-y-3" th:if="${payment != null}">
                             <div class="flex justify-between items-center">
                                 <span class="text-[#8b7355]">Payment Method</span>
-                                <span class="font-medium text-[#5c4a3d]">Credit Card (Visa)</span>
+                                <span class="font-medium text-[#5c4a3d]" th:text="${payment.paymentMethod != null ? payment.paymentMethod : 'N/A'}">-</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-[#8b7355]">Payment Status</span>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                    <i class="fas fa-check-circle"></i>
-                                    Paid
-                                </span>
+                                <span th:text="${payment.status != null ? payment.status : 'Unknown'}" th:classappend="${#strings.equalsIgnoreCase(payment.status,'paid') ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium">-</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-[#8b7355]">Transaction ID</span>
-                                <span class="text-sm text-[#8b7355]">TXN-9384756201</span>
+                                <span class="text-sm text-[#8b7355]" th:text="${payment.transactionDetails != null ? payment.transactionDetails : 'N/A'}">-</span>
                             </div>
                             <div class="pt-3 border-t border-[#e5e0d8]">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#8b7355]">Amount Paid</span>
-                                    <span class="font-semibold text-[#5c4a3d]">BD 130.000</span>
+                                    <span class="font-semibold text-[#5c4a3d]" th:text="'BD ' + ${#numbers.formatDecimal(payment.amount, 1, 3)}">BD 0.000</span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="p-6" th:unless="${payment != null}">
+                            <p class="text-sm text-[#8b7355]">No payment record found for this order.</p>
                         </div>
                     </div>
 
