@@ -159,9 +159,18 @@ public class AdminController {
     }
 
     @GetMapping("/adminArtisanApproval")
-    public String adminArtisanApproval() {
+    public String adminArtisanApproval(Model model) {
+        List<Artisan> pendingArtisans = artisanRepository.findByStatusIn(List.of("pending approval", "pending"));
+        List<Artisan> approvedArtisans = artisanRepository.findByStatus("active");
+        List<Artisan> rejectedArtisans = artisanRepository.findByStatus("rejected");
+
+        model.addAttribute("pendingArtisans", pendingArtisans);
+        model.addAttribute("approvedArtisans", approvedArtisans);
+        model.addAttribute("rejectedArtisans", rejectedArtisans);
+
         return "adminArtisanApproval";
     }
+
 
     @GetMapping("/adminAuction")
     public String adminAuction() {
@@ -234,13 +243,45 @@ public class AdminController {
     }
 
     @PostMapping("/approve-artisan/{id}")
+    @org.springframework.transaction.annotation.Transactional
     public String approveArtisan(@PathVariable Long id) {
-        artisanRepository.findById(id).ifPresent(artisan -> {
-            artisan.setStatus("active");
-            artisanRepository.save(artisan);
+        userRepository.findById(id).ifPresent(user -> {
+            user.setStatus("active");
+            userRepository.save(user);
         });
         return "redirect:/adminArtisanApproval";
     }
+
+    @PostMapping("/reject-artisan/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public String rejectArtisan(@PathVariable Long id) {
+        userRepository.findById(id).ifPresent(user -> {
+            user.setStatus("rejected");
+            userRepository.save(user);
+        });
+        return "redirect:/adminArtisanApproval";
+    }
+
+    @PostMapping("/reconsider-artisan/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public String reconsiderArtisan(@PathVariable Long id) {
+        userRepository.findById(id).ifPresent(user -> {
+            user.setStatus("pending approval");
+            userRepository.save(user);
+        });
+        return "redirect:/adminArtisanApproval";
+    }
+
+    @PostMapping("/suspend-artisan/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public String suspendArtisan(@PathVariable Long id) {
+        userRepository.findById(id).ifPresent(user -> {
+            user.setStatus("suspended");
+            userRepository.save(user);
+        });
+        return "redirect:/adminArtisanApproval";
+    }
+
 
     @PostMapping("/suspend-user/{id}")
     public String suspendUser(@PathVariable Long id) {

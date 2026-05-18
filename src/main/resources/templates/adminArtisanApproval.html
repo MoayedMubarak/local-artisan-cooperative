@@ -128,47 +128,6 @@
             transform: rotate(180deg);
         }
 
-        .form-input {
-            transition: all 0.2s ease;
-        }
-
-        .form-input:focus {
-            border-color: #c17c5f;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(193, 124, 95, 0.1);
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            transform: scale(0.9) translateY(-20px);
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.open .modal-content {
-            transform: scale(1) translateY(0);
-        }
-
         /* Tab Styles */
         .tab-button {
             position: relative;
@@ -187,31 +146,6 @@
             right: 0;
             height: 2px;
             background-color: #c17c5f;
-        }
-
-        /* Portfolio Gallery */
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-
-        .portfolio-item {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .portfolio-item:hover {
-            transform: scale(1.05);
-        }
-
-        .portfolio-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
     </style>
     <script src="/authguard.js"></script>
@@ -240,7 +174,7 @@
                 <!-- Notification Bell -->
                 <a href="/adminNotification"><button class="relative p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
                     <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold text-[10px]">5</span>
                 </button></a>
                 
                 <!-- User Profile -->
@@ -370,222 +304,66 @@
             <!-- Tab Bar -->
             <div class="bg-white rounded-xl card-shadow mb-6">
                 <div class="flex items-center border-b border-[#e5e0d8]">
-                    <button class="tab-button active px-6 py-4 font-medium text-[#5c4a3d]" onclick="switchTab('pending')">
+                    <button class="tab-button active px-6 py-4 font-medium text-[#5c4a3d]" onclick="switchTab(event, 'pending')">
                         Pending
-                        <span class="ml-2 bg-[#c17c5f] text-white text-xs px-2 py-0.5 rounded-full">12</span>
+                        <span class="ml-2 bg-[#c17c5f] text-white text-xs px-2 py-0.5 rounded-full" th:text="${#lists.size(pendingArtisans)}">12</span>
                     </button>
-                    <button class="tab-button px-6 py-4 font-medium text-[#8b7355]" onclick="switchTab('approved')">
+                    <button class="tab-button px-6 py-4 font-medium text-[#8b7355]" onclick="switchTab(event, 'approved')">
                         Approved
+                        <span class="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full" th:text="${#lists.size(approvedArtisans)}">0</span>
                     </button>
-                    <button class="tab-button px-6 py-4 font-medium text-[#8b7355]" onclick="switchTab('rejected')">
+                    <button class="tab-button px-6 py-4 font-medium text-[#8b7355]" onclick="switchTab(event, 'rejected')">
                         Rejected
+                        <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full" th:text="${#lists.size(rejectedArtisans)}">0</span>
                     </button>
                 </div>
             </div>
 
             <!-- Pending Applications List -->
             <div id="pendingTab" class="space-y-4">
-                <!-- Application Card 1 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
-                        <!-- Avatar -->
-                        <img 
-                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" 
-                            alt="Maya Chen" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
-                        />
-
-                        <!-- Info -->
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Maya Chen</h3>
-                                    <p class="text-sm text-[#8b7355]">maya.chen@email.com</p>
-                                </div>
-                                <span class="text-sm text-[#8b7355]">Applied Dec 15, 2024</span>
-                            </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">The Clay Studio</p>
-                            <p class="text-sm text-[#8b7355] mb-2">Ceramics Artist</p>
-                            <p class="text-sm text-[#8b7355] line-clamp-2">
-                                I am a passionate ceramics artist with over 10 years of experience creating functional and decorative pottery. My work focuses on sustainable practices and natural glazes inspired by the Pacific Northwest landscape...
-                            </p>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center gap-3 pl-4 border-l border-[#e5e0d8]">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Approve
-                            </button>
-                            <button onclick="openModal('maya')" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
-                                View Full Profile
-                            </button>
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reject
-                            </button>
-                        </div>
-                    </div>
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(pendingArtisans)}" class="text-center py-12 bg-white rounded-xl card-shadow">
+                    <i class="fas fa-inbox text-5xl text-[#d4c5b5] mb-4"></i>
+                    <p class="text-lg font-medium text-[#5c4a3d]">No pending artisan applications</p>
+                    <p class="text-[#8b7355] text-sm mt-1">All new applications have been processed.</p>
                 </div>
 
-                <!-- Application Card 2 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
+                <!-- Dynamic Applications List -->
+                <div th:each="artisan : ${pendingArtisans}" class="bg-white rounded-xl card-shadow p-6">
+                    <div class="flex items-start gap-4">
                         <!-- Avatar -->
                         <img 
-                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" 
-                            alt="James Rivera" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
+                            th:src="${artisan.profilePicture}" 
+                            th:alt="${artisan.name}" 
+                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f] flex-shrink-0"
                         />
 
                         <!-- Info -->
                         <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-start justify-between mb-2">
                                 <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">James Rivera</h3>
-                                    <p class="text-sm text-[#8b7355]">james.rivera@email.com</p>
+                                    <h3 class="font-bold text-lg text-[#5c4a3d]" th:text="${artisan.name}">Artisan Name</h3>
+                                    <p class="text-sm text-[#8b7355]" th:text="${artisan.email}">artisan@email.com</p>
                                 </div>
-                                <span class="text-sm text-[#8b7355]">Applied Dec 14, 2024</span>
+                                <span class="text-sm text-[#8b7355] bg-[#f5ebe0] px-3 py-1 rounded-full font-medium" 
+                                      th:text="'Applied ' + ${artisan.joinDate != null ? #temporals.format(artisan.joinDate, 'MMM dd, yyyy') : 'N/A'}">Applied Dec 15, 2024</span>
                             </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Rivera Woodworks</p>
-                            <p class="text-sm text-[#8b7355] mb-2">Woodworking & Furniture</p>
-                            <p class="text-sm text-[#8b7355] line-clamp-2">
-                                Master woodworker specializing in handcrafted furniture and home decor. Each piece is made from reclaimed wood and built to last generations. I believe in sustainable craftsmanship...
-                            </p>
+                            <p class="font-bold text-[#c17c5f] mb-1" th:text="${artisan.shopName}">Workshop Name</p>
+                            <p class="text-sm text-[#8b7355] leading-relaxed mt-2 p-3 bg-[#faf9f6] rounded-lg border border-[#e5e0d8]" th:text="${artisan.biography}">Biography</p>
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex items-center gap-3 pl-4 border-l border-[#e5e0d8]">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Approve
-                            </button>
-                            <button onclick="openModal('james')" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
-                                View Full Profile
-                            </button>
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reject
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Application Card 3 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
-                        <!-- Avatar -->
-                        <img 
-                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" 
-                            alt="Sophie Anderson" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
-                        />
-
-                        <!-- Info -->
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Sophie Anderson</h3>
-                                    <p class="text-sm text-[#8b7355]">sophie.a@email.com</p>
-                                </div>
-                                <span class="text-sm text-[#8b7355]">Applied Dec 13, 2024</span>
-                            </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Woven Dreams</p>
-                            <p class="text-sm text-[#8b7355] mb-2">Textile & Weaving</p>
-                            <p class="text-sm text-[#8b7355] line-clamp-2">
-                                Textile artist creating handwoven wall hangings, tapestries, and home accessories. My work combines traditional weaving techniques with contemporary design aesthetics...
-                            </p>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center gap-3 pl-4 border-l border-[#e5e0d8]">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Approve
-                            </button>
-                            <button onclick="openModal('sophie')" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
-                                View Full Profile
-                            </button>
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reject
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Application Card 4 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
-                        <!-- Avatar -->
-                        <img 
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" 
-                            alt="Marcus Johnson" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
-                        />
-
-                        <!-- Info -->
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Marcus Johnson</h3>
-                                    <p class="text-sm text-[#8b7355]">marcus.j@email.com</p>
-                                </div>
-                                <span class="text-sm text-[#8b7355]">Applied Dec 12, 2024</span>
-                            </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Forge & Fire</p>
-                            <p class="text-sm text-[#8b7355] mb-2">Metalwork & Jewelry</p>
-                            <p class="text-sm text-[#8b7355] line-clamp-2">
-                                Blacksmith and jewelry maker creating unique pieces using traditional forging techniques. Specializing in custom engagement rings and heirloom-quality metalwork...
-                            </p>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center gap-3 pl-4 border-l border-[#e5e0d8]">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Approve
-                            </button>
-                            <button onclick="openModal('marcus')" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
-                                View Full Profile
-                            </button>
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reject
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Application Card 5 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
-                        <!-- Avatar -->
-                        <img 
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face" 
-                            alt="Elena Kowalski" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
-                        />
-
-                        <!-- Info -->
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Elena Kowalski</h3>
-                                    <p class="text-sm text-[#8b7355]">elena.k@email.com</p>
-                                </div>
-                                <span class="text-sm text-[#8b7355]">Applied Dec 11, 2024</span>
-                            </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Painted Petals</p>
-                            <p class="text-sm text-[#8b7355] mb-2">Painting & Illustration</p>
-                            <p class="text-sm text-[#8b7355] line-clamp-2">
-                                Watercolor artist and botanical illustrator. My work captures the delicate beauty of flowers and plants, creating art that brings nature indoors...
-                            </p>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center gap-3 pl-4 border-l border-[#e5e0d8]">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Approve
-                            </button>
-                            <button onclick="openModal('elena')" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">
-                                View Full Profile
-                            </button>
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reject
-                            </button>
+                        <div class="flex flex-col gap-2 pl-4 border-l border-[#e5e0d8] justify-center h-full min-h-[100px]">
+                            <form th:action="@{'/approve-artisan/' + ${artisan.userId}}" method="post" class="w-full">
+                                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap">
+                                    Approve
+                                </button>
+                            </form>
+                            <form th:action="@{'/reject-artisan/' + ${artisan.userId}}" method="post" class="w-full">
+                                <button type="submit" class="w-full border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap">
+                                    Reject
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -593,66 +371,44 @@
 
             <!-- Approved Tab Content (Hidden by default) -->
             <div id="approvedTab" class="space-y-4 hidden">
-                <!-- Approved Card 1 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
-                        <img 
-                            src="https://images.unsplash.com/photo-1554151228-14d9def656ec?w=80&h=80&fit=crop&crop=face" 
-                            alt="Olivia Martinez" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
-                        />
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Olivia Martinez</h3>
-                                    <p class="text-sm text-[#8b7355]">olivia.m@email.com</p>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="text-sm text-[#8b7355]">Approved on Nov 28, 2024</span>
-                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                                        <i class="fas fa-check-circle"></i> Approved
-                                    </span>
-                                </div>
-                            </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Martinez Pottery</p>
-                            <p class="text-sm text-[#8b7355]">Ceramics Artist</p>
-                        </div>
-                        <div class="pl-4 border-l border-[#e5e0d8]">
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Suspend Shop
-                            </button>
-                        </div>
-                    </div>
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(approvedArtisans)}" class="text-center py-12 bg-white rounded-xl card-shadow">
+                    <i class="fas fa-check-circle text-5xl text-[#d4c5b5] mb-4"></i>
+                    <p class="text-lg font-medium text-[#5c4a3d]">No approved artisans yet</p>
+                    <p class="text-[#8b7355] text-sm mt-1">Approve applications to see them here.</p>
                 </div>
 
-                <!-- Approved Card 2 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
+                <!-- Dynamic Approved list -->
+                <div th:each="artisan : ${approvedArtisans}" class="bg-white rounded-xl card-shadow p-6">
+                    <div class="flex items-start gap-4">
                         <img 
-                            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop&crop=face" 
-                            alt="Daniel Park" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f]"
+                            th:src="${artisan.profilePicture}" 
+                            th:alt="${artisan.name}" 
+                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f] flex-shrink-0"
                         />
                         <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-start justify-between mb-2">
                                 <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Daniel Park</h3>
-                                    <p class="text-sm text-[#8b7355]">daniel.p@email.com</p>
+                                    <h3 class="font-bold text-lg text-[#5c4a3d]" th:text="${artisan.name}">Artisan Name</h3>
+                                    <p class="text-sm text-[#8b7355]" th:text="${artisan.email}">artisan@email.com</p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-sm text-[#8b7355]">Approved on Nov 15, 2024</span>
+                                    <span class="text-sm text-[#8b7355] bg-[#f5ebe0] px-3 py-1 rounded-full font-medium" 
+                                          th:text="'Joined ' + ${artisan.joinDate != null ? #temporals.format(artisan.joinDate, 'MMM dd, yyyy') : 'N/A'}">Joined Nov 28, 2024</span>
                                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                                         <i class="fas fa-check-circle"></i> Approved
                                     </span>
                                 </div>
                             </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Park Leather Goods</p>
-                            <p class="text-sm text-[#8b7355]">Leathercraft</p>
+                            <p class="font-bold text-[#c17c5f] mb-1" th:text="${artisan.shopName}">Workshop Name</p>
+                            <p class="text-sm text-[#8b7355] leading-relaxed mt-2 p-3 bg-[#faf9f6] rounded-lg border border-[#e5e0d8]" th:text="${artisan.biography}">Biography</p>
                         </div>
-                        <div class="pl-4 border-l border-[#e5e0d8]">
-                            <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Suspend Shop
-                            </button>
+                        <div class="pl-4 border-l border-[#e5e0d8] flex items-center justify-center min-h-[100px]">
+                            <form th:action="@{'/suspend-artisan/' + ${artisan.userId}}" method="post">
+                                <button type="submit" class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap">
+                                    Suspend Shop
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -660,66 +416,43 @@
 
             <!-- Rejected Tab Content (Hidden by default) -->
             <div id="rejectedTab" class="space-y-4 hidden">
-                <!-- Rejected Card 1 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
-                        <img 
-                            src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face" 
-                            alt="Amanda White" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f] grayscale opacity-70"
-                        />
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Amanda White</h3>
-                                    <p class="text-sm text-[#8b7355]">amanda.w@email.com</p>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="text-sm text-[#8b7355]">Rejected on Dec 5, 2024</span>
-                                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                                        <i class="fas fa-times-circle"></i> Rejected
-                                    </span>
-                                </div>
-                            </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">White Crafts</p>
-                            <p class="text-sm text-[#8b7355]">Mixed Media</p>
-                        </div>
-                        <div class="pl-4 border-l border-[#e5e0d8]">
-                            <button class="border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reconsider
-                            </button>
-                        </div>
-                    </div>
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(rejectedArtisans)}" class="text-center py-12 bg-white rounded-xl card-shadow">
+                    <i class="fas fa-times-circle text-5xl text-[#d4c5b5] mb-4"></i>
+                    <p class="text-lg font-medium text-[#5c4a3d]">No rejected applications</p>
                 </div>
 
-                <!-- Rejected Card 2 -->
-                <div class="bg-white rounded-xl card-shadow p-6">
-                    <div class="flex items-center gap-4">
+                <!-- Dynamic Rejected List -->
+                <div th:each="artisan : ${rejectedArtisans}" class="bg-white rounded-xl card-shadow p-6">
+                    <div class="flex items-start gap-4">
                         <img 
-                            src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&h=80&fit=crop&crop=face" 
-                            alt="Ryan Cooper" 
-                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f] grayscale opacity-70"
+                            th:src="${artisan.profilePicture}" 
+                            th:alt="${artisan.name}" 
+                            class="w-16 h-16 rounded-full object-cover border-2 border-[#c17c5f] grayscale opacity-70 flex-shrink-0"
                         />
                         <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-start justify-between mb-2">
                                 <div>
-                                    <h3 class="font-semibold text-[#5c4a3d]">Ryan Cooper</h3>
-                                    <p class="text-sm text-[#8b7355]">ryan.c@email.com</p>
+                                    <h3 class="font-bold text-lg text-[#5c4a3d]" th:text="${artisan.name}">Artisan Name</h3>
+                                    <p class="text-sm text-[#8b7355]" th:text="${artisan.email}">artisan@email.com</p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-sm text-[#8b7355]">Rejected on Nov 20, 2024</span>
+                                    <span class="text-sm text-[#8b7355] bg-[#f5ebe0] px-3 py-1 rounded-full font-medium" 
+                                          th:text="'Rejected ' + ${artisan.joinDate != null ? #temporals.format(artisan.joinDate, 'MMM dd, yyyy') : 'N/A'}">Rejected Nov 20, 2024</span>
                                     <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                                         <i class="fas fa-times-circle"></i> Rejected
                                     </span>
                                 </div>
                             </div>
-                            <p class="font-bold text-[#c17c5f] mb-1">Cooper Creations</p>
-                            <p class="text-sm text-[#8b7355]">Sculpture</p>
+                            <p class="font-bold text-[#c17c5f] mb-1" th:text="${artisan.shopName}">Workshop Name</p>
+                            <p class="text-sm text-[#8b7355] leading-relaxed mt-2 p-3 bg-[#faf9f6] rounded-lg border border-[#e5e0d8]" th:text="${artisan.biography}">Biography</p>
                         </div>
-                        <div class="pl-4 border-l border-[#e5e0d8]">
-                            <button class="border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                                Reconsider
-                            </button>
+                        <div class="pl-4 border-l border-[#e5e0d8] flex items-center justify-center min-h-[100px]">
+                            <form th:action="@{'/reconsider-artisan/' + ${artisan.userId}}" method="post">
+                                <button type="submit" class="border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap">
+                                    Reconsider
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -727,113 +460,11 @@
         </main>
     </div>
 
-    <!-- Modal Overlay -->
-    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-content bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
-            <!-- Modal Header -->
-            <div class="sticky top-0 bg-white border-b border-[#e5e0d8] px-6 py-4 flex items-center justify-between z-10">
-                <h2 class="text-xl font-bold text-[#5c4a3d]">Artisan Application Details</h2>
-                <button onclick="closeModal()" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="p-6">
-                <!-- Profile Section -->
-                <div class="flex items-center gap-4 mb-6 pb-6 border-b border-[#e5e0d8]">
-                    <img 
-                        id="modalAvatar"
-                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=face" 
-                        alt="Artisan" 
-                        class="w-24 h-24 rounded-full object-cover border-4 border-[#c17c5f]"
-                    />
-                    <div>
-                        <h3 id="modalName" class="text-2xl font-bold text-[#5c4a3d]">Maya Chen</h3>
-                        <p id="modalEmail" class="text-[#8b7355]">maya.chen@email.com</p>
-                        <p id="modalCategory" class="text-sm text-[#c17c5f] mt-1">Ceramics Artist</p>
-                    </div>
-                </div>
-
-                <!-- Shop Info -->
-                <div class="mb-6">
-                    <h4 class="font-semibold text-[#5c4a3d] mb-3">Shop Information</h4>
-                    <div class="bg-[#f5ebe0] rounded-xl p-4">
-                        <p id="modalShopName" class="font-bold text-[#c17c5f] text-lg mb-2">The Clay Studio</p>
-                        <p id="modalShopDescription" class="text-[#8b7355] text-sm">
-                            A boutique ceramics studio focused on creating functional art for everyday use. Each piece is hand-thrown and glazed with natural, food-safe materials. We believe in slow, intentional craftsmanship.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Biography -->
-                <div class="mb-6">
-                    <h4 class="font-semibold text-[#5c4a3d] mb-3">Biography</h4>
-                    <p id="modalBio" class="text-[#8b7355] leading-relaxed">
-                        I am a passionate ceramics artist with over 10 years of experience creating functional and decorative pottery. My journey began in college when I took my first pottery class and immediately fell in love with the meditative process of working with clay.
-                        <br><br>
-                        My work focuses on sustainable practices and natural glazes inspired by the Pacific Northwest landscape where I grew up. I source local clays whenever possible and fire my kiln using renewable energy. Each piece tells a story of the earth it came from and the hands that shaped it.
-                        <br><br>
-                        I specialize in wheel-thrown vessels, from intimate tea cups to large serving bowls. My aesthetic is minimalist yet warm, with glazes that evoke the colors of forest moss, ocean waves, and desert sunsets.
-                    </p>
-                </div>
-
-                <!-- Portfolio Gallery -->
-                <div class="mb-6">
-                    <h4 class="font-semibold text-[#5c4a3d] mb-3">Portfolio</h4>
-                    <div class="portfolio-grid">
-                        <div class="portfolio-item">
-                            <img src="https://images.unsplash.com/photo-1565193566173-034e40c2a8ae?w=300&h=300&fit=crop" alt="Portfolio 1">
-                        </div>
-                        <div class="portfolio-item">
-                            <img src="https://images.unsplash.com/photo-1578749556920-d1e2e3f7036e?w=300&h=300&fit=crop" alt="Portfolio 2">
-                        </div>
-                        <div class="portfolio-item">
-                            <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=300&h=300&fit=crop" alt="Portfolio 3">
-                        </div>
-                        <div class="portfolio-item">
-                            <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=300&fit=crop" alt="Portfolio 4">
-                        </div>
-                        <div class="portfolio-item">
-                            <img src="https://images.unsplash.com/photo-1578749556920-d1e2e3f7036e?w=300&h=300&fit=crop" alt="Portfolio 5">
-                        </div>
-                        <div class="portfolio-item">
-                            <img src="https://images.unsplash.com/photo-1565193566173-034e40c2a8ae?w=300&h=300&fit=crop" alt="Portfolio 6">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Application Date -->
-                <div class="mb-6">
-                    <p class="text-sm text-[#8b7355]">
-                        <i class="far fa-calendar mr-2"></i>
-                        Applied on <span id="modalDate">December 15, 2024</span>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="sticky bottom-0 bg-white border-t border-[#e5e0d8] px-6 py-4 flex items-center justify-between gap-3">
-                <button class="border-2 border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                    <i class="fas fa-envelope mr-2"></i>Request More Info
-                </button>
-                <div class="flex items-center gap-3">
-                    <button class="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                        Reject
-                    </button>
-                    <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
-                        Approve
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         /* Sidebar handled by adminDashboard.js */
 
         // Tab switching
-        function switchTab(tabName) {
+        function switchTab(e, tabName) {
             // Hide all tabs
             document.getElementById('pendingTab').classList.add('hidden');
             document.getElementById('approvedTab').classList.add('hidden');
@@ -849,31 +480,10 @@
             document.getElementById(tabName + 'Tab').classList.remove('hidden');
 
             // Activate clicked button
-            event.target.classList.add('active');
-            event.target.classList.remove('text-[#8b7355]');
+            const btn = e.currentTarget || e.target;
+            btn.classList.add('active');
+            btn.classList.remove('text-[#8b7355]');
         }
-
-        // Modal functions
-        function openModal(artisanId) {
-            const overlay = document.getElementById('modalOverlay');
-            overlay.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(event) {
-            if (!event || event.target === document.getElementById('modalOverlay')) {
-                const overlay = document.getElementById('modalOverlay');
-                overlay.classList.remove('open');
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
     </script>
     <script>
         if (window.initAuthGuard) {

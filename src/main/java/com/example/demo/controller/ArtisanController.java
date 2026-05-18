@@ -58,6 +58,24 @@ public class ArtisanController {
         model.addAttribute("starDistribution", new int[5]);
     }
 
+    private String checkArtisanStatus(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return artisanRepository.findById(id).map(artisan -> {
+            String status = artisan.getStatus();
+            if (!"active".equalsIgnoreCase(status)) {
+                try {
+                    return "redirect:/login?message=" + java.net.URLEncoder.encode(
+                        "Your artisan account status is currently: " + status + ". Please wait for approval or activation.", "UTF-8");
+                } catch (Exception e) {
+                    return "redirect:/login?message=AccessDenied";
+                }
+            }
+            return null;
+        }).orElse(null);
+    }
+
     private void loadArtisan(Long artisanId, Model model) {
         if (artisanId == null) {
             model.addAttribute("artisan", null);
@@ -102,6 +120,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanDashboard")
     public String dashboard(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         if (id != null) {
@@ -118,6 +138,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanProducts")
     public String products(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         if (id != null) {
@@ -129,6 +151,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanAuction")
     public String auctions(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         // Sync auction statuses so ENDED auctions are correctly marked
@@ -141,6 +165,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanOrders")
     public String orders(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         if (id != null) {
@@ -153,6 +179,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanAnalytics")
     public String analytics(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         if (id != null) {
@@ -306,6 +334,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanSettings")
     public String settings(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         return "artisanSettings";
@@ -315,6 +345,8 @@ public class ArtisanController {
     public String ordersDetail(@RequestParam(required = false) Long id,
                                @RequestParam(required = false) Long orderId,
                                Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
 
@@ -341,6 +373,8 @@ public class ArtisanController {
 
     @GetMapping("/artisanNotification")
     public String notifications(@RequestParam(required = false) Long id, Model model) {
+        String redirect = checkArtisanStatus(id);
+        if (redirect != null) return redirect;
         initEmptyModel(model);
         loadArtisan(id, model);
         return "artisanNotification";

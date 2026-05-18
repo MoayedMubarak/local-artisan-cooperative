@@ -54,6 +54,9 @@ public class UserController {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            if (("ARTISAN".equalsIgnoreCase(user.getRole()) || user instanceof Artisan) && !"active".equalsIgnoreCase(user.getStatus())) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+            }
             user.setProfilePicture(imageUrl);
             userRepository.save(user);
             if (user instanceof Customer) {
@@ -82,6 +85,9 @@ public class UserController {
         Optional<Artisan> artisanOpt = artisanRepository.findByEmail(email);
         if (artisanOpt.isPresent()) {
             Artisan artisan = artisanOpt.get();
+            if (!"active".equalsIgnoreCase(artisan.getStatus())) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+            }
             if (name != null) artisan.setName(name);
             if (phone != null) artisan.setPhone(phone);
             if (shopName != null) artisan.setShopName(shopName);
@@ -100,6 +106,9 @@ public class UserController {
         Optional<Artisan> artisanOpt = artisanRepository.findByEmail(email);
         if (artisanOpt.isPresent()) {
             Artisan artisan = artisanOpt.get();
+            if (!"active".equalsIgnoreCase(artisan.getStatus())) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+            }
             artisan.setShopBanner(bannerUrl);
             artisanRepository.save(artisan);
             return ResponseEntity.ok(Map.of("success", true, "user", artisan));

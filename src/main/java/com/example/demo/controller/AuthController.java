@@ -60,8 +60,17 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
                             .body(Map.of("success", false, "message", "Your account has been suspended because you violated our Terms of Service and Policies."));
                 }
+                if ("pending approval".equalsIgnoreCase(user.getStatus()) || "pending".equalsIgnoreCase(user.getStatus())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of("success", false, "message", "Your artisan account is pending approval. Please wait for an administrator to review your application."));
+                }
+                if ("rejected".equalsIgnoreCase(user.getStatus())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of("success", false, "message", "Your artisan registration request has been rejected."));
+                }
                 user.setLastActive(java.time.LocalDateTime.now());
                 userRepository.save(user);
+
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
@@ -110,7 +119,8 @@ public class AuthController {
         if (artisan.getProfilePicture() == null || artisan.getProfilePicture().isBlank()) {
             artisan.setProfilePicture("https://cdn-icons-png.flaticon.com/512/149/149071.png");
         }
-        artisan.setStatus("pending");
+        artisan.setStatus("pending approval");
+
         Artisan saved = artisanRepository.save(artisan);
         return ResponseEntity.ok(Map.of("success", true, "user", saved));
     }

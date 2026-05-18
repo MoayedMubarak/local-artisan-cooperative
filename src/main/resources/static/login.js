@@ -233,18 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok && data.success) {
                 if (isArtisan) {
-                    sessionStorage.setItem('loggedIn', 'true');
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userEmail', data.user.email);
-                    sessionStorage.setItem('userName', data.user.name);
-                    sessionStorage.setItem('userRole', data.user.role);
-                    sessionStorage.setItem('userId', data.user.userId);
-                    sessionStorage.setItem('userProfile', JSON.stringify(data.user));
-
-                    showToast('Artisan account created! Welcome to ArtsyVibe.', 'success');
+                    showToast('Registration request sent to admin! You can log in once approved.', 'success');
                     setTimeout(() => {
-                        window.location.href = `/artisanDashboard?id=${data.user.userId}`;
-                    }, 1200);
+                        window.location.href = '/login?message=' + encodeURIComponent('Your artisan registration request has been submitted and is pending admin approval.');
+                    }, 2500);
                 } else {
                     sessionStorage.setItem('loggedIn', 'true');
                     sessionStorage.setItem('isLoggedIn', 'true');

@@ -11,6 +11,7 @@ import com.example.demo.repository.AuctionRepository;
 import com.example.demo.repository.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -52,6 +53,11 @@ public class ProductApiController {
 
             Artisan artisan = artisanRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("Artisan not found"));
+
+            if (!"active".equalsIgnoreCase(artisan.getStatus())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("success", false, "message", "Your artisan account status is currently " + artisan.getStatus() + ". You cannot perform this action until approved."));
+            }
 
             Product product = new Product();
             product.setArtisan(artisan);
@@ -101,6 +107,12 @@ public class ProductApiController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product) {
         try {
+            Product existing = productRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            if (existing.getArtisan() != null && !"active".equalsIgnoreCase(existing.getArtisan().getStatus())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+            }
             Product updated = productService.updateProduct(id, product);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
@@ -111,6 +123,13 @@ public class ProductApiController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         try {
+            Product existing = productRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            if (existing.getArtisan() != null && !"active".equalsIgnoreCase(existing.getArtisan().getStatus())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+            }
+
             productRepository.findById(id).ifPresent(product -> {
                 // Delete associated wishlist items
                 var wishlistItems = wishlistItemRepository.findByProduct(product);
