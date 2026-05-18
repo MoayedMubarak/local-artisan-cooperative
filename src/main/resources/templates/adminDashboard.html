@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -325,7 +325,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-xs font-medium mb-1">Total Users</h3>
-                    <p class="text-2xl font-bold text-[#5c4a3d]">3,847</p>
+                    <p class="text-2xl font-bold text-[#5c4a3d]" th:text="${totalUsers}">3,847</p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
@@ -341,7 +341,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-xs font-medium mb-1">Total Artisans</h3>
-                    <p class="text-2xl font-bold text-[#5c4a3d]">428</p>
+                    <p class="text-2xl font-bold text-[#5c4a3d]" th:text="${totalArtisans}">428</p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
@@ -351,13 +351,13 @@
                         <div class="w-11 h-11 bg-[#fef3c7] rounded-xl flex items-center justify-center">
                             <i class="fas fa-box text-xl text-[#c17c5f]"></i>
                         </div>
-                        <span class="text-green-600 text-xs font-semibold flex items-center gap-1">
-                            <i class="fas fa-arrow-up"></i>
-                            5.3%
+                        <span th:class="${productGrowth >= 0 ? 'text-green-600 text-xs font-semibold flex items-center gap-1' : 'text-red-600 text-xs font-semibold flex items-center gap-1'}">
+                            <i th:class="${productGrowth >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'}"></i>
+                            <span th:text="${#numbers.formatDecimal(T(java.lang.Math).abs(productGrowth), 1, 1)} + '%'">5.3%</span>
                         </span>
                     </div>
-                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Active Products</h3>
-                    <p class="text-2xl font-bold text-[#5c4a3d]">2,156</p>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Products Added</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]" th:text="${activeProducts}">2,156</p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
@@ -367,13 +367,13 @@
                         <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center">
                             <i class="fas fa-gavel text-xl text-purple-600"></i>
                         </div>
-                        <span class="text-red-600 text-xs font-semibold flex items-center gap-1">
-                            <i class="fas fa-arrow-down"></i>
-                            2.1%
+                        <span th:class="${auctionGrowth >= 0 ? 'text-green-600 text-xs font-semibold flex items-center gap-1' : 'text-red-600 text-xs font-semibold flex items-center gap-1'}">
+                            <i th:class="${auctionGrowth >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'}"></i>
+                            <span th:text="${#numbers.formatDecimal(T(java.lang.Math).abs(auctionGrowth), 1, 1)} + '%'">2.1%</span>
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-xs font-medium mb-1">Open Auctions</h3>
-                    <p class="text-2xl font-bold text-[#5c4a3d]">87</p>
+                    <p class="text-2xl font-bold text-[#5c4a3d]" th:text="${openAuctions}">87</p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
@@ -503,12 +503,7 @@
 
                         <!-- X-axis Labels -->
                         <div class="absolute bottom-0 left-10 right-0 flex justify-around text-xs text-[#8b7355]">
-                            <span>Jul</span>
-                            <span>Aug</span>
-                            <span>Sep</span>
-                            <span>Oct</span>
-                            <span>Nov</span>
-                            <span>Dec</span>
+                            <span th:each="month : ${monthLabels}" th:text="${month}">Jul</span>
                         </div>
                     </div>
                 </div>
@@ -630,6 +625,13 @@
         </main>
     </div>
 
+    <script th:inline="javascript">
+        window.chartData = {
+            ordersPerWeek: /*[[${ordersPerWeek}]]*/ [85, 120, 160, 210, 260, 295],
+            revenuePerMonth: /*[[${revenuePerMonth}]]*/ [8200, 12500, 15800, 19400, 24100, 28750],
+            monthLabels: /*[[${monthLabels}]]*/ ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        };
+    </script>
     <script src="/adminDashboard.js"></script>
     <script>
         if (window.initAuthGuard) {

@@ -283,7 +283,7 @@
 
     // Data labels matching the chart points (left → right)
     const weekLabels  = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'];
-    const orderValues = [85, 120, 160, 210, 260, 295];
+    const orderValues = window.chartData && window.chartData.ordersPerWeek ? window.chartData.ordersPerWeek : [85, 120, 160, 210, 260, 295];
 
     // Create a shared tooltip element
     const tooltip = createTooltip();
@@ -334,8 +334,9 @@
     const revSvg = svgs[1];
     if (!revSvg) return;
 
-    const months  = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const revenues = ['BD 8,200', 'BD 12,500', 'BD 15,800', 'BD 19,400', 'BD 24,100', 'BD 28,750'];
+    const months  = window.chartData && window.chartData.monthLabels ? window.chartData.monthLabels : ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const revenueNumbers = window.chartData && window.chartData.revenuePerMonth ? window.chartData.revenuePerMonth : [8200, 12500, 15800, 19400, 24100, 28750];
+    const revenues = revenueNumbers.map(n => 'BD ' + n.toLocaleString());
 
     const tooltip = createTooltip();
     const bars    = revSvg.querySelectorAll('rect');
@@ -374,7 +375,89 @@
   }
 
   // ─────────────────────────────────────────────
-  // SECTION 9 — Tooltip Helpers
+  // SECTION 9 — Update Chart Visuals
+  // ─────────────────────────────────────────────
+  function updateChartsVisuals() {
+    if (!window.chartData) return;
+
+    // 1. Orders per week
+    const lineSvg = qs('.bg-white svg');
+    if (lineSvg && window.chartData.ordersPerWeek) {
+        const orders = window.chartData.ordersPerWeek;
+        const maxOrder = Math.max(...orders, 10);
+        const getCY = val => 200 - (val / maxOrder) * 160;
+
+        const cxValues = [0, 75, 225, 375, 525, 600];
+        
+        const pathArea = lineSvg.querySelectorAll('path')[0];
+        const pathLine = lineSvg.querySelectorAll('path')[1];
+        const circles = lineSvg.querySelectorAll('circle');
+        
+        let pathLineD = '';
+        let pathAreaD = 'M 0,200 ';
+
+        orders.forEach((val, i) => {
+            if(i >= cxValues.length) return;
+            const cx = cxValues[i];
+            const cy = getCY(val);
+            
+            if (i === 0) {
+                pathLineD += `M ${cx},${cy} `;
+            } else {
+                pathLineD += `L ${cx},${cy} `;
+            }
+            pathAreaD += `L ${cx},${cy} `;
+            
+            if (circles[i]) {
+                circles[i].setAttribute('cy', cy);
+            }
+        });
+        
+        pathAreaD += `L 600,200 Z`;
+        
+        if (pathLine) pathLine.setAttribute('d', pathLineD.trim());
+        if (pathArea) pathArea.setAttribute('d', pathAreaD.trim());
+
+        const yAxisContainer = lineSvg.parentElement.querySelector('div:last-child');
+        if (yAxisContainer && yAxisContainer.classList.contains('flex-col')) {
+            yAxisContainer.innerHTML = `
+                <span>${Math.round(maxOrder)}</span>
+                <span>${Math.round(maxOrder * 0.66)}</span>
+                <span>${Math.round(maxOrder * 0.33)}</span>
+                <span>0</span>
+            `;
+        }
+    }
+
+    // 2. Revenue Overview
+    const svgs = qsa('.bg-white svg');
+    const revSvg = svgs[1];
+    if (revSvg && window.chartData.revenuePerMonth) {
+        const revenues = window.chartData.revenuePerMonth;
+        const maxRev = Math.max(...revenues, 10);
+        
+        const yAxisTexts = revSvg.querySelectorAll('text');
+        if (yAxisTexts.length >= 4) {
+            yAxisTexts[0].textContent = Math.round(maxRev / 1000) + 'K BD';
+            yAxisTexts[1].textContent = Math.round((maxRev * 0.66) / 1000) + 'K BD';
+            yAxisTexts[2].textContent = Math.round((maxRev * 0.33) / 1000) + 'K BD';
+            yAxisTexts[3].textContent = '0K BD';
+        }
+
+        const bars = revSvg.querySelectorAll('rect');
+        revenues.forEach((val, i) => {
+            if (bars[i]) {
+                const height = (val / maxRev) * 150;
+                const y = 190 - height;
+                bars[i].setAttribute('height', height);
+                bars[i].setAttribute('y', y);
+            }
+        });
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // SECTION 10 — Tooltip Helpers
   // ─────────────────────────────────────────────
   function createTooltip() {
     const tip = document.createElement('div');
@@ -654,6 +737,7 @@
     initActivityLinks();
 
     // Chart interactivity
+    updateChartsVisuals();
     initOrdersChartTooltips();
     initRevenueChartTooltips();
 
