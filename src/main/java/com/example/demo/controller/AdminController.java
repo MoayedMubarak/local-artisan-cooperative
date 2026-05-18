@@ -207,7 +207,9 @@ public class AdminController {
         java.util.Set<String> categories = new java.util.TreeSet<>();
         java.util.Set<String> artisans = new java.util.TreeSet<>();
         for (Product p : products) {
-            if (p.getStockQuantity() <= 0) {
+            if ("hidden".equalsIgnoreCase(p.getStatus())) {
+                // Keep it hidden!
+            } else if (p.getStockQuantity() <= 0) {
                 if (!"out of stock".equalsIgnoreCase(p.getStatus())) {
                     p.setStatus("out of stock");
                     productRepository.save(p);

@@ -32,13 +32,18 @@ public class MainController {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("featuredProducts", productRepository.findAll().stream().limit(6).collect(java.util.stream.Collectors.toList()));
+        model.addAttribute("featuredProducts", productRepository.findAll().stream()
+                .filter(p -> !"hidden".equalsIgnoreCase(p.getStatus()))
+                .limit(6)
+                .collect(java.util.stream.Collectors.toList()));
         return "index";
     }
 
     @GetMapping("/products")
     public String products(Model model) {
-        model.addAttribute("products", productRepository.findByIsAuctionItem(false));
+        model.addAttribute("products", productRepository.findByIsAuctionItem(false).stream()
+                .filter(p -> !"hidden".equalsIgnoreCase(p.getStatus()))
+                .collect(java.util.stream.Collectors.toList()));
         return "products";
     }
 

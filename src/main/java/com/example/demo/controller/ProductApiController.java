@@ -9,6 +9,8 @@ import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.ArtisanRepository;
 import com.example.demo.repository.AuctionRepository;
 import com.example.demo.repository.WishlistItemRepository;
+import com.example.demo.repository.ReviewRepository;
+import com.example.demo.model.Review;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -39,10 +41,52 @@ public class ProductApiController {
     @Autowired
     private AuctionService auctionService;
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getProduct(@PathVariable Long id) {
         return productRepository.findById(id)
-                .map(product -> ResponseEntity.ok(Map.of("success", true, "product", product)))
+                .map(product -> {
+                    // Fetch reviews
+                    List<Review> reviews = reviewRepository.findByProductIdWithCustomerOrderByDateDesc(id);
+                    List<Map<String, Object>> reviewsList = reviews.stream().map(r -> Map.<String, Object>of(
+                            "reviewerName", r.getCustomer() != null ? r.getCustomer().getName() : "Anonymous",
+                            "reviewerImage", r.getCustomer() != null && r.getCustomer().getProfilePicture() != null 
+                                    ? r.getCustomer().getProfilePicture() : "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+                            "rating", r.getRating(),
+                            "comment", r.getComment(),
+                            "date", r.getDate() != null ? r.getDate().toString() : ""
+                    )).toList();
+
+                    // Calculate artisan info if present
+                    long totalProducts = 0;
+                    double avgRating = 0.0;
+                    long reviewsCount = 0;
+                    
+                    if (product.getArtisan() != null) {
+                        Long artisanId = product.getArtisan().getUserId();
+                        totalProducts = productRepository.countByArtisanUserId(artisanId);
+                        
+                        List<Review> artisanReviews = reviewRepository.findByProductArtisanUserId(artisanId);
+                        reviewsCount = artisanReviews.size();
+                        if (reviewsCount > 0) {
+                            avgRating = artisanReviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
+                        } else {
+                            avgRating = 5.0; // fallback if no reviews
+                        }
+                    }
+
+                    // Build dynamic response Map
+                    return ResponseEntity.ok(Map.of(
+                            "success", true,
+                            "product", product,
+                            "reviews", reviewsList,
+                            "artisanTotalProducts", totalProducts,
+                            "artisanAverageRating", avgRating,
+                            "artisanReviewsCount", reviewsCount
+                    ));
+                })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Product not found")));
     }
 
@@ -122,6 +166,26 @@ public class ProductApiController {
             }
             Product updated = productService.updateProduct(id, product);
             return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateProductStatus(@PathVariable Long id, @RequestParam String status) {
+        try {
+            return productRepository.findById(id)
+                    .map(product -> {
+                        if ("hidden".equalsIgnoreCase(status)) {
+                            product.setStatus("hidden");
+                        } else {
+                            // "approve": reset to active/out of stock depending on stockQuantity
+                            product.setStatus(product.getStockQuantity() > 0 ? "active" : "out of stock");
+                        }
+                        Product saved = productRepository.save(product);
+                        return ResponseEntity.ok(Map.of("success", true, "product", saved));
+                    })
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Product not found")));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }

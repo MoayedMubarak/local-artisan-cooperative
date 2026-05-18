@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -950,19 +950,19 @@
                                 Artisan Information
                             </h4>
                             <div class="flex items-center gap-3 mb-3">
-                                <img 
+                                <img id="modalArtisanImage"
                                     src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face" 
                                     alt="Elena Rodriguez" 
                                     class="w-12 h-12 rounded-full object-cover"
                                 />
                                 <div>
-                                    <p class="font-semibold text-[#5c4a3d]">Elena Rodriguez</p>
-                                    <p class="text-sm text-[#8b7355]">Ceramics Artist</p>
+                                    <p id="modalArtisanName" class="font-semibold text-[#5c4a3d]">Elena Rodriguez</p>
+                                    <p id="modalArtisanShop" class="text-sm text-[#8b7355]">Ceramics Artist</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 text-sm text-[#8b7355]">
-                                <span><i class="fas fa-star text-amber-500 mr-1"></i>4.9 (127 reviews)</span>
-                                <span><i class="fas fa-box mr-1"></i>43 products</span>
+                                <span><i class="fas fa-star text-amber-500 mr-1"></i><span id="modalArtisanRating">4.9 (127 reviews)</span></span>
+                                <span><i class="fas fa-box mr-1"></i><span id="modalArtisanProducts">43 products</span></span>
                             </div>
                         </div>
 
@@ -970,9 +970,9 @@
                         <div>
                             <h4 class="font-semibold text-[#5c4a3d] mb-3 flex items-center gap-2">
                                 <i class="fas fa-comments text-[#c17c5f]"></i>
-                                Customer Reviews (8)
+                                Customer Reviews (<span id="modalReviewsCount">8</span>)
                             </h4>
-                            <div class="space-y-3 max-h-64 overflow-y-auto">
+                            <div id="modalReviewsContainer" class="space-y-3 max-h-64 overflow-y-auto">
                                 <!-- Review 1 -->
                                 <div class="bg-gray-50 rounded-lg p-3">
                                     <div class="flex items-center justify-between mb-2">
@@ -1052,24 +1052,24 @@
                         <i class="fas fa-shield-alt text-[#c17c5f]"></i>
                         Admin Actions
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <button onclick="handleAdminAction('approve')" class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button id="modalApproveBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
                             <i class="fas fa-check-circle"></i>
                             Approve Listing
                         </button>
-                        <button onclick="handleAdminAction('remove')" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <button id="modalRemoveBtn" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
                             <i class="fas fa-trash"></i>
                             Remove Listing
                         </button>
-                        <button onclick="handleAdminAction('flag')" class="bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <i class="fas fa-flag"></i>
-                            Flag for Review
-                        </button>
-                        <button onclick="handleAdminAction('contact')" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <i class="fas fa-envelope"></i>
-                            Contact Artisan
-                        </button>
-                    </div>
+
+
+
+
+
+
+
+
+
                 </div>
             </div>
         </div>
@@ -1086,37 +1086,29 @@
                     if (data.success && data.product) {
                         const p = data.product;
                         
-                        // Set Title, SKU, Description, Price, Date Added
                         document.querySelector('#productModal h3').textContent = p.title;
                         document.querySelector('#productModal .text-sm.text-\\[\\#8b7355\\]').textContent = 'SKU: PRD-' + p.id;
                         document.querySelector('#productModal .text-\\[\\#5c4a3d\\]').textContent = p.description || 'No description provided.';
                         
-                        // Price & Date Added
                         document.getElementById('modalPrice').textContent = 'BD ' + p.price.toFixed(3);
                         document.getElementById('modalDate').textContent = p.addingDate || 'N/A';
                         
-                        // Status Badge
                         const statusBadge = document.querySelector('#productModal .status-badge');
                         const isOutOfStock = p.stockQuantity <= 0 || p.status === 'out of stock';
-                        if (isOutOfStock) {
+                        if (p.status === 'hidden') {
+                            statusBadge.className = 'status-badge bg-gray-100 text-gray-700';
+                            statusBadge.innerHTML = '<i class="fas fa-eye-slash"></i> Hidden / Removed';
+                        } else if (isOutOfStock) {
                             statusBadge.className = 'status-badge bg-red-100 text-red-700';
                             statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
-                        } else if (p.status === 'active') {
+                        } else {
                             statusBadge.className = 'status-badge bg-green-100 text-green-700';
                             statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Active';
-                        } else if (p.status === 'flagged') {
-                            statusBadge.className = 'status-badge bg-amber-100 text-amber-700';
-                            statusBadge.innerHTML = '<i class="fas fa-flag"></i> Flagged';
-                        } else {
-                            statusBadge.className = 'status-badge bg-gray-100 text-gray-700';
-                            statusBadge.innerHTML = `<i class="fas fa-info-circle"></i> ${p.status}`;
                         }
                         
-                        // Image
                         const mainImage = document.getElementById('mainImage');
                         mainImage.src = p.imageUrl || 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop';
                         
-                        // Thumbnails
                         const gallery = document.getElementById('thumbnailGallery');
                         gallery.innerHTML = `
                             <img 
@@ -1126,18 +1118,63 @@
                             />
                         `;
                         
-                        // Artisan Info
-                        const artisanNameEl = document.querySelector('#productModal .bg-white.border p.font-semibold');
-                        artisanNameEl.textContent = p.artisanName || 'Unknown Artisan';
+                        document.getElementById('modalArtisanName').textContent = p.artisanName || 'Unknown Artisan';
                         
-                        const artisanImg = document.querySelector('#productModal .bg-white.border img');
+                        const artisanImg = document.getElementById('modalArtisanImage');
                         if (p.artisan && p.artisan.profilePicture) {
                             artisanImg.src = p.artisan.profilePicture;
                         } else {
                             artisanImg.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
                         }
 
-                        // Modal show
+                        document.getElementById('modalArtisanShop').textContent = (p.artisan && p.artisan.shopName) ? p.artisan.shopName : 'Artisan Shop';
+
+                        document.getElementById('modalArtisanProducts').textContent = `${data.artisanTotalProducts || 0} products`;
+                        document.getElementById('modalArtisanRating').textContent = `${(data.artisanAverageRating || 0).toFixed(1)} (${data.artisanReviewsCount || 0} reviews)`;
+
+                        document.getElementById('modalReviewsCount').textContent = data.reviews ? data.reviews.length : 0;
+                        const reviewsContainer = document.getElementById('modalReviewsContainer');
+                        if (!data.reviews || data.reviews.length === 0) {
+                            reviewsContainer.innerHTML = `
+                                <div class="text-center py-6 text-sm text-[#8b7355]">
+                                    No reviews yet for this product.
+                                </div>
+                            `;
+                        } else {
+                            reviewsContainer.innerHTML = data.reviews.map(r => {
+                                let starHtml = '';
+                                for (let i = 1; i <= 5; i++) {
+                                    if (i <= r.rating) {
+                                        starHtml += '<i class="fas fa-star text-amber-500 text-xs"></i>';
+                                    } else {
+                                        starHtml += '<i class="far fa-star text-amber-500 text-xs"></i>';
+                                    }
+                                }
+                                return `
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <img 
+                                                    src="${r.reviewerImage}" 
+                                                    alt="${r.reviewerName}" 
+                                                    class="w-8 h-8 rounded-full object-cover"
+                                                />
+                                                <span class="text-sm font-medium text-[#5c4a3d]">${r.reviewerName}</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                ${starHtml}
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-[#5c4a3d]">${r.comment}</p>
+                                        <p class="text-xs text-[#8b7355] mt-1">${r.date}</p>
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+
+                        document.getElementById('modalApproveBtn').onclick = () => handleAdminAction('approve', p.id);
+                        document.getElementById('modalRemoveBtn').onclick = () => handleAdminAction('remove', p.id);
+
                         const modal = document.getElementById('productModal');
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
@@ -1369,32 +1406,32 @@
         }
 
         // Handle admin action
-        function handleAdminAction(action) {
-            let message = '';
-            let type = 'info';
-
-            if (action === 'approve') {
-                message = 'Product listing approved successfully.';
-                type = 'success';
-            } else if (action === 'remove') {
-                message = 'Product listing removed. Artisan has been notified.';
-                type = 'info';
-            } else if (action === 'flag') {
-                message = 'Product flagged for review.';
-                type = 'warning';
-            } else if (action === 'contact') {
-                message = 'Opening contact form with artisan...';
-                type = 'info';
-            }
-
-            showNotification(message, type);
-
-            if (action !== 'contact') {
-                setTimeout(() => {
-                    closeProductModal();
-                }, 1000);
-            }
+        function handleAdminAction(action, productId) {
+            let status = (action === "approve") ? "active" : "hidden";
+            fetch(`/api/products/${productId}/status?status=${status}`, {
+                method: "PUT"
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(action === "approve" ? "Product approved and visible!" : "Product listing removed (hidden)!", "success");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showNotification(data.message || "Action failed.", "error");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showNotification("An error occurred.", "error");
+            });
         }
+
+
+
+
+
 
         // Close modal on outside click
         document.getElementById('productModal').addEventListener('click', function(e) {
