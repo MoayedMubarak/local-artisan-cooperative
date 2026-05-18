@@ -7,6 +7,7 @@ import com.example.demo.repository.ArtisanRepository;
 import com.example.demo.repository.AuctionRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
+import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,9 @@ public class AdminController {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @GetMapping("/adminDashboard")
     public String dashboard(Model model) {
@@ -82,16 +86,38 @@ public class AdminController {
             auctionGrowth = 100.0;
         }
         
+        List<com.example.demo.model.Review> allReviews = reviewRepository.findAll();
+        long totalReviewsThisMonth = allReviews.stream()
+            .filter(r -> r.getDate() != null && 
+                         r.getDate().getMonthValue() == now.getMonthValue() && 
+                         r.getDate().getYear() == now.getYear())
+            .count();
+            
+        long reviewsLastMonth = allReviews.stream()
+            .filter(r -> r.getDate() != null && 
+                         r.getDate().getMonthValue() == now.minusMonths(1).getMonthValue() && 
+                         r.getDate().getYear() == now.minusMonths(1).getYear())
+            .count();
+            
+        double reviewGrowth = 0;
+        if (reviewsLastMonth > 0) {
+            reviewGrowth = ((double) (totalReviewsThisMonth - reviewsLastMonth) / reviewsLastMonth) * 100;
+        } else if (totalReviewsThisMonth > 0) {
+            reviewGrowth = 100.0;
+        }
+
         model.addAttribute("totalUsers", totalUsers);
         model.addAttribute("totalArtisans", totalArtisans);
         model.addAttribute("activeProducts", activeProducts);
         model.addAttribute("openAuctions", openAuctions);
+        model.addAttribute("totalReviews", totalReviewsThisMonth);
         
         // Mock percentages for now (as User has no createdAt)
         model.addAttribute("userGrowth", 8.2);
         model.addAttribute("artisanGrowth", 12.5);
         model.addAttribute("productGrowth", productGrowth);
         model.addAttribute("auctionGrowth", auctionGrowth);
+        model.addAttribute("reviewGrowth", reviewGrowth);
         
         List<Order> allOrders = orderRepository.findAll();
         

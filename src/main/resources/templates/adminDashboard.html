@@ -377,19 +377,19 @@
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
-                <!-- Pending Reviews -->
+                <!-- Total Reviews -->
                 <div class="stat-card bg-white rounded-xl p-5 card-shadow">
                     <div class="flex items-center justify-between mb-3">
                         <div class="w-11 h-11 bg-orange-50 rounded-xl flex items-center justify-center">
                             <i class="fas fa-star text-xl text-orange-600"></i>
                         </div>
-                        <span class="text-orange-600 text-xs font-semibold flex items-center gap-1">
-                            <i class="fas fa-exclamation-circle"></i>
-                            23
+                        <span th:class="${reviewGrowth >= 0 ? 'text-green-600 text-xs font-semibold flex items-center gap-1' : 'text-red-600 text-xs font-semibold flex items-center gap-1'}">
+                            <i th:class="${reviewGrowth >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'}"></i>
+                            <span th:text="${#numbers.formatDecimal(T(java.lang.Math).abs(reviewGrowth), 1, 1)} + '%'">23</span>
                         </span>
                     </div>
-                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Pending Reviews</h3>
-                    <p class="text-2xl font-bold text-[#5c4a3d]">156</p>
+                    <h3 class="text-[#8b7355] text-xs font-medium mb-1">Total Reviews</h3>
+                    <p class="text-2xl font-bold text-[#5c4a3d]" th:text="${totalReviews}">156</p>
                     <p class="text-xs text-[#8b7355] mt-2">This month</p>
                 </div>
 
