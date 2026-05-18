@@ -207,9 +207,16 @@ public class AdminController {
         java.util.Set<String> categories = new java.util.TreeSet<>();
         java.util.Set<String> artisans = new java.util.TreeSet<>();
         for (Product p : products) {
-            if (p.getStockQuantity() <= 0 && !"out of stock".equalsIgnoreCase(p.getStatus())) {
-                p.setStatus("out of stock");
-                productRepository.save(p);
+            if (p.getStockQuantity() <= 0) {
+                if (!"out of stock".equalsIgnoreCase(p.getStatus())) {
+                    p.setStatus("out of stock");
+                    productRepository.save(p);
+                }
+            } else {
+                if (!"active".equalsIgnoreCase(p.getStatus())) {
+                    p.setStatus("active");
+                    productRepository.save(p);
+                }
             }
             if (p.getCategory() != null && !p.getCategory().trim().isEmpty()) {
                 categories.add(p.getCategory().trim());

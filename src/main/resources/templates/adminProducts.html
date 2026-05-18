@@ -479,21 +479,13 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <!-- Status Badge -->
-                                    <span th:if="${product.stockQuantity <= 0 || #strings.equals(product.status, 'out of stock')}" class="status-badge bg-red-100 text-red-700">
+                                    <span th:if="${product.stockQuantity <= 0}" class="status-badge bg-red-100 text-red-700">
                                         <i class="fas fa-times-circle"></i>
                                         Out of stock
                                     </span>
-                                    <span th:if="${product.stockQuantity > 0 && #strings.equals(product.status, 'active')}" class="status-badge bg-green-100 text-green-700">
+                                    <span th:if="${product.stockQuantity > 0}" class="status-badge bg-green-100 text-green-700">
                                         <i class="fas fa-check-circle"></i>
                                         Active
-                                    </span>
-                                    <span th:if="${product.stockQuantity > 0 && #strings.equals(product.status, 'flagged')}" class="status-badge bg-amber-100 text-amber-700">
-                                        <i class="fas fa-flag"></i>
-                                        Flagged
-                                    </span>
-                                    <span th:if="${product.stockQuantity > 0 && !#strings.equals(product.status, 'active') && !#strings.equals(product.status, 'out of stock') && !#strings.equals(product.status, 'flagged')}" class="status-badge bg-gray-100 text-gray-700">
-                                        <i class="fas fa-info-circle"></i>
-                                        <span th:text="${product.status}">Pending</span>
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
