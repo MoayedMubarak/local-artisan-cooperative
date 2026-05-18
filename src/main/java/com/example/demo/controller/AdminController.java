@@ -191,13 +191,25 @@ public class AdminController {
         return "adminNotification";
     }
 
-    @GetMapping("/adminOrderDetail")
-    public String adminOrderDetail() {
+    @GetMapping({"/adminOrderDetail", "/adminOrderDetail/{id}"})
+    public String adminOrderDetail(@PathVariable(required = false) Long id, Model model) {
+        if (id != null) {
+            orderRepository.findById(id).ifPresent(order -> model.addAttribute("order", order));
+        }
         return "adminOrderDetail";
     }
 
     @GetMapping("/adminOrderManagment")
-    public String adminOrderManagment() {
+    public String adminOrderManagment(Model model) {
+        List<Order> orders = orderRepository.findAll();
+        // Sort orders by date descending
+        orders.sort((o1, o2) -> {
+            if (o1.getDate() == null && o2.getDate() == null) return 0;
+            if (o1.getDate() == null) return 1;
+            if (o2.getDate() == null) return -1;
+            return o2.getDate().compareTo(o1.getDate());
+        });
+        model.addAttribute("ordersList", orders);
         return "adminOrderManagment";
     }
 
