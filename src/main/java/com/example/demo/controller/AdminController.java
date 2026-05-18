@@ -224,15 +224,61 @@ public class AdminController {
     }
 
     @GetMapping("/adminOrderManagment")
-    public String adminOrderManagment(Model model) {
+    public String adminOrderManagment(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo,
+            Model model) {
+
         List<Order> orders = orderRepository.findAll();
-        // Sort orders by date descending
+
+        // Filter by search (order ID or customer name)
+        if (search != null && !search.trim().isEmpty()) {
+            String q = search.trim().toLowerCase();
+            orders = orders.stream().filter(o -> {
+                String idStr = String.valueOf(o.getOrderId());
+                String customerName = o.getCustomer() != null && o.getCustomer().getName() != null
+                        ? o.getCustomer().getName().toLowerCase() : "";
+                return idStr.contains(q) || customerName.contains(q);
+            }).collect(java.util.stream.Collectors.toList());
+        }
+
+        // Filter by status
+        if (status != null && !status.trim().isEmpty()) {
+            String s = status.trim().toLowerCase();
+            orders = orders.stream()
+                    .filter(o -> o.getStatus() != null && o.getStatus().toLowerCase().equals(s))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Filter by date range
+        if (dateFrom != null && !dateFrom.trim().isEmpty()) {
+            java.time.LocalDate from = java.time.LocalDate.parse(dateFrom);
+            orders = orders.stream()
+                    .filter(o -> o.getDate() != null && !o.getDate().isBefore(from))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        if (dateTo != null && !dateTo.trim().isEmpty()) {
+            java.time.LocalDate to = java.time.LocalDate.parse(dateTo);
+            orders = orders.stream()
+                    .filter(o -> o.getDate() != null && !o.getDate().isAfter(to))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        // Sort by date descending
         orders.sort((o1, o2) -> {
             if (o1.getDate() == null && o2.getDate() == null) return 0;
             if (o1.getDate() == null) return 1;
             if (o2.getDate() == null) return -1;
             return o2.getDate().compareTo(o1.getDate());
         });
+
+        // Pass filter values back to retain in form
+        model.addAttribute("searchVal", search != null ? search : "");
+        model.addAttribute("statusVal", status != null ? status : "");
+        model.addAttribute("dateFromVal", dateFrom != null ? dateFrom : "");
+        model.addAttribute("dateToVal", dateTo != null ? dateTo : "");
         model.addAttribute("ordersList", orders);
         return "adminOrderManagment";
     }
