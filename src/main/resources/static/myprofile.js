@@ -342,14 +342,26 @@ window.deleteAccount = function () {
 };
 
 window.logout = function () {
-    sessionStorage.removeItem('loggedIn');
-    sessionStorage.removeItem('isLoggedIn');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('cartCount');
-    sessionStorage.removeItem('postLoginNext');
-    showToast('You have been logged out.', 'success');
-    setTimeout(() => window.location.href = '/login', 1000);
+    const email = sessionStorage.getItem('userEmail');
+    const doLogout = () => {
+        sessionStorage.removeItem('loggedIn');
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('cartCount');
+        sessionStorage.removeItem('postLoginNext');
+        showToast('You have been logged out.', 'success');
+        setTimeout(() => window.location.href = '/login', 1000);
+    };
+    if (email) {
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        }).finally(doLogout);
+    } else {
+        doLogout();
+    }
 };
 
 // ============================================================

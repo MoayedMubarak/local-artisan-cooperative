@@ -371,6 +371,19 @@
     startNotificationPolling();
   }
 
+  // Capture site exit / pagehide activity tracking
+  window.addEventListener('pagehide', () => {
+    const email = sessionStorage.getItem('userEmail');
+    if (email) {
+      fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email }),
+        keepalive: true
+      });
+    }
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runAuthGuardInit);
   } else {

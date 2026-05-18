@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.List;
@@ -207,24 +209,75 @@ public class AdminController {
     }
 
     @GetMapping("/adminUsersManagement")
-    public String adminUsersManagement() {
+    public String adminUsersManagement(Model model) {
+        List<User> users = userRepository.findAll();
+        boolean needsSave = false;
+        for (User u : users) {
+            if (u.getStatus() == null) {
+                if ("ARTISAN".equalsIgnoreCase(u.getRole())) {
+                    u.setStatus("pending");
+                } else {
+                    u.setStatus("active");
+                }
+                needsSave = true;
+            }
+            if (u.getJoinDate() == null) {
+                u.setJoinDate(java.time.LocalDateTime.now());
+                needsSave = true;
+            }
+        }
+        if (needsSave) {
+            userRepository.saveAll(users);
+        }
+        model.addAttribute("usersList", users);
         return "adminUsersManagement";
     }
 
     @PostMapping("/approve-artisan/{id}")
     public String approveArtisan(@PathVariable Long id) {
         artisanRepository.findById(id).ifPresent(artisan -> {
-            // Logic to approve artisan (e.g. set a flag if added)
-            // For now, we'll just redirect
+            artisan.setStatus("active");
+            artisanRepository.save(artisan);
         });
-        return "redirect:/adminDashboard";
+        return "redirect:/adminArtisanApproval";
     }
 
     @PostMapping("/suspend-user/{id}")
     public String suspendUser(@PathVariable Long id) {
         userRepository.findById(id).ifPresent(user -> {
-            // Logic to suspend user
+            user.setStatus("suspended");
+            userRepository.save(user);
         });
-        return "redirect:/adminDashboard";
+        return "redirect:/adminUsersManagement";
+    }
+
+    @PostMapping("/api/admin/users/{id}/status")
+    @ResponseBody
+    public ResponseEntity<?> updateUserStatus(@PathVariable Long id, @RequestParam String status) {
+        return userRepository.findById(id).map(user -> {
+            user.setStatus(status.toLowerCase());
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("success", true, "message", "User status updated to " + status));
+        }).orElse(ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found")));
+    }
+
+    @PostMapping("/api/admin/users/{id}/update")
+    @ResponseBody
+    public ResponseEntity<?> updateUserDetails(@PathVariable Long id, @RequestParam String name, @RequestParam String email) {
+        return userRepository.findById(id).map(user -> {
+            user.setName(name);
+            user.setEmail(email);
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("success", true, "message", "User updated successfully"));
+        }).orElse(ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found")));
+    }
+
+    @PostMapping("/api/admin/users/{id}/delete")
+    @ResponseBody
+    public ResponseEntity<?> deleteUserAccount(@PathVariable Long id) {
+        return userRepository.findById(id).map(user -> {
+            userRepository.delete(user);
+            return ResponseEntity.ok(Map.of("success", true, "message", "User deleted successfully"));
+        }).orElse(ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found")));
     }
 }

@@ -131,13 +131,28 @@
     logoutBtn.addEventListener('click', () => {
       const confirmed = window.confirm('Are you sure you want to logout?');
       if (confirmed) {
-        // Clear all session/local data
-        sessionStorage.clear();
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminUser');
-        showToast('Logged out successfully. Redirecting…', 'info');
-        // Short delay so the toast is visible before redirect
-        setTimeout(() => window.location.replace('/login'), 1200);
+        const userStr = localStorage.getItem('adminUser') || localStorage.getItem('user') || sessionStorage.getItem('userProfile');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const email = user ? (user.email || null) : sessionStorage.getItem('userEmail');
+
+        const doLogout = () => {
+          sessionStorage.clear();
+          localStorage.removeItem('adminToken');
+          localStorage.removeItem('adminUser');
+          localStorage.removeItem('user');
+          showToast('Logged out successfully. Redirecting…', 'info');
+          setTimeout(() => window.location.replace('/login'), 1200);
+        };
+
+        if (email) {
+          fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          }).finally(doLogout);
+        } else {
+          doLogout();
+        }
       }
     });
   }

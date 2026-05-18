@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -479,362 +479,56 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e5e0d8]">
-                            <!-- User 1 - Active Customer -->
-                            <tr class="table-row">
+                            <tr th:each="user : ${usersList}"
+                                th:class="${'suspended'.equals(user.status) ? 'table-row suspended' : 'table-row'}"
+                                th:data-user-id="${user.userId}">
                                 <td class="px-6 py-4">
                                     <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-blue-600">JD</span>
+                                        <div th:class="${'ARTISAN'.equals(user.role) ? 'w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center' : ('ADMIN'.equals(user.role) ? 'w-9 h-9 bg-red-100 rounded-full flex items-center justify-center' : 'w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center')}">
+                                            <span th:class="${'ARTISAN'.equals(user.role) ? 'text-sm font-semibold text-amber-600' : ('ADMIN'.equals(user.role) ? 'text-sm font-semibold text-red-600' : 'text-sm font-semibold text-blue-600')}"
+                                                  th:text="${user.name != null and !user.name.isEmpty() ? user.name.substring(0,1).toUpperCase() : '?'}">U</span>
                                         </div>
-                                        <span class="font-medium text-[#5c4a3d]">John Davis</span>
+                                        <span class="font-medium text-[#5c4a3d]" th:text="${user.name}">User Name</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-[#8b7355]">john.davis@email.com</td>
+                                <td class="px-6 py-4 text-[#8b7355]" th:text="${user.email}">email@example.com</td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge role-customer px-3 py-1 rounded-full text-xs font-semibold">Customer</span>
+                                    <span th:class="${'ARTISAN'.equals(user.role) ? 'status-badge role-artisan px-3 py-1 rounded-full text-xs font-semibold' : ('ADMIN'.equals(user.role) ? 'status-badge role-admin px-3 py-1 rounded-full text-xs font-semibold' : 'status-badge role-customer px-3 py-1 rounded-full text-xs font-semibold')}"
+                                          th:text="${user.role != null ? user.role.substring(0,1).toUpperCase() + user.role.substring(1).toLowerCase() : 'Unknown'}">Customer</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge status-active px-3 py-1 rounded-full text-xs font-semibold">Active</span>
+                                    <span th:class="${'suspended'.equals(user.status) ? 'status-badge status-suspended px-3 py-1 rounded-full text-xs font-semibold' : ('pending'.equals(user.status) ? 'status-badge status-pending px-3 py-1 rounded-full text-xs font-semibold' : 'status-badge status-active px-3 py-1 rounded-full text-xs font-semibold')}"
+                                          th:text="${user.status != null ? user.status.substring(0,1).toUpperCase() + user.status.substring(1).toLowerCase() : 'Active'}">Active</span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Jan 15, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">2 hours ago</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]"
+                                    th:text="${user.joinDate != null ? #temporals.format(user.joinDate, 'MMM dd, yyyy') : 'N/A'}">Jan 01, 2024</td>
+                                <td class="px-6 py-4 text-sm text-[#8b7355]"
+                                    th:text="${user.lastActive != null ? #temporals.format(user.lastActive, 'MMM dd, yyyy HH:mm') : 'Never'}">Never</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
                                         <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 2 - Active Artisan -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-amber-600">SM</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Sarah Mitchell</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">sarah.m@artisan.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-artisan px-3 py-1 rounded-full text-xs font-semibold">Artisan</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active px-3 py-1 rounded-full text-xs font-semibold">Active</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Mar 8, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">5 minutes ago</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 3 - Suspended Customer -->
-                            <tr class="table-row suspended">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-gray-600">MK</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Michael Kim</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">michael.kim@email.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-customer px-3 py-1 rounded-full text-xs font-semibold">Customer</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-suspended px-3 py-1 rounded-full text-xs font-semibold">Suspended</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Nov 22, 2023</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">30 days ago</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-medium transition-colors">
+                                        <button th:if="${!'suspended'.equals(user.status)}"
+                                                class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-medium transition-colors">
                                             Suspend
                                         </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 4 - Pending Artisan -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-amber-600">EW</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Emily Watson</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">emily.w@artisan.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-artisan px-3 py-1 rounded-full text-xs font-semibold">Artisan</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-pending px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Dec 10, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Never</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 5 - Active Admin -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-red-600">AU</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Admin User</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">admin@artisancoop.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-admin px-3 py-1 rounded-full text-xs font-semibold">Admin</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active px-3 py-1 rounded-full text-xs font-semibold">Active</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Jan 1, 2023</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Now</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 6 - Suspended Artisan -->
-                            <tr class="table-row suspended">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-amber-600">DL</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">David Lee</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">david.lee@artisan.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-artisan px-3 py-1 rounded-full text-xs font-semibold">Artisan</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-suspended px-3 py-1 rounded-full text-xs font-semibold">Suspended</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Jun 5, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">15 days ago</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Suspend
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 7 - Active Customer -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-blue-600">AB</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Anna Brown</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">anna.brown@email.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-customer px-3 py-1 rounded-full text-xs font-semibold">Customer</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active px-3 py-1 rounded-full text-xs font-semibold">Active</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Feb 18, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">1 day ago</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 8 - Active Customer -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-blue-600">RJ</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Robert Johnson</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">robert.j@email.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-customer px-3 py-1 rounded-full text-xs font-semibold">Customer</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active px-3 py-1 rounded-full text-xs font-semibold">Active</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Apr 3, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">3 hours ago</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 9 - Active Artisan -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-amber-600">LT</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Lisa Thompson</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">lisa.t@artisan.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-artisan px-3 py-1 rounded-full text-xs font-semibold">Artisan</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-active px-3 py-1 rounded-full text-xs font-semibold">Active</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Jul 12, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">6 hours ago</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- User 10 - Pending Customer -->
-                            <tr class="table-row">
-                                <td class="px-6 py-4">
-                                    <input type="checkbox" class="user-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer" onchange="updateBulkActionBar()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-blue-600">CW</span>
-                                        </div>
-                                        <span class="font-medium text-[#5c4a3d]">Chris Wilson</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-[#8b7355]">chris.w@email.com</td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge role-customer px-3 py-1 rounded-full text-xs font-semibold">Customer</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge status-pending px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Dec 14, 2024</td>
-                                <td class="px-6 py-4 text-sm text-[#8b7355]">Never</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="openUserPanel()" class="text-[#c17c5f] hover:text-[#a5664d] font-medium text-sm">View</button>
-                                        <button class="p-2 text-[#8b7355] hover:text-[#c17c5f] transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
-                                            Active
+                                        <button th:if="${'suspended'.equals(user.status)}"
+                                                class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
+                                            Activate
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
+
                     </table>
                 </div>
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
-                    <p class="text-sm text-[#8b7355]">Showing 1-10 of 125 users</p>
+                    <p class="text-sm text-[#8b7355]" th:text="'Showing all ' + ${#lists.size(usersList)} + ' users'">Showing all users</p>
                     <div class="flex items-center gap-2">
                         <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors" disabled>
                             Previous

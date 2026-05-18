@@ -17,4 +17,20 @@ public class User {
     private String role;
     @Column(columnDefinition = "TEXT")
     private String profilePicture = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+    private String status;
+    private java.time.LocalDateTime joinDate;
+    private java.time.LocalDateTime lastActive;
+
+    @PrePersist
+    protected void onCreate() {
+        joinDate = java.time.LocalDateTime.now();
+    }
+
+    public String getStatus() {
+        if (status == null) {
+            return "active";
+        }
+        return status;
+    }
 }

@@ -56,6 +56,9 @@ public class AuthController {
             }
 
             if (passwordMatch) {
+                user.setLastActive(java.time.LocalDateTime.now());
+                userRepository.save(user);
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 if (user instanceof Customer) {
@@ -82,6 +85,7 @@ public class AuthController {
         customer.setPassword(BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt()));
         customer.setTotalOrders(0);
         customer.setTotalSpent(0.0);
+        customer.setStatus("active");
         userRepository.save(customer);
 
         com.example.demo.model.Wishlist wishlist = new com.example.demo.model.Wishlist();
@@ -102,6 +106,7 @@ public class AuthController {
         if (artisan.getProfilePicture() == null || artisan.getProfilePicture().isBlank()) {
             artisan.setProfilePicture("https://cdn-icons-png.flaticon.com/512/149/149071.png");
         }
+        artisan.setStatus("pending");
         Artisan saved = artisanRepository.save(artisan);
         return ResponseEntity.ok(Map.of("success", true, "user", saved));
     }
@@ -121,5 +126,21 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("success", true, "message", "Account deleted successfully"));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "User not found"));
+    }
+
+    @PostMapping("/logout")
+    @Transactional
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        if (email != null) {
+            Optional<User> userOpt = userRepository.findByEmail(email);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                user.setLastActive(java.time.LocalDateTime.now());
+                userRepository.save(user);
+                return ResponseEntity.ok(Map.of("success", true));
+            }
+        }
+        return ResponseEntity.ok(Map.of("success", true)); // Still return success to allow frontend logout to proceed
     }
 }

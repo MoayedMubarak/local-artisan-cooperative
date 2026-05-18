@@ -141,15 +141,27 @@
     }
 
     window.artisanLogout = function artisanLogout() {
-        sessionStorage.removeItem('loggedIn');
-        sessionStorage.removeItem('isLoggedIn');
-        sessionStorage.removeItem('userEmail');
-        sessionStorage.removeItem('userName');
-        sessionStorage.removeItem('userRole');
-        sessionStorage.removeItem('userId');
-        sessionStorage.removeItem('userProfile');
-        sessionStorage.removeItem('postLoginNext');
-        window.location.href = '/login';
+        const email = sessionStorage.getItem('userEmail');
+        const doLogout = () => {
+            sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('userEmail');
+            sessionStorage.removeItem('userName');
+            sessionStorage.removeItem('userRole');
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('userProfile');
+            sessionStorage.removeItem('postLoginNext');
+            window.location.href = '/login';
+        };
+        if (email) {
+            fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            }).finally(doLogout);
+        } else {
+            doLogout();
+        }
     };
 
     if (document.readyState === 'loading') {

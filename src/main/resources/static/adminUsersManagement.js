@@ -147,32 +147,47 @@
     // SECTION 4 — Suspend / Activate Toggle
     // ─────────────────────────────────────────────
     function toggleSuspend(row) {
+      const userId = row.dataset.userId;
+      if (!userId) return;
+
       const actionsDiv = qs('td:last-child .flex', row);
       const toggleBtn  = actionsDiv ? actionsDiv.children[2] : null;
       const statusBadge = qs('[class*="status-"]', row);
       if (!toggleBtn || !statusBadge) return;
 
-      const isSuspended = toggleBtn.textContent.trim() === 'Suspend';
+      // If button text is "Suspend", we want to suspend the user. Otherwise, activate them.
+      const currentlyActive = toggleBtn.textContent.trim() === 'Suspend';
+      const targetStatus = currentlyActive ? 'suspended' : 'active';
 
-      if (isSuspended) {
-        // Currently suspended-looking button → means row is suspended, activate it
-        toggleBtn.textContent = 'Active';
-        toggleBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-        toggleBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-        statusBadge.className = statusBadge.className.replace('status-suspended', 'status-active');
-        statusBadge.textContent = 'Active';
-        row.classList.remove('suspended');
-        if (window.showToast) window.showToast('User activated successfully', 'success');
-      } else {
-        // Active → suspend
-        toggleBtn.textContent = 'Suspend';
-        toggleBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-        toggleBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-        statusBadge.className = statusBadge.className.replace('status-active', 'status-suspended');
-        statusBadge.textContent = 'Suspended';
-        row.classList.add('suspended');
-        if (window.showToast) window.showToast('User suspended successfully', 'warning');
-      }
+      fetch(`/api/admin/users/${userId}/status?status=${targetStatus}`, {
+        method: 'POST'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          if (targetStatus === 'active') {
+            toggleBtn.textContent = 'Suspend';
+            toggleBtn.className = 'px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-medium transition-colors';
+            statusBadge.className = statusBadge.className.replace(/status-\w+/, 'status-active');
+            statusBadge.textContent = 'Active';
+            row.classList.remove('suspended');
+            if (window.showToast) window.showToast('User activated successfully', 'success');
+          } else {
+            toggleBtn.textContent = 'Activate';
+            toggleBtn.className = 'px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors';
+            statusBadge.className = statusBadge.className.replace(/status-\w+/, 'status-suspended');
+            statusBadge.textContent = 'Suspended';
+            row.classList.add('suspended');
+            if (window.showToast) window.showToast('User suspended successfully', 'warning');
+          }
+        } else {
+          if (window.showToast) window.showToast(data.message || 'Operation failed', 'error');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        if (window.showToast) window.showToast('Error connecting to server', 'error');
+      });
     }
 
     function wireToggleButtons() {
@@ -213,6 +228,23 @@
             const emailInput = qs('input', emailTd);
             const newName  = nameInput ? nameInput.value.trim() : '';
             const newEmail = emailInput ? emailInput.value.trim() : '';
+            const userId = row.dataset.userId;
+
+            if (userId) {
+              fetch(`/api/admin/users/${userId}/update?name=${encodeURIComponent(newName)}&email=${encodeURIComponent(newEmail)}`, {
+                method: 'POST'
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (!data.success) {
+                  if (window.showToast) window.showToast(data.message || 'Failed to update user in database', 'error');
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                if (window.showToast) window.showToast('Error saving user to database', 'error');
+              });
+            }
 
             // Restore name cell
             const nameSpan = qs('span.font-medium', nameTd) || nameTd.querySelector('div span.font-medium');
@@ -373,6 +405,17 @@
               const val = qs('span:last-child', infoRows[2]);
               if (val) val.textContent = lastAct;
             }
+
+            // Update suspend button state
+            if (suspendBtn) {
+              if (status === 'suspended') {
+                suspendBtn.innerHTML = '<i class="fas fa-check-circle"></i> Activate Account';
+                suspendBtn.className = 'w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2';
+              } else {
+                suspendBtn.innerHTML = '<i class="fas fa-ban"></i> Suspend Account';
+                suspendBtn.className = 'w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2';
+              }
+            }
           }
 
           // Open panel
@@ -399,9 +442,27 @@
 
     if (suspendBtn) {
       suspendBtn.addEventListener('click', () => {
-        if (window.confirm('Are you sure you want to suspend this account?')) {
-          if (window.showToast) window.showToast('Account suspended', 'warning');
-          if (typeof window.closeUserPanel === 'function') window.closeUserPanel();
+        if (currentPanelRow) {
+          const actionText = suspendBtn.textContent.trim().toLowerCase();
+          const confirmed = window.confirm(`Are you sure you want to ${actionText}?`);
+          if (confirmed) {
+            toggleSuspend(currentPanelRow);
+            setTimeout(() => {
+              const newStatus = getStatusText(currentPanelRow);
+              const statusBadge = qs('.side-panel .bg-\\[\\#f5ebe0\\] [class*="status-"]', panel);
+              if (statusBadge) {
+                statusBadge.className = `status-badge status-${newStatus} px-3 py-1 rounded-full text-xs font-semibold`;
+                statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+              }
+              if (newStatus === 'suspended') {
+                suspendBtn.innerHTML = '<i class="fas fa-check-circle"></i> Activate Account';
+                suspendBtn.className = 'w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2';
+              } else {
+                suspendBtn.innerHTML = '<i class="fas fa-ban"></i> Suspend Account';
+                suspendBtn.className = 'w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2';
+              }
+            }, 300);
+          }
         }
       });
     }
@@ -416,14 +477,30 @@
 
     if (deleteAccBtn) {
       deleteAccBtn.addEventListener('click', () => {
-        if (window.confirm('This action is permanent. Are you sure you want to delete this account?')) {
-          if (currentPanelRow) {
-            currentPanelRow.remove();
-            currentPanelRow = null;
-            updatePaginationLabel();
+        if (currentPanelRow) {
+          const userId = currentPanelRow.dataset.userId;
+          if (!userId) return;
+          if (window.confirm('This action is permanent. Are you sure you want to delete this account?')) {
+            fetch(`/api/admin/users/${userId}/delete`, {
+              method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                currentPanelRow.remove();
+                currentPanelRow = null;
+                updatePaginationLabel();
+                if (window.showToast) window.showToast('Account deleted successfully', 'error');
+                if (typeof window.closeUserPanel === 'function') window.closeUserPanel();
+              } else {
+                if (window.showToast) window.showToast(data.message || 'Delete failed', 'error');
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              if (window.showToast) window.showToast('Error deleting account', 'error');
+            });
           }
-          if (window.showToast) window.showToast('Account deleted', 'error');
-          if (typeof window.closeUserPanel === 'function') window.closeUserPanel();
         }
       });
     }
@@ -455,7 +532,8 @@
 
         rows.forEach(row => {
           const toggleBtn = qs('td:last-child .flex', row)?.children[2];
-          if (toggleBtn && toggleBtn.textContent.trim() === 'Active') {
+          const currentlyActive = toggleBtn && toggleBtn.textContent.trim() === 'Suspend';
+          if (currentlyActive) {
             toggleSuspend(row);
           }
         });
@@ -471,7 +549,13 @@
         if (!window.confirm('Permanently delete all selected users?')) return;
 
         const count = rows.length;
-        rows.forEach(r => r.remove());
+        rows.forEach(r => {
+          const userId = r.dataset.userId;
+          if (userId) {
+            fetch(`/api/admin/users/${userId}/delete`, { method: 'POST' });
+          }
+          r.remove();
+        });
         uncheckAll();
         updatePaginationLabel();
         if (window.showToast) window.showToast(`${count} users deleted`, 'error');
