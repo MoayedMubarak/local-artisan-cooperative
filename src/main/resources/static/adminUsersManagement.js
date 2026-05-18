@@ -19,14 +19,12 @@
     const roleSelect   = selects[0];
     const statusSelect = selects[1];
     const paginationLabel = qs('.border-t p.text-sm');
-    const pagBtns      = qsa('.border-t .flex.items-center.gap-2 button');
+    const paginationContainer = qs('.border-t .flex.items-center.gap-2');
     const bulkBar      = qs('#bulkActionBar');
     const selectedCountEl = qs('#selectedCount');
     let currentPanelRow = null;
     let currentPage = 1;
     const perPage = 10;
-    const totalUsers = 125;
-    const totalPages = Math.ceil(totalUsers / perPage);
 
     // ─── Helpers ───
     function getRows() { return qsa('tr.table-row', tbody); }
@@ -41,31 +39,85 @@
       return td ? td.textContent.trim() : '';
     }
     function getRoleText(row) {
-      const badge = qs('[class*="role-"]', row);
+      const cell = row.children[3];
+      const badge = cell ? qs('span', cell) : null;
       return badge ? badge.textContent.trim().toLowerCase() : '';
     }
     function getStatusText(row) {
-      const badge = qs('[class*="status-"]', row);
+      const cell = row.children[4];
+      const badge = cell ? qs('span', cell) : null;
       return badge ? badge.textContent.trim().toLowerCase() : '';
     }
     function getJoinDate(row) { return row.children[5] ? row.children[5].textContent.trim() : ''; }
     function getLastActive(row) { return row.children[6] ? row.children[6].textContent.trim() : ''; }
 
-    function updatePaginationLabel() {
-      const visible = getVisibleRows().length;
-      if (paginationLabel) {
-        paginationLabel.textContent = `Showing 1\u2013${visible} of ${visible} users`;
+    function renderPaginationControls(totalFiltered) {
+      if (!paginationContainer) return;
+      
+      const totalPages = Math.ceil(totalFiltered / perPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+      
+      let html = '';
+      
+      // Previous button
+      const prevDisabled = currentPage === 1 ? 'disabled opacity-50 cursor-not-allowed' : '';
+      html += `<button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors ${prevDisabled}" data-page="prev">Previous</button>`;
+      
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+          html += `<button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium" data-page="${i}">${i}</button>`;
+        } else {
+          html += `<button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors" data-page="${i}">${i}</button>`;
+        }
       }
+      
+      // Next button
+      const nextDisabled = currentPage === totalPages ? 'disabled opacity-50 cursor-not-allowed' : '';
+      html += `<button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors ${nextDisabled}" data-page="next">Next</button>`;
+      
+      paginationContainer.innerHTML = html;
+      
+      // Wire up event listeners
+      qsa('button', paginationContainer).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.dataset.page;
+          if (!action || btn.disabled) return;
+          
+          if (action === 'prev') {
+            if (currentPage > 1) {
+              currentPage--;
+              applyAllFilters(false);
+            }
+          } else if (action === 'next') {
+            if (currentPage < totalPages) {
+              currentPage++;
+              applyAllFilters(false);
+            }
+          } else {
+            const pageNum = parseInt(action);
+            if (!isNaN(pageNum)) {
+              currentPage = pageNum;
+              applyAllFilters(false);
+            }
+          }
+        });
+      });
     }
 
     // ─────────────────────────────────────────────
-    // SECTION 1 — Search Filter
+    // SECTION 1 — Search Filter & Pagination Application
     // ─────────────────────────────────────────────
-    function applyAllFilters() {
+    function applyAllFilters(resetPage = true) {
+      if (resetPage) currentPage = 1;
+      
       const searchVal = (searchInput ? searchInput.value : '').toLowerCase();
       const roleVal   = roleSelect ? roleSelect.value.toLowerCase() : '';
       const statusVal = statusSelect ? statusSelect.value.toLowerCase() : '';
 
+      const matchedRows = [];
+      
       getRows().forEach(row => {
         const name   = getNameText(row).toLowerCase();
         const email  = getEmailText(row).toLowerCase();
@@ -77,9 +129,37 @@
         if (roleVal && role !== roleVal) show = false;
         if (statusVal && status !== statusVal) show = false;
 
-        row.style.display = show ? '' : 'none';
+        if (show) {
+          matchedRows.push(row);
+        } else {
+          row.style.display = 'none';
+        }
       });
-      updatePaginationLabel();
+      
+      const totalFiltered = matchedRows.length;
+      const totalPages = Math.ceil(totalFiltered / perPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+      
+      const startIndex = (currentPage - 1) * perPage;
+      const endIndex = startIndex + perPage;
+      
+      matchedRows.forEach((row, index) => {
+        if (index >= startIndex && index < endIndex) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      // Update pagination label
+      const start = totalFiltered === 0 ? 0 : startIndex + 1;
+      const end   = Math.min(endIndex, totalFiltered);
+      if (paginationLabel) {
+        paginationLabel.textContent = `Showing ${start}–${end} of ${totalFiltered} users`;
+      }
+      
+      renderPaginationControls(totalFiltered);
     }
 
     if (searchInput) searchInput.addEventListener('input', applyAllFilters);
@@ -152,7 +232,8 @@
 
       const actionsDiv = qs('td:last-child .flex', row);
       const toggleBtn  = actionsDiv ? actionsDiv.children[1] : null;
-      const statusBadge = qs('[class*="status-"]', row);
+      const statusCell = row.children[4];
+      const statusBadge = statusCell ? qs('span', statusCell) : null;
       if (!toggleBtn || !statusBadge) return;
 
       // If button text is "Suspend", we want to suspend the user. Otherwise, activate them.
@@ -168,14 +249,14 @@
           if (targetStatus === 'active') {
             toggleBtn.textContent = 'Suspend';
             toggleBtn.className = 'px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-medium transition-colors';
-            statusBadge.className = statusBadge.className.replace(/status-\w+/, 'status-active');
+            statusBadge.className = 'status-badge status-active px-3 py-1 rounded-full text-xs font-semibold';
             statusBadge.textContent = 'Active';
             row.classList.remove('suspended');
             if (window.showToast) window.showToast('User activated successfully', 'success');
           } else {
             toggleBtn.textContent = 'Activate';
             toggleBtn.className = 'px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors';
-            statusBadge.className = statusBadge.className.replace(/status-\w+/, 'status-suspended');
+            statusBadge.className = 'status-badge status-suspended px-3 py-1 rounded-full text-xs font-semibold';
             statusBadge.textContent = 'Suspended';
             row.classList.add('suspended');
             if (window.showToast) window.showToast('User suspended successfully', 'warning');
@@ -528,17 +609,27 @@
       bulkSuspendBtn.addEventListener('click', () => {
         const rows = getCheckedRows();
         if (!rows.length) return;
-        if (!window.confirm('Suspend all selected users?')) return;
+
+        const isActivate = bulkSuspendBtn.textContent.trim() === 'Activate Selected';
+        const confirmMsg = isActivate ? 'Are you sure you want to activate all selected users?' : 'Are you sure you want to suspend all selected users?';
+        if (!window.confirm(confirmMsg)) return;
 
         rows.forEach(row => {
-          const toggleBtn = qs('td:last-child .flex', row)?.children[2];
-          const currentlyActive = toggleBtn && toggleBtn.textContent.trim() === 'Suspend';
-          if (currentlyActive) {
+          const toggleBtn = qs('td:last-child .flex', row)?.children[1];
+          if (!toggleBtn) return;
+          const btnText = toggleBtn.textContent.trim().toLowerCase();
+          if (isActivate && btnText === 'activate') {
+            toggleSuspend(row);
+          } else if (!isActivate && btnText === 'suspend') {
             toggleSuspend(row);
           }
         });
         uncheckAll();
-        if (window.showToast) window.showToast(`${rows.length} users suspended`, 'warning');
+        if (window.showToast) {
+          const toastMsg = isActivate ? `${rows.length} users activated successfully` : `${rows.length} users suspended successfully`;
+          const toastType = isActivate ? 'success' : 'warning';
+          window.showToast(toastMsg, toastType);
+        }
       });
     }
 
@@ -557,7 +648,7 @@
           r.remove();
         });
         uncheckAll();
-        updatePaginationLabel();
+        applyAllFilters(false);
         if (window.showToast) window.showToast(`${count} users deleted`, 'error');
       });
     }
@@ -593,61 +684,9 @@
     }
 
     // ─────────────────────────────────────────────
-    // SECTION 10 — Pagination Buttons
+    // SECTION 10 — Pagination Initializer
     // ─────────────────────────────────────────────
-    function updatePagination(page) {
-      currentPage = page;
-      const start = (page - 1) * perPage + 1;
-      const end   = Math.min(page * perPage, totalUsers);
-      if (paginationLabel) {
-        paginationLabel.textContent = `Showing ${start}\u2013${end} of ${totalUsers} users`;
-      }
-
-      pagBtns.forEach(btn => {
-        const text = btn.textContent.trim();
-        if (text === 'Previous' || text === 'Next') {
-          btn.disabled = false;
-          btn.classList.remove('opacity-50');
-          if (text === 'Previous' && page === 1) {
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-          }
-          if (text === 'Next' && page === totalPages) {
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-          }
-        } else if (!isNaN(parseInt(text))) {
-          const num = parseInt(text);
-          if (num === page) {
-            btn.classList.add('bg-[#c17c5f]', 'text-white');
-            btn.classList.remove('border', 'border-[#e5e0d8]', 'text-[#8b7355]');
-          } else {
-            btn.classList.remove('bg-[#c17c5f]', 'text-white');
-            btn.classList.add('border', 'border-[#e5e0d8]', 'text-[#8b7355]');
-          }
-        }
-      });
-
-      const mainContent = qs('main');
-      if (mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    pagBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const text = btn.textContent.trim();
-        if (text === 'Previous') {
-          if (currentPage > 1) updatePagination(currentPage - 1);
-        } else if (text === 'Next') {
-          if (currentPage < totalPages) updatePagination(currentPage + 1);
-        } else {
-          const num = parseInt(text);
-          if (!isNaN(num)) updatePagination(num);
-        }
-      });
-    });
-
-    // Init pagination to page 1
-    updatePagination(1);
+    applyAllFilters(true);
 
   }); // end DOMContentLoaded
 })();

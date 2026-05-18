@@ -421,7 +421,7 @@
                             <option value="">All Statuses</option>
                             <option value="active">Active</option>
                             <option value="suspended">Suspended</option>
-                            <option value="pending">Pending Approval</option>
+
                         </select>
                     </div>
 
@@ -675,6 +675,7 @@
                     <button class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
                         <i class="fas fa-ban"></i>
                         Suspend Account
+
                     </button>
                     <button class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
                         <i class="fas fa-key"></i>
@@ -690,11 +691,6 @@
     </div>
 
     <script>
-        /* Sidebar handled by adminDashboard.js */
-
-        // User profile logout dropdown
-        /* User menu handled by adminDashboard.js */
-
         // Toggle all checkboxes
         function toggleAllCheckboxes(source) {
             const checkboxes = document.querySelectorAll('.user-checkbox');
@@ -707,7 +703,8 @@
         // Update bulk action bar
         function updateBulkActionBar() {
             const checkboxes = document.querySelectorAll('.user-checkbox');
-            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const checkedCount = checkedBoxes.length;
             const bulkActionBar = document.getElementById('bulkActionBar');
             const selectedCount = document.getElementById('selectedCount');
 
@@ -715,6 +712,33 @@
 
             if (checkedCount > 0) {
                 bulkActionBar.classList.add('visible');
+                
+                let hasActive = false;
+                let hasSuspended = false;
+                
+                checkedBoxes.forEach(cb => {
+                    const row = cb.closest('tr');
+                    if (row) {
+                        const statusTd = row.children[4];
+                        const statusSpan = statusTd ? statusTd.querySelector('span') : null;
+                        const statusText = statusSpan ? statusSpan.textContent.trim().toLowerCase() : '';
+                        if (statusText === 'suspended') {
+                            hasSuspended = true;
+                        } else {
+                            hasActive = true;
+                        }
+                    }
+                });
+                
+                const bulkBtns = document.querySelectorAll('#bulkActionBar .flex.items-center.gap-3 button');
+                const bulkSuspendBtn = bulkBtns[0];
+                if (bulkSuspendBtn) {
+                    if (hasSuspended && !hasActive) {
+                        bulkSuspendBtn.textContent = 'Activate Selected';
+                    } else {
+                        bulkSuspendBtn.textContent = 'Suspend Selected';
+                    }
+                }
             } else {
                 bulkActionBar.classList.remove('visible');
             }
@@ -729,7 +753,7 @@
             checkboxes.forEach(checkbox => {
                 checkbox.checked = false;
             });
-            selectAll.checked = false;
+            if (selectAll) selectAll.checked = false;
 
             bulkActionBar.classList.remove('visible');
         }
