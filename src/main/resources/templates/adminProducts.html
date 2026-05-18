@@ -356,7 +356,7 @@
                         <div class="relative">
                             <input 
                                 type="text" 
-                                placeholder="Search products..." 
+                                id="searchInput" placeholder="Search products..." 
                                 class="w-full pl-10 pr-4 py-2.5 border border-[#e5e0d8] rounded-lg focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
                             />
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></i>
@@ -365,37 +365,37 @@
 
                     <!-- Category Filter -->
                     <div class="relative">
-                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                        <select id="categoryFilter" class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
                             <option value="">All Categories</option>
-                            <option value="ceramics">Ceramics</option>
-                            <option value="jewelry">Jewelry</option>
-                            <option value="paintings">Paintings</option>
-                            <option value="textiles">Textiles</option>
-                            <option value="woodwork">Woodwork</option>
+                            <option th:each="cat : ${categoriesList}" th:value="${cat}" th:text="${cat}"></option>
+
+
+
+
                         </select>
                         <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
                     </div>
 
                     <!-- Status Filter -->
                     <div class="relative">
-                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                        <select id="statusFilter" class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
                             <option value="">All Statuses</option>
                             <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="flagged">Flagged</option>
+                            <option value="out of stock">Out of stock</option>
+
                         </select>
                         <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
                     </div>
 
                     <!-- Artisan Filter -->
                     <div class="relative">
-                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                        <select id="artisanFilter" class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
                             <option value="">All Artisans</option>
-                            <option value="elena">Elena Rodriguez</option>
-                            <option value="marcus">Marcus Chen</option>
-                            <option value="sarah">Sarah Mitchell</option>
-                            <option value="anna">Anna Kowalski</option>
-                            <option value="james">James Thompson</option>
+                            <option th:each="artisanName : ${artisansList}" th:value="${artisanName}" th:text="${artisanName}"></option>
+
+
+
+
                         </select>
                         <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
                     </div>
@@ -411,10 +411,10 @@
                 <div class="mt-4 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-sm text-[#8b7355]">Quick Filters:</span>
-                        <button class="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 border border-red-200 px-4 py-1.5 rounded-full text-sm font-medium text-red-700 transition-colors">
+                        <button id="flaggedQuickFilter" class="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 border border-red-200 px-4 py-1.5 rounded-full text-sm font-medium text-red-700 transition-colors">
                             <i class="fas fa-flag"></i>
                             Flagged Products
-                            <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">7</span>
+                            <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full" th:text="${#lists.size(productsList.?[status == 'flagged'])}">0</span>
                         </button>
                     </div>
                 </div>
@@ -433,13 +433,87 @@
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Artisan</th>
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Category</th>
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Price</th>
-                                <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Stock</th>
+
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Status</th>
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Date Added</th>
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e5e0d8]">
+                            <!-- Dynamic Products List -->
+                            <tr th:each="product : ${productsList}" class="table-row-hover table-row" th:classappend="${#strings.equals(product.status, 'flagged') ? 'flagged-row' : ''}">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f]" />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            th:src="${product.imageUrl != null ? product.imageUrl : 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=60&h=60&fit=crop'}" 
+                                            th:alt="${product.title}" 
+                                            class="w-14 h-14 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                            <p class="font-semibold text-[#5c4a3d]" th:text="${product.title}">Handmade Ceramic Vase</p>
+                                            <p class="text-xs text-[#8b7355]" th:text="${'SKU: PRD-' + product.id}">SKU: CER-VASE-001</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img 
+                                            th:src="${product.artisan != null && product.artisan.profilePicture != null ? product.artisan.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" 
+                                            th:alt="${product.artisanName}" 
+                                            class="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span class="font-medium text-[#5c4a3d]" th:text="${product.artisanName}">Elena Rodriguez</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="category-badge">
+                                        <i class="fas fa-tag mr-1"></i>
+                                        <span th:text="${product.category}">Ceramics</span>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-semibold text-[#5c4a3d]" th:text="${'BD ' + #numbers.formatDecimal(product.price, 1, 3)}">BD 85.000</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <!-- Status Badge -->
+                                    <span th:if="${product.stockQuantity <= 0 || #strings.equals(product.status, 'out of stock')}" class="status-badge bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle"></i>
+                                        Out of stock
+                                    </span>
+                                    <span th:if="${product.stockQuantity > 0 && #strings.equals(product.status, 'active')}" class="status-badge bg-green-100 text-green-700">
+                                        <i class="fas fa-check-circle"></i>
+                                        Active
+                                    </span>
+                                    <span th:if="${product.stockQuantity > 0 && #strings.equals(product.status, 'flagged')}" class="status-badge bg-amber-100 text-amber-700">
+                                        <i class="fas fa-flag"></i>
+                                        Flagged
+                                    </span>
+                                    <span th:if="${product.stockQuantity > 0 && !#strings.equals(product.status, 'active') && !#strings.equals(product.status, 'out of stock') && !#strings.equals(product.status, 'flagged')}" class="status-badge bg-gray-100 text-gray-700">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span th:text="${product.status}">Pending</span>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[#8b7355]" th:text="${product.addingDate}">Feb 15, 2025</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <button th:onclick="'openProductModal(' + ${product.id} + ')'" class="text-[#5c4a3d] hover:text-[#c17c5f] p-2 transition-colors" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <form th:action="@{'/admin/delete-product/' + ${product.id}}" method="post" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                            <button type="submit" class="text-red-500 hover:text-red-700 p-2 transition-colors" title="Remove">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody class="divide-y divide-[#e5e0d8] hidden">
                             <!-- Row 1 - Active Product -->
                             <tr class="table-row-hover">
                                 <td class="px-6 py-4">
@@ -775,10 +849,10 @@
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
-                    <p class="text-sm text-[#8b7355]">
+                    <p class="text-sm text-[#8b7355]" id="paginationLabel">
                         Showing <span class="font-semibold text-[#5c4a3d]">1</span> to <span class="font-semibold text-[#5c4a3d]">5</span> of <span class="font-semibold text-[#5c4a3d]">2,156</span> products
                     </p>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2" id="paginationControls">
                         <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50" disabled>
                             <i class="fas fa-chevron-left"></i>
                         </button>
@@ -869,11 +943,11 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-[#f5ebe0] rounded-lg p-4">
                                 <p class="text-sm text-[#8b7355] mb-1">Price</p>
-                                <p class="text-2xl font-bold text-[#c17c5f]">BD 85.000</p>
+                                <p id="modalPrice" class="text-2xl font-bold text-[#c17c5f]">BD 85.000</p>
                             </div>
                             <div class="bg-[#f5ebe0] rounded-lg p-4">
-                                <p class="text-sm text-[#8b7355] mb-1">Stock</p>
-                                <p class="text-2xl font-bold text-[#5c4a3d]">24 units</p>
+                                <p class="text-sm text-[#8b7355] mb-1">Date Added</p>
+                                <p id="modalDate" class="text-2xl font-bold text-[#5c4a3d]">Feb 15, 2025</p>
                             </div>
                         </div>
 
@@ -1012,12 +1086,78 @@
     <script>
         /* Sidebar handled by adminDashboard.js */
 
-        // Open product modal
+        // Open product modal & fetch dynamically
         function openProductModal(productId) {
-            const modal = document.getElementById('productModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
+            fetch(`/api/products/${productId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.product) {
+                        const p = data.product;
+                        
+                        // Set Title, SKU, Description, Price, Date Added
+                        document.querySelector('#productModal h3').textContent = p.title;
+                        document.querySelector('#productModal .text-sm.text-\\[\\#8b7355\\]').textContent = 'SKU: PRD-' + p.id;
+                        document.querySelector('#productModal .text-\\[\\#5c4a3d\\]').textContent = p.description || 'No description provided.';
+                        
+                        // Price & Date Added
+                        document.getElementById('modalPrice').textContent = 'BD ' + p.price.toFixed(3);
+                        document.getElementById('modalDate').textContent = p.addingDate || 'N/A';
+                        
+                        // Status Badge
+                        const statusBadge = document.querySelector('#productModal .status-badge');
+                        const isOutOfStock = p.stockQuantity <= 0 || p.status === 'out of stock';
+                        if (isOutOfStock) {
+                            statusBadge.className = 'status-badge bg-red-100 text-red-700';
+                            statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
+                        } else if (p.status === 'active') {
+                            statusBadge.className = 'status-badge bg-green-100 text-green-700';
+                            statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Active';
+                        } else if (p.status === 'flagged') {
+                            statusBadge.className = 'status-badge bg-amber-100 text-amber-700';
+                            statusBadge.innerHTML = '<i class="fas fa-flag"></i> Flagged';
+                        } else {
+                            statusBadge.className = 'status-badge bg-gray-100 text-gray-700';
+                            statusBadge.innerHTML = `<i class="fas fa-info-circle"></i> ${p.status}`;
+                        }
+                        
+                        // Image
+                        const mainImage = document.getElementById('mainImage');
+                        mainImage.src = p.imageUrl || 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop';
+                        
+                        // Thumbnails
+                        const gallery = document.getElementById('thumbnailGallery');
+                        gallery.innerHTML = `
+                            <img 
+                                src="${p.imageUrl || 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=150&h=150&fit=crop'}" 
+                                class="gallery-thumbnail active w-20 h-20 object-cover rounded-lg cursor-pointer border-2 border-[#c17c5f]"
+                                onclick="changeMainImage(this)"
+                            />
+                        `;
+                        
+                        // Artisan Info
+                        const artisanNameEl = document.querySelector('#productModal .bg-white.border p.font-semibold');
+                        artisanNameEl.textContent = p.artisanName || 'Unknown Artisan';
+                        
+                        const artisanImg = document.querySelector('#productModal .bg-white.border img');
+                        if (p.artisan && p.artisan.profilePicture) {
+                            artisanImg.src = p.artisan.profilePicture;
+                        } else {
+                            artisanImg.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+                        }
+
+                        // Modal show
+                        const modal = document.getElementById('productModal');
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        alert('Failed to load product details.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error loading product details.');
+                });
         }
 
         // Close product modal
@@ -1030,6 +1170,200 @@
 
         // Change main image from thumbnail
         function changeMainImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = thumbnail.src;
+
+            // Update active state
+            document.querySelectorAll('.gallery-thumbnail').forEach(thumb => {
+                thumb.classList.remove('active', 'border-[#c17c5f]');
+                thumb.classList.add('border-transparent');
+            });
+            thumbnail.classList.add('active', 'border-[#c17c5f]');
+            thumbnail.classList.remove('border-transparent');
+        }
+
+        // Close modal on outside click
+        document.getElementById('productModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProductModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeProductModal();
+            }
+        });
+
+        // Dynamic Filtering & Pagination
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const artisanFilter = document.getElementById('artisanFilter');
+            const flaggedQuickFilter = document.getElementById('flaggedQuickFilter');
+            
+            const tbody = document.querySelector('tbody');
+            const allRows = Array.from(tbody.querySelectorAll('.table-row'));
+            
+            let currentPage = 1;
+            const perPage = 10;
+            let filteredRows = [...allRows];
+            let showFlaggedOnly = false;
+
+            function applyFilters() {
+                const searchVal = searchInput.value.toLowerCase().trim();
+                const catVal = categoryFilter.value.toLowerCase();
+                const statusVal = statusFilter.value.toLowerCase();
+                const artisanVal = artisanFilter.value.toLowerCase();
+
+                filteredRows = allRows.filter(row => {
+                    // Extract fields
+                    const productText = row.querySelector('td:nth-child(2) p.font-semibold').textContent.toLowerCase();
+                    const artisanText = row.querySelector('td:nth-child(3) span.font-medium').textContent.toLowerCase();
+                    const categoryText = row.querySelector('td:nth-child(4) span span').textContent.toLowerCase();
+                    
+                    const statusBadge = row.querySelector('td:nth-child(6) .status-badge');
+                    const statusText = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
+
+                    // Match filters
+                    const matchesSearch = productText.includes(searchVal) || artisanText.includes(searchVal);
+                    const matchesCat = !catVal || categoryText === catVal;
+                    
+                    let matchesStatus = !statusVal;
+                    if (statusVal === 'active') {
+                        matchesStatus = statusText.includes('active');
+                    } else if (statusVal === 'out of stock') {
+                        matchesStatus = statusText.includes('out of stock');
+                    }
+
+                    const matchesArtisan = !artisanVal || artisanText === artisanVal;
+                    const matchesFlagged = !showFlaggedOnly || statusText.includes('flagged');
+
+                    return matchesSearch && matchesCat && matchesStatus && matchesArtisan && matchesFlagged;
+                });
+
+                currentPage = 1;
+                renderTable();
+            }
+
+            function renderTable() {
+                // Hide all rows
+                allRows.forEach(row => row.style.display = 'none');
+
+                // Determine pagination bounds
+                const total = filteredRows.length;
+                const startIdx = (currentPage - 1) * perPage;
+                const endIdx = Math.min(startIdx + perPage, total);
+
+                // Show active page rows
+                filteredRows.slice(startIdx, endIdx).forEach(row => {
+                    row.style.display = '';
+                });
+
+                // Update Pagination Label
+                const label = document.getElementById('paginationLabel');
+                if (total === 0) {
+                    label.innerHTML = `Showing <span class="font-semibold text-[#5c4a3d]">0</span> to <span class="font-semibold text-[#5c4a3d]">0</span> of <span class="font-semibold text-[#5c4a3d]">0</span> products`;
+                } else {
+                    label.innerHTML = `Showing <span class="font-semibold text-[#5c4a3d]">${startIdx + 1}</span> to <span class="font-semibold text-[#5c4a3d]">${endIdx}</span> of <span class="font-semibold text-[#5c4a3d]">${total}</span> products`;
+                }
+
+                // Render Controls
+                renderPaginationControls(total);
+            }
+
+            function renderPaginationControls(total) {
+                const controls = document.getElementById('paginationControls');
+                controls.innerHTML = '';
+
+                const totalPages = Math.ceil(total / perPage);
+                if (totalPages <= 1) return;
+
+                // Prev button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTable();
+                    }
+                });
+                controls.appendChild(prevBtn);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    if (i === currentPage) {
+                        btn.className = 'px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium';
+                    } else {
+                        btn.className = 'px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors';
+                    }
+                    btn.textContent = i;
+                    btn.addEventListener('click', () => {
+                        currentPage = i;
+                        renderTable();
+                    });
+                    controls.appendChild(btn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderTable();
+                    }
+                });
+                controls.appendChild(nextBtn);
+            }
+
+            // Wire Listeners
+            searchInput.addEventListener('input', applyFilters);
+            categoryFilter.addEventListener('change', applyFilters);
+            statusFilter.addEventListener('change', applyFilters);
+            artisanFilter.addEventListener('change', applyFilters);
+            
+            flaggedQuickFilter.addEventListener('click', () => {
+                showFlaggedOnly = !showFlaggedOnly;
+                if (showFlaggedOnly) {
+                    flaggedQuickFilter.classList.add('bg-red-200');
+                } else {
+                    flaggedQuickFilter.classList.remove('bg-red-200');
+                }
+                applyFilters();
+            });
+
+            // Initial Filter Run
+            applyFilters();
+        });
+
+        function ignoreEverythingElse() {}
+
+
+        function openProductModalOld(productId) {
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close product modal
+        function closeProductModalOld() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Change main image from thumbnail
+        function changeMainImageOld(thumbnail) {
             const mainImage = document.getElementById('mainImage');
             mainImage.src = thumbnail.src.replace('w=150&h=150', 'w=600&h=600');
 

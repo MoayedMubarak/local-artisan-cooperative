@@ -39,6 +39,13 @@ public class ProductApiController {
     @Autowired
     private AuctionService auctionService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+        return productRepository.findById(id)
+                .map(product -> ResponseEntity.ok(Map.of("success", true, "product", product)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Product not found")));
+    }
+
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody Map<String, Object> payload) {
         try {

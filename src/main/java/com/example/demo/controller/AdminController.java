@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Artisan;
 import com.example.demo.model.Order;
 import com.example.demo.model.User;
+import com.example.demo.model.Product;
 import com.example.demo.repository.ArtisanRepository;
 import com.example.demo.repository.AuctionRepository;
 import com.example.demo.repository.OrderRepository;
@@ -41,6 +42,9 @@ public class AdminController {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private com.example.demo.repository.WishlistItemRepository wishlistItemRepository;
 
     @GetMapping("/adminDashboard")
     public String dashboard(Model model) {
@@ -198,8 +202,44 @@ public class AdminController {
     }
 
     @GetMapping("/adminProducts")
-    public String adminProducts() {
+    public String adminProducts(Model model) {
+        List<Product> products = productRepository.findAll();
+        java.util.Set<String> categories = new java.util.TreeSet<>();
+        java.util.Set<String> artisans = new java.util.TreeSet<>();
+        for (Product p : products) {
+            if (p.getStockQuantity() <= 0 && !"out of stock".equalsIgnoreCase(p.getStatus())) {
+                p.setStatus("out of stock");
+                productRepository.save(p);
+            }
+            if (p.getCategory() != null && !p.getCategory().trim().isEmpty()) {
+                categories.add(p.getCategory().trim());
+            }
+            if (p.getArtisanName() != null && !p.getArtisanName().trim().isEmpty()) {
+                artisans.add(p.getArtisanName().trim());
+            }
+        }
+        model.addAttribute("productsList", products);
+        model.addAttribute("categoriesList", categories);
+        model.addAttribute("artisansList", artisans);
         return "adminProducts";
+    }
+
+    @PostMapping("/admin/delete-product/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public String deleteProduct(@PathVariable Long id) {
+        productRepository.findById(id).ifPresent(product -> {
+            // Delete associated wishlist items
+            var wishlistItems = wishlistItemRepository.findByProduct(product);
+            wishlistItemRepository.deleteAll(wishlistItems);
+
+            // Delete associated auctions
+            var auctions = auctionRepository.findAll().stream()
+                    .filter(a -> a.getProduct() != null && a.getProduct().getId().equals(id))
+                    .toList();
+            auctionRepository.deleteAll(auctions);
+        });
+        productRepository.deleteById(id);
+        return "redirect:/adminProducts";
     }
 
     @GetMapping("/adminRefund")
