@@ -217,9 +217,6 @@
                         <i id="chevronIcon" class="chevron-icon fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
                     </button>
                     <div id="userMenuDropdown" class="user-menu-dropdown">
-                        <a href="/profile" class="user-menu-item block">
-                            <i class="fas fa-user mr-2"></i> My Profile
-                        </a>
                         <button id="logoutButton" type="button" class="user-menu-item logout w-full text-left">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </button>
@@ -252,7 +249,7 @@
             <nav class="p-4">
                 <ul class="space-y-1">
                     <li>
-                        <a href="/artisanDashboard" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                        <a href="/artisanDashboard" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-chart-line w-5"></i>
                             <span>Dashboard</span>
                         </a>
@@ -453,5 +450,29 @@
 
     <script src="/artisan-common.js"></script>
     <script src="/artisanDashboard.js"></script>
+
+    <script>
+        // Dynamic sidebar active state — highlights the link matching the current page URL
+        (function() {
+            var path = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.sidebar-link').forEach(function(link) {
+                link.classList.remove('active', 'text-white');
+                link.classList.add('text-[#d4c5b5]');
+                var href = (link.getAttribute('href') || '').toLowerCase().replace(/^\//, '');
+                if (href && path.includes(href)) {
+                    link.classList.add('active', 'text-white');
+                    link.classList.remove('text-[#d4c5b5]');
+                }
+            });
+            // Special case: artisanOrderDetail should highlight Orders
+            if (path.includes('artisanorderdetail')) {
+                var ordersLink = document.querySelector('a[href="/artisanOrders"]');
+                if (ordersLink) {
+                    ordersLink.classList.add('active', 'text-white');
+                    ordersLink.classList.remove('text-[#d4c5b5]');
+                }
+            }
+        })();
+    </script>
 </body>
 </html>

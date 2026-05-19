@@ -8,14 +8,18 @@
             const loggedIn = sessionStorage.getItem('loggedIn') === 'true' ||
                 sessionStorage.getItem('isLoggedIn') === 'true';
             const role = (sessionStorage.getItem('userRole') || '').toUpperCase();
-            return loggedIn && role === 'ARTISAN';
+            return loggedIn && role === 'ARTISAN' && getArtisanUserId() !== null;
         } catch (e) {
             return false;
         }
     }
 
     function getArtisanUserId() {
-        return sessionStorage.getItem('userId');
+        const id = sessionStorage.getItem('userId');
+        if (!id || id === 'undefined' || id === 'null') {
+            return null;
+        }
+        return id;
     }
 
     function appendIdToHref(href, userId) {
@@ -70,11 +74,11 @@
                     shopNameEl.textContent = data.user.shopName || '';
                 }
 
-                document.querySelectorAll('.user-menu .font-semibold.text-\\[\\#5c4a3d\\]').forEach((el) => {
+                document.querySelectorAll('.user-menu p.font-semibold.text-\\[\\#5c4a3d\\]').forEach((el) => {
                     el.textContent = data.user.name || 'Artisan';
                 });
 
-                document.querySelectorAll('.user-menu .text-xs.text-\\[\\#8b7355\\]').forEach((el) => {
+                document.querySelectorAll('.user-menu p.text-xs.text-\\[\\#8b7355\\]').forEach((el) => {
                     el.textContent = data.user.email || '';
                 });
             })
@@ -111,7 +115,65 @@
         syncArtisanProfileFromApi();
         syncUnreadNotificationsBadge(userId);
         setInterval(() => syncUnreadNotificationsBadge(userId), 10000);
+        setupUserMenuDropdown();
     };
+
+    function setupUserMenuDropdown() {
+        const userMenu = document.querySelector('.user-menu');
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+        const chevronIcon = document.getElementById('chevronIcon');
+        const logoutButton = document.getElementById('logoutButton');
+
+        if (!userMenu || userMenu.dataset.dropdownWired === 'true') return;
+        userMenu.dataset.dropdownWired = 'true';
+
+        let hideTimeout;
+
+        function showUserMenu() {
+            clearTimeout(hideTimeout);
+            userMenuDropdown?.classList.add('show');
+            chevronIcon?.classList.add('rotated');
+        }
+
+        function hideUserMenu() {
+            hideTimeout = setTimeout(() => {
+                userMenuDropdown?.classList.remove('show');
+                chevronIcon?.classList.remove('rotated');
+            }, 150);
+        }
+
+        userMenu.addEventListener('mouseenter', showUserMenu);
+        userMenu.addEventListener('mouseleave', hideUserMenu);
+
+        userMenuButton?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userMenuDropdown?.classList.contains('show');
+            if (isOpen) {
+                hideUserMenu();
+            } else {
+                showUserMenu();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target)) {
+                userMenuDropdown?.classList.remove('show');
+                chevronIcon?.classList.remove('rotated');
+            }
+        });
+
+        if (logoutButton) {
+            const newLogoutButton = logoutButton.cloneNode(true);
+            logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
+            newLogoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.confirm('Are you sure you want to logout?')) {
+                    window.artisanLogout();
+                }
+            });
+        }
+    }
 
     function syncUnreadNotificationsBadge(userId) {
         if (!userId) return;

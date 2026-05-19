@@ -228,7 +228,7 @@
                     </button>
                 </a>
 
-                <!-- User Profile -->
+                                                <!-- User Profile -->
                 <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
                     <button id="userMenuButton" type="button" class="flex items-center gap-3 text-left focus:outline-none">
                         <img 
@@ -237,20 +237,17 @@
                             class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
                         />
                         <div class="hidden md:block">
-                            <p class="font-semibold text-[#5c4a3d] text-sm">Elena Martinez</p>
-                            <p class="text-xs text-[#8b7355]">elena@artisan.com</p>
+                            <p class="font-semibold text-[#5c4a3d] text-sm" th:text="${artisan != null ? artisan.name : 'User'}">Elena Martinez</p>
+                            <p class="text-xs text-[#8b7355]" th:text="${artisan != null ? artisan.email : 'email@artisan.com'}">elena@artisan.com</p>
                         </div>
                         <i id="chevronIcon" class="chevron-icon fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
                     </button>
                     <div id="userMenuDropdown" class="user-menu-dropdown">
-                        <a href="/artisanSettings" class="user-menu-item block">
-                            <i class="fas fa-user mr-2"></i> My Profile
-                        </a>
-                        <button id="logoutButton" class="user-menu-item logout w-full text-left">
+                        <button id="logoutButton" type="button" class="user-menu-item logout w-full text-left">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </button>
                     </div>
-        </div>
+                </div>
     </nav>
 
     <!-- Main Content Area with Sidebar -->
@@ -424,12 +421,14 @@
                         <!-- Select Product -->
                         <div>
                             <label class="block text-[#5c4a3d] font-semibold mb-2">Select Product</label>
-                            <select class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
+                            <select id="auction-product" class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
                                 <option value="">Choose a product from your inventory</option>
-                                <option value="1">Handcrafted Ceramic Vase - 85.00 BD</option>
-                                <option value="2">Ceramic Bowl Set - 120.00 BD</option>
-                                <option value="3">Artisan Tea Set - 195.00 BD</option>
-                                <option value="4">Decorative Plant Pot - 45.00 BD</option>
+                                <option th:each="p : ${products}" 
+                                        th:value="${p.id}" 
+                                        th:data-price="${p.price}" 
+                                        th:text="${p.title + ' - ' + #numbers.formatDecimal(p.price, 1, 2) + ' BD'}">
+                                    Product Name - 0.00 BD
+                                </option>
                             </select>
                         </div>
 
@@ -438,6 +437,7 @@
                             <div>
                                 <label class="block text-[#5c4a3d] font-semibold mb-2">Starting Bid (BD)</label>
                                 <input 
+                                    id="auction-starting-bid"
                                     type="number" 
                                     placeholder="0.00"
                                     step="0.01"
@@ -449,6 +449,7 @@
                             <div>
                                 <label class="block text-[#5c4a3d] font-semibold mb-2">Reserve Price (BD)</label>
                                 <input 
+                                    id="auction-reserve-price"
                                     type="number" 
                                     placeholder="Optional"
                                     step="0.01"
@@ -461,7 +462,7 @@
                         <!-- Auction Duration -->
                         <div>
                             <label class="block text-[#5c4a3d] font-semibold mb-2">Auction Duration</label>
-                            <select class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
+                            <select id="auction-duration" class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
                                 <option value="">Select duration</option>
                                 <option value="1">1 day</option>
                                 <option value="3">3 days</option>
@@ -475,6 +476,7 @@
                         <div>
                             <label class="block text-[#5c4a3d] font-semibold mb-2">Expected End Time</label>
                             <input 
+                                id="auction-expected-endtime"
                                 type="text" 
                                 placeholder="Will be calculated based on duration"
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] bg-[#f5ebe0]"
@@ -486,6 +488,7 @@
                         <div>
                             <label class="block text-[#5c4a3d] font-semibold mb-2">Auction Notes (Optional)</label>
                             <textarea 
+                                id="auction-notes"
                                 rows="3"
                                 placeholder="Add any special notes or conditions for this auction..."
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] resize-none"
@@ -496,6 +499,7 @@
                         <div>
                             <label class="flex items-start cursor-pointer">
                                 <input 
+                                    id="auction-agree-terms"
                                     type="checkbox" 
                                     class="w-5 h-5 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f] mt-0.5"
                                     required
@@ -520,21 +524,7 @@
     </div>
 
     <script>
-        // Sidebar navigation active state handling
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Remove active state from all links
-                document.querySelectorAll('.sidebar-link').forEach(l => {
-                    l.classList.remove('active');
-                    l.classList.remove('text-white');
-                    l.classList.add('text-[#d4c5b5]');
-                });
-
-                // Add active state to clicked link
-                this.classList.add('active');
-                this.classList.remove('text-[#d4c5b5]');
-            });
-        });
+        /* Sidebar active state handled by dynamic script below */
 
         // Modal functions
         function openModal() {
@@ -548,7 +538,42 @@
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             document.getElementById('auction-form').reset();
+            document.getElementById('auction-expected-endtime').value = '';
         }
+
+        // Listen for product selection to auto-fill starting bid
+        document.getElementById('auction-product').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const startingBidInput = document.getElementById('auction-starting-bid');
+            if (price) {
+                startingBidInput.value = parseFloat(price).toFixed(2);
+            } else {
+                startingBidInput.value = '';
+            }
+        });
+
+        // Listen for duration selection to calculate expected end time
+        document.getElementById('auction-duration').addEventListener('change', function() {
+            const days = parseInt(this.value);
+            const endTimeInput = document.getElementById('auction-expected-endtime');
+            if (days) {
+                const now = new Date();
+                now.setDate(now.getDate() + days);
+                
+                // Format expected end time elegantly
+                const options = { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                };
+                endTimeInput.value = now.toLocaleDateString(undefined, options);
+            } else {
+                endTimeInput.value = '';
+            }
+        });
 
         // Filter auctions by status
         function filterAuctions(button, status) {
@@ -570,12 +595,55 @@
             });
         }
 
-        // Save auction
+        // Save auction by calling the backend API
         function saveAuction(event) {
             event.preventDefault();
-            // In a real application, you would submit the form data to a server
-            alert('Auction created successfully!');
-            closeModal();
+            
+            const productId = document.getElementById('auction-product').value;
+            const startingBid = parseFloat(document.getElementById('auction-starting-bid').value);
+            const durationDays = parseInt(document.getElementById('auction-duration').value);
+
+            if (!productId || isNaN(startingBid) || isNaN(durationDays)) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            const payload = {
+                productId: productId,
+                startingBid: startingBid,
+                durationDays: durationDays
+            };
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating...';
+            submitBtn.disabled = true;
+
+            fetch('/api/products/auction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Auction listing created successfully!');
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to list auction.'));
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error creating auction:', error);
+                alert('An error occurred. Please try again.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
         }
 
         // Confirm cancel auction
@@ -628,6 +696,30 @@
             }
         });
     </script>
-    <script src="/artisan-common.js"></script>
+    <script src="/artisan-common.js" defer></script>
+
+    <script>
+        // Dynamic sidebar active state — highlights the link matching the current page URL
+        (function() {
+            var path = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.sidebar-link').forEach(function(link) {
+                link.classList.remove('active', 'text-white');
+                link.classList.add('text-[#d4c5b5]');
+                var href = (link.getAttribute('href') || '').toLowerCase().replace(/^\//, '');
+                if (href && path.includes(href)) {
+                    link.classList.add('active', 'text-white');
+                    link.classList.remove('text-[#d4c5b5]');
+                }
+            });
+            // Special case: artisanOrderDetail should highlight Orders
+            if (path.includes('artisanorderdetail')) {
+                var ordersLink = document.querySelector('a[href="/artisanOrders"]');
+                if (ordersLink) {
+                    ordersLink.classList.add('active', 'text-white');
+                    ordersLink.classList.remove('text-[#d4c5b5]');
+                }
+            }
+        })();
+    </script>
 </body>
 </html>

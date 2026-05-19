@@ -252,29 +252,26 @@
                     </button>
                 </a>
 
-                <!-- User Profile -->
+                                                <!-- User Profile -->
                 <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
                     <button id="userMenuButton" type="button" class="flex items-center gap-3 text-left focus:outline-none">
                         <img 
-                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
-                            alt="Elena Martinez" 
+                            th:src="${artisan != null ? artisan.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" 
+                            th:alt="${artisan != null ? artisan.name : 'User'}" 
                             class="w-10 h-10 rounded-full object-cover border-2 border-[#c17c5f]"
                         />
                         <div class="hidden md:block">
-                            <p class="font-semibold text-[#5c4a3d] text-sm">Elena Martinez</p>
-                            <p class="text-xs text-[#8b7355]">elena@artisan.com</p>
+                            <p class="font-semibold text-[#5c4a3d] text-sm" th:text="${artisan != null ? artisan.name : 'User'}">Elena Martinez</p>
+                            <p class="text-xs text-[#8b7355]" th:text="${artisan != null ? artisan.email : 'email@artisan.com'}">elena@artisan.com</p>
                         </div>
                         <i id="chevronIcon" class="chevron-icon fas fa-chevron-down text-[#8b7355] text-xs hidden md:block"></i>
                     </button>
                     <div id="userMenuDropdown" class="user-menu-dropdown">
-                        <a href="/artisanSettings" class="user-menu-item block">
-                            <i class="fas fa-user mr-2"></i> My Profile
-                        </a>
-                        <button id="logoutButton" class="user-menu-item logout w-full text-left">
+                        <button id="logoutButton" type="button" class="user-menu-item logout w-full text-left">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </button>
                     </div>
-        </div>
+                </div>
     </nav>
 
     <!-- Main Content Area with Sidebar -->
@@ -301,7 +298,7 @@
             <nav class="p-4">
                 <ul class="space-y-1">
                     <li>
-                        <a href="/artisanDashboard" class="sidebar-link active flex items-center gap-3 text-white px-4 py-3 rounded-lg">
+                        <a href="/artisanDashboard" class="sidebar-link flex items-center gap-3 text-[#d4c5b5] px-4 py-3 rounded-lg">
                             <i class="fas fa-chart-line w-5"></i>
                             <span>Dashboard</span>
                         </a>
@@ -689,21 +686,7 @@
     </div>
 
     <script>
-        // Sidebar navigation active state handling
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Remove active state from all links
-                document.querySelectorAll('.sidebar-link').forEach(l => {
-                    l.classList.remove('active');
-                    l.classList.remove('text-white');
-                    l.classList.add('text-[#d4c5b5]');
-                });
-
-                // Add active state to clicked link
-                this.classList.add('active');
-                this.classList.remove('text-[#d4c5b5]');
-            });
-        });
+        /* Sidebar active state handled by dynamic script below */
 
         // Validate phone number on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -912,5 +895,29 @@
         });
     </script>
     <script src="/artisan-common.js"></script>
+
+    <script>
+        // Dynamic sidebar active state — highlights the link matching the current page URL
+        (function() {
+            var path = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.sidebar-link').forEach(function(link) {
+                link.classList.remove('active', 'text-white');
+                link.classList.add('text-[#d4c5b5]');
+                var href = (link.getAttribute('href') || '').toLowerCase().replace(/^\//, '');
+                if (href && path.includes(href)) {
+                    link.classList.add('active', 'text-white');
+                    link.classList.remove('text-[#d4c5b5]');
+                }
+            });
+            // Special case: artisanOrderDetail should highlight Orders
+            if (path.includes('artisanorderdetail')) {
+                var ordersLink = document.querySelector('a[href="/artisanOrders"]');
+                if (ordersLink) {
+                    ordersLink.classList.add('active', 'text-white');
+                    ordersLink.classList.remove('text-[#d4c5b5]');
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
