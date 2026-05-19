@@ -211,7 +211,7 @@
                     </button>
                 </a>
 
-                                                <!-- User Profile -->
+                <!-- User Profile -->
                 <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
                     <button id="userMenuButton" type="button" class="flex items-center gap-3 text-left focus:outline-none">
                         <img 
@@ -530,29 +530,7 @@
                             ></textarea>
                         </div>
 
-                        <!-- Enable Auction -->
-                        <div>
-                            <label class="flex items-center cursor-pointer">
-                                <input 
-                                    type="checkbox" 
-                                    id="enable-auction"
-                                    class="w-5 h-5 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f]"
-                                    onchange="toggleAuctionField()"
-                                >
-                                <span class="ml-3 text-[#5c4a3d] font-semibold">Enable Auction</span>
-                            </label>
 
-                            <!-- Auction End Time (Hidden by default) -->
-                            <div id="auction-field" class="auction-field mt-4">
-                                <label class="block text-[#5c4a3d] font-semibold mb-2">Auction End Time</label>
-                                <input 
-                                    id="auction-endtime"
-                                    type="datetime-local" 
-                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d]"
-                                />
-                                <p class="text-xs text-[#8b7355] mt-1">Select when the auction should end</p>
-                            </div>
-                        </div>
                     </div>
                 </form>
             </div>
@@ -583,8 +561,6 @@
             currentEditProductId = null;
             document.getElementById('modal-title').textContent = "Add New Product";
             document.getElementById('product-form').reset();
-            document.getElementById('enable-auction').checked = false;
-            document.getElementById('auction-field').classList.remove('show');
             
             const modal = document.getElementById('product-modal');
             modal.classList.remove('hidden');
@@ -603,16 +579,6 @@
             document.getElementById('product-image-url').value = prod.image || '';
             document.getElementById('product-description').value = prod.description || '';
             
-            const isAuction = prod.isAuction;
-            document.getElementById('enable-auction').checked = isAuction;
-            
-            const auctionField = document.getElementById('auction-field');
-            if (isAuction) {
-                auctionField.classList.add('show');
-            } else {
-                auctionField.classList.remove('show');
-            }
-
             const modal = document.getElementById('product-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -623,20 +589,7 @@
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             document.getElementById('product-form').reset();
-            document.getElementById('auction-field').classList.remove('show');
             currentEditProductId = null;
-        }
-
-        // Toggle auction field visibility
-        function toggleAuctionField() {
-            const checkbox = document.getElementById('enable-auction');
-            const auctionField = document.getElementById('auction-field');
-
-            if (checkbox.checked) {
-                auctionField.classList.add('show');
-            } else {
-                auctionField.classList.remove('show');
-            }
         }
 
         function handleStatusChange() {
@@ -676,8 +629,6 @@
             const stockQuantity = parseInt(document.getElementById('product-stock').value);
             const imageUrl = document.getElementById('product-image-url').value.trim();
             const description = document.getElementById('product-description').value.trim();
-            const isAuctionItem = document.getElementById('enable-auction').checked;
-            const endTime = document.getElementById('auction-endtime').value;
             const status = document.getElementById('product-status').value;
             if (status === 'active' && stockQuantity <= 0) {
                 alert("Please specify a stock quantity greater than 0 for active status.");
@@ -693,8 +644,8 @@
                 status: status,
                 imageUrl: imageUrl,
                 description: description,
-                isAuctionItem: isAuctionItem,
-                endTime: endTime
+                isAuctionItem: false,
+                endTime: null
             };
 
             const method = currentEditProductId ? 'PUT' : 'POST';
@@ -789,10 +740,31 @@
 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const imageUrl = e.target.result;
-                    document.getElementById('product-image-url').value = imageUrl;
-                    const textEl = document.querySelector('.border-dashed p');
-                    if (textEl) textEl.textContent = "Image uploaded successfully!";
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 800;
+                        if (width > maxDim || height > maxDim) {
+                            if (width > height) {
+                                height = Math.round((height * maxDim) / width);
+                                width = maxDim;
+                            } else {
+                                width = Math.round((width * maxDim) / height);
+                                height = maxDim;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const compressedUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('product-image-url').value = compressedUrl;
+                        const textEl = document.querySelector('.border-dashed p');
+                        if (textEl) textEl.textContent = "Image uploaded successfully!";
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });

@@ -131,21 +131,40 @@ public class ProductApiController {
                 auction.setProduct(saved);
                 auction.setStartingBid(price);
                 auction.setCurrentHighestBid(price);
-                auction.setStartTime(java.time.LocalDateTime.now());
                 
+                java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                java.time.LocalDateTime start = now;
+                String startTimeStr = (String) payload.get("startTime");
+                if (startTimeStr != null && !startTimeStr.isBlank()) {
+                    try {
+                        start = java.time.LocalDateTime.parse(startTimeStr);
+                    } catch (Exception ex) {}
+                }
+                auction.setStartTime(start);
+                
+                java.time.LocalDateTime end = start.plusDays(7);
                 String endTimeStr = (String) payload.get("endTime");
                 if (endTimeStr != null && !endTimeStr.isBlank()) {
-                    auction.setEndTime(java.time.LocalDateTime.parse(endTimeStr));
-                } else {
-                    auction.setEndTime(java.time.LocalDateTime.now().plusDays(7));
+                    try {
+                        end = java.time.LocalDateTime.parse(endTimeStr);
+                    } catch (Exception ex) {}
                 }
-                auction.setStatus("LIVE");
+                auction.setEndTime(end);
+                
+                if (start.isAfter(now)) {
+                    auction.setStatus("UPCOMING");
+                } else {
+                    auction.setStatus("LIVE");
+                }
+                
                 Auction savedAuction = auctionRepository.save(auction);
                 
-                try {
-                    auctionService.triggerAuctionStartNotification(savedAuction);
-                } catch (Exception ex) {
-                    // Ignore
+                if ("LIVE".equals(savedAuction.getStatus())) {
+                    try {
+                        auctionService.triggerAuctionStartNotification(savedAuction);
+                    } catch (Exception ex) {
+                        // Ignore
+                    }
                 }
             }
 

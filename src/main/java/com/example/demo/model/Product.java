@@ -17,6 +17,7 @@ public class Product {
     private String description;
     private double price;
     private String category;
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
     private int stockQuantity;
     private String status = "active";

@@ -143,8 +143,8 @@ public class ArtisanController {
         initEmptyModel(model);
         loadArtisan(id, model);
         if (id != null) {
-            model.addAttribute("products", productRepository.findByArtisanUserId(id));
-            model.addAttribute("productsCount", productRepository.countByArtisanUserId(id));
+            model.addAttribute("products", productRepository.findByArtisanUserIdAndIsAuctionItem(id, false));
+            model.addAttribute("productsCount", productRepository.countByArtisanUserIdAndIsAuctionItem(id, false));
         }
         return "artisanProducts";
     }

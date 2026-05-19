@@ -418,80 +418,94 @@
             <div class="p-6">
                 <form id="auction-form" onsubmit="saveAuction(event)">
                     <div class="space-y-5">
-                        <!-- Select Product -->
+                        <!-- Product Name -->
                         <div>
-                            <label class="block text-[#5c4a3d] font-semibold mb-2">Select Product</label>
-                            <select id="auction-product" class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
-                                <option value="">Choose a product from your inventory</option>
-                                <option th:each="p : ${products}" 
-                                        th:value="${p.id}" 
-                                        th:data-price="${p.price}" 
-                                        th:text="${p.title + ' - ' + #numbers.formatDecimal(p.price, 1, 2) + ' BD'}">
-                                    Product Name - 0.00 BD
-                                </option>
-                            </select>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Product Name</label>
+                            <input 
+                                id="auction-title"
+                                type="text" 
+                                placeholder="e.g., Handcrafted Ceramic Vase"
+                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a]"
+                                required
+                            />
                         </div>
 
-                        <!-- Starting Bid and Reserve Price Row -->
+                        <!-- Category and Starting Price Row -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-[#5c4a3d] font-semibold mb-2">Starting Bid (BD)</label>
+                                <label class="block text-[#5c4a3d] font-semibold mb-2">Category</label>
+                                <select id="auction-category" class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
+                                    <option value="">Select Category</option>
+                                    <option value="ceramics">Ceramics</option>
+                                    <option value="jewelry">Jewelry</option>
+                                    <option value="paintings">Paintings</option>
+                                    <option value="textiles">Textiles</option>
+                                    <option value="woodwork">Woodwork</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[#5c4a3d] font-semibold mb-2">Starting Price (BD)</label>
                                 <input 
                                     id="auction-starting-bid"
                                     type="number" 
-                                    placeholder="0.00"
-                                    step="0.01"
-                                    min="0"
+                                    placeholder="e.g., 45"
+                                    step="1"
+                                    min="1"
                                     class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a]"
                                     required
                                 />
                             </div>
+                        </div>
+
+                        <!-- Start Time and End Time Row -->
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-[#5c4a3d] font-semibold mb-2">Reserve Price (BD)</label>
+                                <label class="block text-[#5c4a3d] font-semibold mb-2">Start Time</label>
                                 <input 
-                                    id="auction-reserve-price"
-                                    type="number" 
-                                    placeholder="Optional"
-                                    step="0.01"
-                                    min="0"
-                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a]"
+                                    id="auction-starttime"
+                                    type="datetime-local" 
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d]"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-[#5c4a3d] font-semibold mb-2">End Time</label>
+                                <input 
+                                    id="auction-endtime"
+                                    type="datetime-local" 
+                                    class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d]"
+                                    required
                                 />
                             </div>
                         </div>
 
-                        <!-- Auction Duration -->
+                        <!-- Product Image -->
                         <div>
-                            <label class="block text-[#5c4a3d] font-semibold mb-2">Auction Duration</label>
-                            <select id="auction-duration" class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] bg-white" required>
-                                <option value="">Select duration</option>
-                                <option value="1">1 day</option>
-                                <option value="3">3 days</option>
-                                <option value="5">5 days</option>
-                                <option value="7">7 days</option>
-                                <option value="14">14 days</option>
-                            </select>
-                        </div>
-
-                        <!-- End Time (Auto-calculated, shown for reference) -->
-                        <div>
-                            <label class="block text-[#5c4a3d] font-semibold mb-2">Expected End Time</label>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Product Image</label>
+                            <div class="border-2 border-dashed border-[#e5e0d8] rounded-xl p-6 text-center hover:border-[#c17c5f] transition-colors cursor-pointer" id="auction-image-upload-area">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-[#b8a99a] mb-3"></i>
+                                <p class="text-[#8b7355] font-medium">Click to upload or drag and drop</p>
+                                <p class="text-[#b8a99a] text-sm mt-1">PNG, JPG up to 5MB</p>
+                                <input id="auction-image-file" type="file" class="hidden" accept="image/*">
+                            </div>
+                            <p class="text-xs text-[#8b7355] mt-2">Or enter image URL:</p>
                             <input 
-                                id="auction-expected-endtime"
-                                type="text" 
-                                placeholder="Will be calculated based on duration"
-                                class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] bg-[#f5ebe0]"
-                                readonly
+                                id="auction-image-url"
+                                type="url" 
+                                placeholder="https://example.com/image.jpg"
+                                class="form-input w-full px-4 py-2 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] mt-1"
                             />
                         </div>
 
-                        <!-- Auction Description -->
+                        <!-- Description -->
                         <div>
-                            <label class="block text-[#5c4a3d] font-semibold mb-2">Auction Notes (Optional)</label>
+                            <label class="block text-[#5c4a3d] font-semibold mb-2">Description</label>
                             <textarea 
-                                id="auction-notes"
-                                rows="3"
-                                placeholder="Add any special notes or conditions for this auction..."
+                                id="auction-description"
+                                rows="4"
+                                placeholder="Describe your product, materials used, dimensions..."
                                 class="form-input w-full px-4 py-3 rounded-xl border border-[#e5e0d8] text-[#5c4a3d] placeholder-[#b8a99a] resize-none"
+                                required
                             ></textarea>
                         </div>
 
@@ -504,7 +518,7 @@
                                     class="w-5 h-5 rounded border-[#e5e0d8] text-[#c17c5f] focus:ring-[#c17c5f] mt-0.5"
                                     required
                                 >
-                                <span class="ml-3 text-sm text-[#8b7355]">I agree to the auction terms and conditions. I understand that once the auction ends, I am committed to selling the item to the highest bidder if the reserve price is met.</span>
+                                <span class="ml-3 text-sm text-[#8b7355]">I agree to the auction terms and conditions. I understand that once the auction starts, it will be visible to buyers and will run until the specified end time.</span>
                             </label>
                         </div>
                     </div>
@@ -538,40 +552,55 @@
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             document.getElementById('auction-form').reset();
-            document.getElementById('auction-expected-endtime').value = '';
+            const textEl = document.querySelector('#auction-image-upload-area p');
+            if (textEl) textEl.textContent = "Click to upload or drag and drop";
         }
 
-        // Listen for product selection to auto-fill starting bid
-        document.getElementById('auction-product').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-            const startingBidInput = document.getElementById('auction-starting-bid');
-            if (price) {
-                startingBidInput.value = parseFloat(price).toFixed(2);
-            } else {
-                startingBidInput.value = '';
+        // Image file upload drag/drop and click reader
+        document.getElementById('auction-image-file')?.addEventListener('change', function() {
+            if (!this.files.length) return;
+            const file = this.files[0];
+            const maxBytes = 5 * 1024 * 1024;
+            if (file.size > maxBytes) {
+                alert("Product image must be 5MB or smaller.");
+                return;
             }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 800;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('auction-image-url').value = compressedUrl;
+                    const textEl = document.querySelector('#auction-image-upload-area p');
+                    if (textEl) textEl.textContent = "Image uploaded successfully!";
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         });
 
-        // Listen for duration selection to calculate expected end time
-        document.getElementById('auction-duration').addEventListener('change', function() {
-            const days = parseInt(this.value);
-            const endTimeInput = document.getElementById('auction-expected-endtime');
-            if (days) {
-                const now = new Date();
-                now.setDate(now.getDate() + days);
-                
-                // Format expected end time elegantly
-                const options = { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric', 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                };
-                endTimeInput.value = now.toLocaleDateString(undefined, options);
-            } else {
-                endTimeInput.value = '';
+        // Click listener to trigger file upload click
+        document.getElementById('auction-image-upload-area')?.addEventListener('click', function(e) {
+            if (!e.target.closest('input')) {
+                document.getElementById('auction-image-file').click();
             }
         });
 
@@ -595,23 +624,50 @@
             });
         }
 
+        function getArtisanEmail() {
+            return sessionStorage.getItem('userEmail') || '';
+        }
+
         // Save auction by calling the backend API
         function saveAuction(event) {
             event.preventDefault();
             
-            const productId = document.getElementById('auction-product').value;
-            const startingBid = parseFloat(document.getElementById('auction-starting-bid').value);
-            const durationDays = parseInt(document.getElementById('auction-duration').value);
+            const email = getArtisanEmail();
+            if (!email) {
+                alert("Error: Artisan email not found in session. Please log in again.");
+                return;
+            }
 
-            if (!productId || isNaN(startingBid) || isNaN(durationDays)) {
-                alert('Please fill in all required fields.');
+            const title = document.getElementById('auction-title').value.trim();
+            const category = document.getElementById('auction-category').value.trim();
+            const price = parseInt(document.getElementById('auction-starting-bid').value); // integer price
+            const imageUrl = document.getElementById('auction-image-url').value.trim();
+            const description = document.getElementById('auction-description').value.trim();
+            const startTime = document.getElementById('auction-starttime').value;
+            const endTime = document.getElementById('auction-endtime').value;
+
+            if (isNaN(price) || price <= 0) {
+                alert('Please enter a valid starting price.');
+                return;
+            }
+
+            if (!startTime || !endTime) {
+                alert('Please specify both start and end times for the auction.');
                 return;
             }
 
             const payload = {
-                productId: productId,
-                startingBid: startingBid,
-                durationDays: durationDays
+                artisanEmail: email,
+                title: title,
+                category: category,
+                price: price,
+                stockQuantity: 1,
+                status: "active",
+                imageUrl: imageUrl,
+                description: description,
+                isAuctionItem: true,
+                startTime: startTime,
+                endTime: endTime
             };
 
             const submitBtn = document.querySelector('button[type="submit"][form="auction-form"]') || event.target.querySelector('button[type="submit"]');
@@ -621,7 +677,7 @@
                 submitBtn.disabled = true;
             }
 
-            fetch('/api/products/auction', {
+            fetch('/api/products', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
