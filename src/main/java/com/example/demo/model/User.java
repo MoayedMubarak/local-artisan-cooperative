@@ -11,6 +11,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    public Long getUserId() {
+        return this.userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     private String name;
     private String email;
     private String password;
@@ -21,6 +30,14 @@ public class User {
     private String status = "active";
     private java.time.LocalDateTime joinDate;
     private java.time.LocalDateTime lastActive;
+
+    public String getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     @PrePersist
     protected void onCreate() {

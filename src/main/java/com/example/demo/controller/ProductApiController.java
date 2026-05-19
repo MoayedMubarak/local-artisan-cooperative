@@ -139,7 +139,7 @@ public class ProductApiController {
                 } else {
                     auction.setEndTime(java.time.LocalDateTime.now().plusDays(7));
                 }
-                auction.setStatus("active");
+                auction.setStatus("LIVE");
                 Auction savedAuction = auctionRepository.save(auction);
                 
                 try {
@@ -150,6 +150,47 @@ public class ProductApiController {
             }
 
             return ResponseEntity.ok(Map.of("success", true, "product", saved));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/auction")
+    public ResponseEntity<?> listProductForAuction(@RequestBody Map<String, Object> payload) {
+        try {
+            Long productId = Long.parseLong(payload.get("productId").toString());
+            double startingBid = Double.parseDouble(payload.get("startingBid").toString());
+            int durationDays = Integer.parseInt(payload.get("durationDays").toString());
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+            if (product.getArtisan() != null && !"active".equalsIgnoreCase(product.getArtisan().getStatus())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("success", false, "message", "Your artisan account is not active."));
+            }
+
+            product.setAuctionItem(true);
+            product.setPrice(startingBid);
+            Product savedProduct = productRepository.save(product);
+
+            Auction auction = new Auction();
+            auction.setProduct(savedProduct);
+            auction.setStartingBid(startingBid);
+            auction.setCurrentHighestBid(startingBid);
+            auction.setStartTime(java.time.LocalDateTime.now());
+            auction.setEndTime(java.time.LocalDateTime.now().plusDays(durationDays));
+            auction.setStatus("LIVE");
+
+            Auction savedAuction = auctionRepository.save(auction);
+
+            try {
+                auctionService.triggerAuctionStartNotification(savedAuction);
+            } catch (Exception ex) {
+                // Ignore
+            }
+
+            return ResponseEntity.ok(Map.of("success", true, "auction", savedAuction));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }

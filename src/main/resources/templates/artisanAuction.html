@@ -614,10 +614,12 @@
                 durationDays: durationDays
             };
 
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating...';
-            submitBtn.disabled = true;
+            const submitBtn = document.querySelector('button[type="submit"][form="auction-form"]') || event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn ? submitBtn.innerHTML : 'Create Auction';
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating...';
+                submitBtn.disabled = true;
+            }
 
             fetch('/api/products/auction', {
                 method: 'POST',
@@ -634,15 +636,19 @@
                     window.location.reload();
                 } else {
                     alert('Error: ' + (data.message || 'Failed to list auction.'));
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
+                    if (submitBtn) {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error creating auction:', error);
                 alert('An error occurred. Please try again.');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
             });
         }
 

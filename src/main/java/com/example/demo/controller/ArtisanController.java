@@ -159,6 +159,11 @@ public class ArtisanController {
         try { auctionService.syncStoredStatuses(); } catch (Exception ignored) {}
         if (id != null) {
             model.addAttribute("auctions", auctionRepository.findByProductArtisanUserId(id));
+            // Pass the artisan's non-auction products so the "Add Auction" modal
+            // dropdown can be populated dynamically from the database.
+            model.addAttribute("products", productRepository.findByArtisanUserId(id).stream()
+                    .filter(p -> !p.isAuctionItem())
+                    .toList());
         }
         return "artisanAuction";
     }
