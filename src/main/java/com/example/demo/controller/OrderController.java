@@ -126,6 +126,7 @@ public class OrderController {
         OrderItem item = itemOpt.get();
         item.setRefundRequested(true);
         item.setRefundStatus("PENDING");
+        item.setAdminRefundStatus("PENDING");
         item.setRefundReason((String) payload.get("reason"));
         item.setRefundImages((String) payload.get("images"));
         orderItemRepository.save(item);
@@ -169,9 +170,11 @@ public class OrderController {
 
         if ("ACCEPT".equals(status)) {
             item.setRefundStatus("APPROVED");
+            item.setAdminRefundStatus("PENDING");
             msg = "Your refund request for " + item.getProduct().getTitle() + " has been accepted by the artisan and is awaiting administrator approval.";
         } else if ("DECLINE".equals(status)) {
             item.setRefundStatus("DECLINED");
+            item.setAdminRefundStatus("PENDING");
             String refusalReason = payload.get("refusalReason");
             if (refusalReason == null || refusalReason.trim().isEmpty()) {
                 refusalReason = "No reason provided.";
@@ -180,6 +183,7 @@ public class OrderController {
             msg = "Your refund request for " + item.getProduct().getTitle() + " has been declined by the artisan (Reason: " + refusalReason + "). The administrator will make the final decision.";
         } else if ("ESCALATE".equals(status)) {
             item.setRefundStatus("ESCALATED");
+            item.setAdminRefundStatus("PENDING");
             msg = "Your refund request for " + item.getProduct().getTitle() + " has been escalated to the administrator.";
         } else {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid decision"));
