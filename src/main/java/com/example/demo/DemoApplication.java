@@ -23,6 +23,12 @@ public class DemoApplication {
 				System.err.println("Schema Migration: could not alter products.image_url column: " + ex.getMessage());
 			}
 			try {
+				int updatedRows = jdbcTemplate.update("UPDATE products SET image_url = 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600' WHERE image_url LIKE 'data:image%' AND LENGTH(image_url) > 100000");
+				System.out.println("Data Cleanup: successfully cleaned " + updatedRows + " bloated base64 images from database");
+			} catch (Exception ex) {
+				System.err.println("Data Cleanup: could not clean bloated base64 images: " + ex.getMessage());
+			}
+			try {
 				jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN profile_picture TYPE TEXT");
 				System.out.println("Schema Migration: successfully altered users.profile_picture to TEXT");
 			} catch (Exception ex) {

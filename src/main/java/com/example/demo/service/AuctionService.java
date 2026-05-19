@@ -244,7 +244,7 @@ public class AuctionService {
 
     public void syncStoredStatuses() {
         LocalDateTime now = LocalDateTime.now();
-        for (Auction auction : auctionRepository.findAll()) {
+        for (Auction auction : auctionRepository.findActiveAndUpcomingAuctions()) {
             String resolved = resolveDisplayStatus(auction);
             String normalized = normalizeStatus(auction.getStatus());
             
@@ -257,10 +257,6 @@ public class AuctionService {
                 }
                 
                 auction.setStatus(resolved);
-                auctionRepository.save(auction);
-            }
-            if (DISPLAY_ENDED.equals(resolved) && auction.getEndTime() != null && now.isAfter(auction.getEndTime())) {
-                auction.setStatus(DISPLAY_ENDED);
                 auctionRepository.save(auction);
             }
         }

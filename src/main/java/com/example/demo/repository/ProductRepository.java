@@ -12,4 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByArtisanUserIdAndIsAuctionItem(Long artisanId, boolean isAuctionItem);
     long countByArtisanUserId(Long artisanId);
     long countByArtisanUserIdAndIsAuctionItem(Long artisanId, boolean isAuctionItem);
+
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT p.category FROM Product p WHERE p.category IS NOT NULL AND p.category <> ''")
+    List<String> findDistinctCategories();
 }

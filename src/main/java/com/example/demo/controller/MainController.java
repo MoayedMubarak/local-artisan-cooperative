@@ -55,11 +55,7 @@ public class MainController {
             // Ignore
         }
         model.addAttribute("auctions", auctionRepository.findAll());
-        model.addAttribute("categories", productRepository.findAll().stream()
-                .map(p -> p.getProductCategory() != null ? p.getProductCategory().getName() : p.getCategory())
-                .filter(c -> c != null && !c.isBlank())
-                .distinct()
-                .collect(java.util.stream.Collectors.toList()));
+        model.addAttribute("categories", productRepository.findDistinctCategories());
         return "auctions";
     }
 

@@ -403,7 +403,7 @@
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
-                    <p class="text-sm text-[#8b7355]" th:text="${productsCount != null and productsCount > 0} ? ('Showing ' + productsCount + ' product(s)') : 'No products'">No products</p>
+                    <p class="text-sm text-[#8b7355]" th:text="${productsCount != null and productsCount > 0 ? 'Showing ' + productsCount + ' product(s)' : 'No products'}">No products</p>
                     <div class="flex items-center gap-2">
                         <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:border-[#c17c5f] hover:text-[#c17c5f] transition-colors" disabled>
                             Previous
