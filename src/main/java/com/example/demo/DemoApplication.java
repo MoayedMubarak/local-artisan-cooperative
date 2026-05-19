@@ -40,6 +40,15 @@ public class DemoApplication {
 			} catch (Exception ex) {
 				System.err.println("Schema Migration: could not alter artisans.shop_banner column: " + ex.getMessage());
 			}
+			try {
+				jdbcTemplate.execute("ALTER TABLE order_items ADD COLUMN IF NOT EXISTS refund_requested BOOLEAN DEFAULT FALSE");
+				jdbcTemplate.execute("ALTER TABLE order_items ADD COLUMN IF NOT EXISTS refund_status VARCHAR(255)");
+				jdbcTemplate.execute("ALTER TABLE order_items ADD COLUMN IF NOT EXISTS refund_reason VARCHAR(4000)");
+				jdbcTemplate.execute("ALTER TABLE order_items ADD COLUMN IF NOT EXISTS refund_images TEXT");
+				System.out.println("Schema Migration: successfully verified/added refund columns to order_items");
+			} catch (Exception ex) {
+				System.err.println("Schema Migration: could not alter order_items table for refund columns: " + ex.getMessage());
+			}
 		};
 	}
 }

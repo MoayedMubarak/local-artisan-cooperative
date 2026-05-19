@@ -21,4 +21,13 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    private boolean refundRequested;
+    private String refundStatus; // PENDING, APPROVED, DECLINED, ESCALATED
+    
+    @Column(length = 4000)
+    private String refundReason;
+    
+    @Column(columnDefinition = "TEXT")
+    private String refundImages;
 }

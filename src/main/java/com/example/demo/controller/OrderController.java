@@ -27,6 +27,9 @@ public class OrderController {
     private CustomerRepository customerRepository;
 
     @Autowired
+    private com.example.demo.repository.OrderItemRepository orderItemRepository;
+
+    @Autowired
     private com.example.demo.service.NotificationService notificationService;
 
     @GetMapping
@@ -57,10 +60,15 @@ public class OrderController {
             if (order.getOrderItems() != null) {
                 for (OrderItem item : order.getOrderItems()) {
                     Map<String, Object> itemMap = new HashMap<>();
+                    itemMap.put("orderItemId", item.getOrderItemId());
                     itemMap.put("title", item.getProduct().getTitle());
                     itemMap.put("imageUrl", item.getProduct().getImageUrl());
                     itemMap.put("quantity", item.getQuantity());
                     itemMap.put("price", item.getPrice());
+                    itemMap.put("refundRequested", item.isRefundRequested());
+                    itemMap.put("refundStatus", item.getRefundStatus());
+                    itemMap.put("refundReason", item.getRefundReason());
+                    itemMap.put("refundImages", item.getRefundImages());
                     items.add(itemMap);
                 }
             }
@@ -99,5 +107,84 @@ public class OrderController {
 
             return ResponseEntity.ok(Map.of("success", true));
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/items/{orderItemId}/refund")
+    @Transactional
+    public ResponseEntity<?> requestRefund(
+            @PathVariable Long orderItemId,
+            @RequestBody Map<String, Object> payload) {
+        
+        Optional<OrderItem> itemOpt = orderItemRepository.findById(orderItemId);
+        if (itemOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Order item not found"));
+        }
+
+        OrderItem item = itemOpt.get();
+        item.setRefundRequested(true);
+        item.setRefundStatus("PENDING");
+        item.setRefundReason((String) payload.get("reason"));
+        item.setRefundImages((String) payload.get("images"));
+        orderItemRepository.save(item);
+
+        // Notify the artisan
+        if (item.getProduct() != null && item.getProduct().getArtisan() != null) {
+            String title = "Refund Request Received";
+            String msg = "A refund has been requested for item: " + item.getProduct().getTitle() + 
+                         " (Order #" + item.getOrder().getOrderId() + ").";
+            notificationService.sendNotification(
+                item.getProduct().getArtisan(),
+                title,
+                msg,
+                "REFUND_REQUESTED",
+                "/artisanOrderDetail?orderId=" + item.getOrder().getOrderId() + "&id=" + item.getProduct().getArtisan().getUserId()
+            );
+        }
+
+        return ResponseEntity.ok(Map.of("success", true, "message", "Refund request submitted successfully."));
+    }
+
+    @PutMapping("/items/{orderItemId}/refund/decision")
+    @Transactional
+    public ResponseEntity<?> handleRefundDecision(
+            @PathVariable Long orderItemId,
+            @RequestBody Map<String, String> payload) {
+        
+        String decision = payload.get("decision"); // ACCEPT, DECLINE, ESCALATE
+        if (decision == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Decision is required"));
+        }
+
+        Optional<OrderItem> itemOpt = orderItemRepository.findById(orderItemId);
+        if (itemOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Order item not found"));
+        }
+
+        OrderItem item = itemOpt.get();
+        String status = decision.toUpperCase();
+        if ("ACCEPT".equals(status)) {
+            item.setRefundStatus("APPROVED");
+        } else if ("DECLINE".equals(status)) {
+            item.setRefundStatus("DECLINED");
+        } else if ("ESCALATE".equals(status)) {
+            item.setRefundStatus("ESCALATED");
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid decision"));
+        }
+
+        orderItemRepository.save(item);
+
+        // Notify customer
+        String title = "Refund Update";
+        String msg = "Your refund request for " + item.getProduct().getTitle() + " has been " + item.getRefundStatus().toLowerCase() + ".";
+        notificationService.sendNotification(
+            item.getOrder().getCustomer(),
+            title,
+            msg,
+            "REFUND_UPDATE",
+            "/orders"
+        );
+
+        return ResponseEntity.ok(Map.of("success", true, "message", "Refund status updated."));
     }
 }

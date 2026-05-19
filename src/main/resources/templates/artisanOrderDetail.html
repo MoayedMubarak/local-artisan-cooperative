@@ -522,9 +522,14 @@
                                     <p class="text-sm text-[#8b7355]" th:text="${order.customer.email}">customer@email.com</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 text-[#8b7355]">
-                                <i class="fas fa-phone"></i>
-                                <span class="text-sm" th:text="${order.customer.phone}">+973 0000 0000</span>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-2 text-[#8b7355]">
+                                    <i class="fas fa-phone"></i>
+                                    <span id="customerPhone" class="text-sm" th:text="${order.customer.phone}">+973 0000 0000</span>
+                                </div>
+                                <div id="phoneWarning" class="hidden text-xs text-red-500 flex items-center gap-1 mt-1">
+                                    <i class="fas fa-exclamation-circle"></i> Phone format is invalid (+973 followed by 8 digits)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -592,61 +597,39 @@
                         </div>
                     </div>
 
-                    <!-- Refund Request Panel -->
-                    <div class="bg-white rounded-xl card-shadow overflow-hidden border-l-4 border-amber-500">
+                    <!-- Refund Request Panels -->
+                    <div th:each="item : ${orderItems}" th:if="${item.refundRequested}" 
+                         class="bg-white rounded-xl card-shadow overflow-hidden border-l-4 border-amber-500 mb-6">
                         <div class="p-6 border-b border-[#e5e0d8]">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-exclamation-triangle text-amber-500 text-xl"></i>
-                                    <h2 class="text-xl font-semibold text-amber-600">Refund Request</h2>
+                                    <h2 class="text-xl font-semibold text-amber-600" th:text="'Refund Request - ' + ${item.product.title}">Refund Request</h2>
                                 </div>
-                                <span class="text-sm text-[#8b7355]">March 18, 2025 at 2:45 PM</span>
+                                <span class="text-sm font-semibold text-amber-600" th:text="${item.refundStatus}">PENDING</span>
                             </div>
                         </div>
                         <div class="p-6 space-y-4">
                             <!-- Refund Reason -->
                             <div>
                                 <p class="text-sm font-medium text-[#8b7355] mb-2">Customer's Reason:</p>
-                                <blockquote class="bg-amber-50 border-l-4 border-amber-400 p-4 italic text-[#5c4a3d]">
-                                    "The item arrived damaged and does not match the description. The ceramic vase has a large crack on the side and the color is significantly different from what was shown in the product images."
+                                <blockquote class="bg-amber-50 border-l-4 border-amber-400 p-4 italic text-[#5c4a3d]" th:text="${item.refundReason}">
+                                    Reason details...
                                 </blockquote>
                             </div>
 
                             <!-- Attached Evidence Section -->
-                            <div>
+                            <div th:if="${item.refundImages != null and !item.refundImages.isEmpty()}">
                                 <p class="text-sm font-medium text-[#8b7355] mb-2 flex items-center gap-2">
                                     <i class="fas fa-paperclip"></i>
-                                    Attached Photos
+                                    Attached Photo
                                 </p>
                                 <div class="flex gap-3">
-                                    <div class="relative group cursor-pointer" onclick="openLightbox(0)">
+                                    <div class="relative group cursor-pointer" th:onclick="'openLightboxDirect(\'' + ${item.refundImages} + '\')'">
                                         <img 
-                                            src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=160&h=160&fit=crop" 
-                                            alt="Evidence photo 1" 
+                                            th:src="${item.refundImages}" 
+                                            alt="Evidence photo" 
                                             class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
-                                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e0d8%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%238b7355%22 font-size=%2224%22><tspan>📷</tspan></text></svg>'"
-                                        />
-                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <i class="fas fa-expand text-white text-xl"></i>
-                                        </div>
-                                    </div>
-                                    <div class="relative group cursor-pointer" onclick="openLightbox(1)">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=160&h=160&fit=crop" 
-                                            alt="Evidence photo 2" 
-                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
-                                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e0d8%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%238b7355%22 font-size=%2224%22><tspan>📷</tspan></text></svg>'"
-                                        />
-                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <i class="fas fa-expand text-white text-xl"></i>
-                                        </div>
-                                    </div>
-                                    <div class="relative group cursor-pointer" onclick="openLightbox(2)">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=160&h=160&fit=crop" 
-                                            alt="Evidence photo 3" 
-                                            class="w-20 h-20 rounded-lg object-cover border border-[#e5e0d8]"
-                                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e0d8%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%238b7355%22 font-size=%2224%22><tspan>📷</tspan></text></svg>'"
                                         />
                                         <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <i class="fas fa-expand text-white text-xl"></i>
@@ -657,25 +640,32 @@
 
                             <!-- Refund Amount -->
                             <div class="flex justify-between items-center pt-2">
-                                <span class="text-[#8b7355]">Requested Refund Amount</span>
-                                <span class="text-lg font-semibold text-amber-600">BD 85.000</span>
+                                <span class="text-[#8b7355]">Refund Amount (Qty: <span th:text="${item.quantity}">1</span>)</span>
+                                <span class="text-lg font-semibold text-amber-600" th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 3) + ' BD'}">0.000 BD</span>
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="flex gap-3 pt-4" id="refundActions">
-                                <button onclick="handleRefundDecision('accept')" class="refund-btn flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg transition-colors">
+                            <div class="flex gap-3 pt-4" th:id="'refundActions-' + ${item.orderItemId}" th:if="${item.refundStatus == 'PENDING'}">
+                                <button th:onclick="'handleRefundDecisionDirect(\'accept\', ' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg transition-colors">
                                     Accept Refund
                                 </button>
-                                <button onclick="handleRefundDecision('decline')" class="refund-btn flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 font-medium py-2.5 rounded-lg transition-colors">
+                                <button th:onclick="'handleRefundDecisionDirect(\'decline\', ' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 font-medium py-2.5 rounded-lg transition-colors">
                                     Decline Refund
                                 </button>
-                                <button onclick="handleRefundDecision('escalate')" class="refund-btn flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-2.5 rounded-lg transition-colors">
+                                <button th:onclick="'handleRefundDecisionDirect(\'escalate\', ' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-2.5 rounded-lg transition-colors">
                                     Escalate to Admin
                                 </button>
                             </div>
+                            
+                            <!-- If already resolved -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center" th:if="${item.refundStatus != 'PENDING'}">
+                                <p class="text-sm font-semibold text-gray-700">
+                                    This refund request has been <span class="text-[#c17c5f]" th:text="${item.refundStatus}">RESOLVED</span>.
+                                </p>
+                            </div>
 
                             <!-- Notice -->
-                            <p class="text-xs text-[#8b7355] text-center pt-2">
+                            <p class="text-xs text-[#8b7355] text-center pt-2" th:if="${item.refundStatus == 'PENDING'}">
                                 Your decision will be reviewed and finalized by the administrator before any funds are returned.
                             </p>
                         </div>
@@ -697,6 +687,53 @@
         function validatePhoneNumber() {
             const phoneElement = document.getElementById('customerPhone');
             const warningElement = document.getElementById('phoneWarning');
+            const phoneNumber = phoneElement.textContent.trim();
+
+            // Bahraini format: +973 followed by 8 digits starting with 3 or 6
+            const bahrainiPattern = /^\+973\s?[36]\d{7}$/;
+
+            if (!bahrainiPattern.test(phoneNumber)) {
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        // Update order status
+        function updateOrderStatus() {
+            const btn = document.getElementById('updateStatusBtn');
+            const status = document.getElementById('orderStatus').value;
+
+            // Disable button to prevent double-click
+            btn.disabled = true;
+            btn.classList.add('btn-disabled');
+            btn.textContent = 'Updating...';
+
+            // Simulate API call
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.textContent = 'Update Status';
+
+                showNotification(`Order status updated to ${status.charAt(0).toUpperCase() + status.slice(1)}`, 'success');
+
+                // Show relevant input fields based on status
+                updateTimelineInputs(status);
+            }, 1000);
+        }
+    </script>
+
+    <script>
+        /* Sidebar active state handled by dynamic script below */
+
+        // Validate phone number on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            validatePhoneNumber();
+        });
+
+        // Validate Bahraini phone number format
+        function validatePhoneNumber() {
+            const phoneElement = document.getElementById('customerPhone');
+            const warningElement = document.getElementById('phoneWarning');
+            if (!phoneElement || !warningElement) return;
             const phoneNumber = phoneElement.textContent.trim();
 
             // Bahraini format: +973 followed by 8 digits starting with 3 or 6
@@ -787,22 +824,26 @@
             }
         }
 
-        // Evidence photos for lightbox
-        const evidencePhotos = [
-            'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=800&h=600&fit=crop'
-        ];
+        // Close lightbox
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            if (lightbox) {
+                lightbox.style.opacity = '0';
+                lightbox.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => {
+                    lightbox.remove();
+                }, 200);
+            }
+        }
 
-        // Open lightbox with image
-        function openLightbox(index) {
+        function openLightboxDirect(imgSrc) {
             const lightbox = document.createElement('div');
             lightbox.id = 'lightbox';
             lightbox.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center cursor-pointer';
             lightbox.onclick = closeLightbox;
 
             const img = document.createElement('img');
-            img.src = evidencePhotos[index];
+            img.src = imgSrc;
             img.alt = 'Evidence photo';
             img.className = 'max-w-full max-h-full w-auto h-auto object-contain p-4';
             img.onclick = (e) => e.stopPropagation();
@@ -820,16 +861,50 @@
             document.body.appendChild(lightbox);
         }
 
-        // Close lightbox
-        function closeLightbox() {
-            const lightbox = document.getElementById('lightbox');
-            if (lightbox) {
-                lightbox.style.opacity = '0';
-                lightbox.style.transition = 'opacity 0.2s ease';
-                setTimeout(() => {
-                    lightbox.remove();
-                }, 200);
-            }
+        function handleRefundDecisionDirect(decision, orderItemId) {
+            const container = document.getElementById('refundActions-' + orderItemId);
+            const buttons = container ? container.querySelectorAll('button') : [];
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('btn-disabled');
+            });
+
+            fetch(`/api/orders/items/${orderItemId}/refund/decision`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ decision: decision })
+            })
+            .then(res => {
+                if (res.ok) {
+                    if (decision === 'accept') {
+                        showNotification('Refund request accepted.', 'success');
+                    } else if (decision === 'decline') {
+                        showNotification('Refund request declined.', 'info');
+                    } else if (decision === 'escalate') {
+                        showNotification('Refund request escalated to administrator.', 'info');
+                    }
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification('Error processing decision', 'error');
+                    buttons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('btn-disabled');
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showNotification('Network error occurred', 'error');
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('btn-disabled');
+                });
+            });
         }
 
         // Show notification toast
@@ -867,32 +942,36 @@
 
         const showUserMenu = () => {
             clearTimeout(hideTimeout);
-            userMenuDropdown.classList.add('show');
-            chevronIcon.classList.add('rotated');
+            if (userMenuDropdown) userMenuDropdown.classList.add('show');
+            if (chevronIcon) chevronIcon.classList.add('rotated');
         };
 
         const hideUserMenu = () => {
             hideTimeout = setTimeout(() => {
-                userMenuDropdown.classList.remove('show');
-                chevronIcon.classList.remove('rotated');
+                if (userMenuDropdown) userMenuDropdown.classList.remove('show');
+                if (chevronIcon) chevronIcon.classList.remove('rotated');
             }, 150);
         };
 
-        userMenu.addEventListener('mouseenter', showUserMenu);
-        userMenu.addEventListener('mouseleave', hideUserMenu);
+        if (userMenu) {
+            userMenu.addEventListener('mouseenter', showUserMenu);
+            userMenu.addEventListener('mouseleave', hideUserMenu);
+        }
 
-        logoutButton.addEventListener('click', () => {
-            const confirmed = window.confirm('Are you sure you want to logout?');
-            if (confirmed) {
-                if (typeof window.artisanLogout === 'function') {
-                    window.artisanLogout();
-                } else {
-                    sessionStorage.clear();
-                    localStorage.clear();
-                    window.location.href = '/login';
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                const confirmed = window.confirm('Are you sure you want to logout?');
+                if (confirmed) {
+                    if (typeof window.artisanLogout === 'function') {
+                        window.artisanLogout();
+                    } else {
+                        sessionStorage.clear();
+                        localStorage.clear();
+                        window.location.href = '/login';
+                    }
                 }
-            }
-        });
+            });
+        }
     </script>
     <script src="/artisan-common.js"></script>
 
