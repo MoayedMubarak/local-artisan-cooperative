@@ -625,7 +625,7 @@
                                     Attached Photo
                                 </p>
                                 <div class="flex gap-3">
-                                    <div class="relative group cursor-pointer" th:onclick="'openLightboxDirect(\'' + ${item.refundImages} + '\')'">
+                                    <div class="relative group cursor-pointer" onclick="openLightboxDirectFromImage(this)">
                                         <img 
                                             th:src="${item.refundImages}" 
                                             alt="Evidence photo" 
@@ -649,7 +649,7 @@
                                 <button th:onclick="'handleRefundDecisionDirect(\'accept\', ' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg transition-colors">
                                     Accept Refund
                                 </button>
-                                <button th:onclick="'handleRefundDecisionDirect(\'decline\', ' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 font-medium py-2.5 rounded-lg transition-colors">
+                                <button th:onclick="'openDeclineModal(' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 font-medium py-2.5 rounded-lg transition-colors">
                                     Decline Refund
                                 </button>
                                 <button th:onclick="'handleRefundDecisionDirect(\'escalate\', ' + ${item.orderItemId} + ')'" class="refund-btn-action flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-2.5 rounded-lg transition-colors">
@@ -658,10 +658,30 @@
                             </div>
                             
                             <!-- If already resolved -->
-                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center" th:if="${item.refundStatus != 'PENDING'}">
-                                <p class="text-sm font-semibold text-gray-700">
-                                    This refund request has been <span class="text-[#c17c5f]" th:text="${item.refundStatus}">RESOLVED</span>.
+                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-left" th:if="${item.refundStatus != 'PENDING'}">
+                                <p class="text-sm text-gray-700">
+                                    <span class="font-semibold">Your Decision:</span> 
+                                    <span class="text-[#c17c5f] font-semibold" th:text="${item.refundStatus}">DECISION</span>.
                                 </p>
+                                <div th:if="${item.refundStatus == 'DECLINED' and item.artisanRefusalReason != null}" class="bg-red-50 p-3 rounded-lg border-l-4 border-red-300">
+                                    <p class="text-xs font-semibold text-red-700">Refusal Reason:</p>
+                                    <p class="text-sm text-red-800 italic" th:text="${item.artisanRefusalReason}">Reason text...</p>
+                                </div>
+                                <div class="border-t border-gray-200 pt-2 mt-2" th:if="${item.adminRefundStatus != 'PENDING'}">
+                                    <p class="text-sm text-gray-700">
+                                        <span class="font-semibold">Administrator Final Decision:</span> 
+                                        <span class="font-semibold" th:classappend="${item.adminRefundStatus == 'APPROVED' ? 'text-green-600' : 'text-red-600'}" th:text="${item.adminRefundStatus}">STATUS</span>.
+                                    </p>
+                                    <div th:if="${item.adminNote != null}" class="bg-gray-100 p-3 rounded-lg border-l-4 border-gray-400 mt-1">
+                                        <p class="text-xs font-semibold text-gray-600">Admin Note:</p>
+                                        <p class="text-sm text-gray-700 italic" th:text="${item.adminNote}">Note text...</p>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 pt-2 mt-2" th:if="${item.adminRefundStatus == 'PENDING'}">
+                                    <p class="text-sm text-amber-600 font-semibold flex items-center gap-1">
+                                        <i class="fas fa-clock"></i> Awaiting Administrator Review
+                                    </p>
+                                </div>
                             </div>
 
                             <!-- Notice -->
@@ -901,7 +921,39 @@
             document.body.appendChild(lightbox);
         }
 
-        function handleRefundDecisionDirect(decision, orderItemId) {
+        function openLightboxDirectFromImage(element) {
+            const img = element.querySelector('img');
+            if (img && img.src) {
+                openLightboxDirect(img.src);
+            }
+        }
+
+        function openDeclineModal(orderItemId) {
+            document.getElementById('declineOrderItemId').value = orderItemId;
+            document.getElementById('refusalReason').value = '';
+            const modal = document.getElementById('declineRefundModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDeclineModal() {
+            const modal = document.getElementById('declineRefundModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function submitDeclineRefund() {
+            const orderItemId = document.getElementById('declineOrderItemId').value;
+            const refusalReason = document.getElementById('refusalReason').value.trim();
+            if (!refusalReason) {
+                showNotification('Please enter a refusal reason', 'error');
+                return;
+            }
+            closeDeclineModal();
+            handleRefundDecisionDirect('decline', orderItemId, refusalReason);
+        }
+
+        function handleRefundDecisionDirect(decision, orderItemId, refusalReason = '') {
             const container = document.getElementById('refundActions-' + orderItemId);
             const buttons = container ? container.querySelectorAll('button') : [];
             
@@ -915,14 +967,17 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ decision: decision })
+                body: JSON.stringify({ 
+                    decision: decision,
+                    refusalReason: refusalReason
+                })
             })
             .then(res => {
                 if (res.ok) {
                     if (decision === 'accept') {
-                        showNotification('Refund request accepted.', 'success');
+                        showNotification('Refund request accepted and sent to administrator.', 'success');
                     } else if (decision === 'decline') {
-                        showNotification('Refund request declined.', 'info');
+                        showNotification('Refund request declined and sent to administrator.', 'info');
                     } else if (decision === 'escalate') {
                         showNotification('Refund request escalated to administrator.', 'info');
                     }
@@ -1038,5 +1093,30 @@
             }
         })();
     </script>
+    <!-- Decline Refund Modal -->
+    <div id="declineRefundModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 mx-4">
+            <div class="flex justify-between items-center pb-3 border-b border-[#e5e0d8] mb-4">
+                <h3 class="text-lg font-semibold text-[#5c4a3d]">Decline Refund Request</h3>
+                <button onclick="closeDeclineModal()" class="text-[#8b7355] hover:text-[#c17c5f]">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-sm text-[#8b7355]">
+                    Please provide a reason for declining this refund request. This explanation will be visible to both the customer and the administrator.
+                </p>
+                <input type="hidden" id="declineOrderItemId" />
+                <div>
+                    <label for="refusalReason" class="block text-xs font-semibold text-[#8b7355] mb-2 uppercase tracking-wider">Reason for Refusal</label>
+                    <textarea id="refusalReason" rows="4" placeholder="Explain why you are declining this refund..." class="w-full border border-[#e5e0d8] rounded-xl px-4 py-3 text-sm text-[#5c4a3d] focus:outline-none focus:border-[#c17c5f] resize-none" required></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeDeclineModal()" class="flex-1 py-2.5 border border-[#e5e0d8] text-[#8b7355] hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancel</button>
+                    <button onclick="submitDeclineRefund()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium">Decline Refund</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

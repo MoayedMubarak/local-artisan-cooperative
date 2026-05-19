@@ -30,4 +30,13 @@ public class OrderItem {
     
     @Column(columnDefinition = "TEXT")
     private String refundImages;
+
+    @Column(length = 4000)
+    private String artisanRefusalReason;
+
+    @Column(name = "admin_refund_status")
+    private String adminRefundStatus = "PENDING"; // PENDING, APPROVED, REJECTED
+
+    @Column(length = 4000)
+    private String adminNote;
 }

@@ -46,6 +46,9 @@ public class AdminController {
     @Autowired
     private com.example.demo.repository.WishlistItemRepository wishlistItemRepository;
 
+    @Autowired
+    private com.example.demo.repository.OrderItemRepository orderItemRepository;
+
     @GetMapping("/adminDashboard")
     public String dashboard(Model model) {
         long totalUsers = userRepository.count();
@@ -334,7 +337,33 @@ public class AdminController {
     }
 
     @GetMapping("/adminRefund")
-    public String adminRefund() {
+    public String adminRefund(Model model) {
+        List<com.example.demo.model.OrderItem> refundItems = orderItemRepository.findAll().stream()
+                .filter(com.example.demo.model.OrderItem::isRefundRequested)
+                .toList();
+
+        long pendingReview = refundItems.stream()
+                .filter(item -> "PENDING".equalsIgnoreCase(item.getAdminRefundStatus()))
+                .count();
+
+        long escalatedByArtisan = refundItems.stream()
+                .filter(item -> "ESCALATED".equalsIgnoreCase(item.getRefundStatus()) && "PENDING".equalsIgnoreCase(item.getAdminRefundStatus()))
+                .count();
+
+        long approvedRefunds = refundItems.stream()
+                .filter(item -> "APPROVED".equalsIgnoreCase(item.getAdminRefundStatus()))
+                .count();
+
+        long rejectedRefunds = refundItems.stream()
+                .filter(item -> "REJECTED".equalsIgnoreCase(item.getAdminRefundStatus()))
+                .count();
+
+        model.addAttribute("refundItems", refundItems);
+        model.addAttribute("pendingCount", pendingReview);
+        model.addAttribute("escalatedCount", escalatedByArtisan);
+        model.addAttribute("approvedCount", approvedRefunds);
+        model.addAttribute("rejectedCount", rejectedRefunds);
+
         return "adminRefund";
     }
 

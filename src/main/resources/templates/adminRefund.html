@@ -152,13 +152,7 @@
         }
 
         .review-panel {
-            max-height: 0;
-            overflow: hidden;
             transition: max-height 0.3s ease;
-        }
-
-        .review-panel.open {
-            max-height: 2000px;
         }
 
         .timeline-step {
@@ -387,7 +381,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Pending Review</h3>
-                    <p class="text-3xl font-bold text-[#5c4a3d]">12</p>
+                    <p class="text-3xl font-bold text-[#5c4a3d]" th:text="${pendingCount}">12</p>
                 </div>
 
                 <!-- Escalated by Artisan -->
@@ -402,7 +396,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Escalated by Artisan</h3>
-                    <p class="text-3xl font-bold text-[#5c4a3d]">5</p>
+                    <p class="text-3xl font-bold text-[#5c4a3d]" th:text="${escalatedCount}">5</p>
                 </div>
 
                 <!-- Approved This Month -->
@@ -417,7 +411,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Approved This Month</h3>
-                    <p class="text-3xl font-bold text-[#5c4a3d]">28</p>
+                    <p class="text-3xl font-bold text-[#5c4a3d]" th:text="${approvedCount}">28</p>
                 </div>
 
                 <!-- Rejected This Month -->
@@ -432,7 +426,7 @@
                         </span>
                     </div>
                     <h3 class="text-[#8b7355] text-sm font-medium mb-1">Rejected This Month</h3>
-                    <p class="text-3xl font-bold text-[#5c4a3d]">15</p>
+                    <p class="text-3xl font-bold text-[#5c4a3d]" th:text="${rejectedCount}">15</p>
                 </div>
             </div>
 
@@ -476,670 +470,217 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e5e0d8]">
-                            <!-- Row 1 - Pending Review -->
-                            <tr class="table-row-hover">
+                            <!-- Loop through real refundItems -->
+                            <tr th:each="item : ${refundItems}" class="table-row-hover" th:data-id="${item.orderItemId}" th:data-admin-status="${item.adminRefundStatus}" th:data-artisan-status="${item.refundStatus}">
                                 <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#REF-2024-0089</span>
+                                    <span class="font-mono font-semibold text-[#5c4a3d]" th:text="'#REF-' + ${item.orderItemId}">#REF-0000</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="font-mono text-[#8b7355]">#ORD-2024-1549</span>
+                                    <span class="font-mono text-[#8b7355]" th:text="'#ORD-' + ${item.order.orderId}">#ORD-0000</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <img 
-                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Emma Wilson" 
+                                            th:src="${item.order.customer.profilePicture != null ? item.order.customer.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" 
+                                            alt="Customer" 
                                             class="w-10 h-10 rounded-full object-cover"
                                         />
-                                        <span class="font-medium text-[#5c4a3d]">Emma Wilson</span>
+                                        <span class="font-medium text-[#5c4a3d]" th:text="${item.order.customer.name}">Customer Name</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <img 
-                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Elena Rodriguez" 
+                                            th:src="${item.product.artisan.profilePicture != null ? item.product.artisan.profilePicture : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" 
+                                            alt="Artisan" 
                                             class="w-10 h-10 rounded-full object-cover"
                                         />
-                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
+                                        <span class="font-medium text-[#5c4a3d]" th:text="${item.product.artisan.shopName != null ? item.product.artisan.shopName : item.product.artisan.name}">Artisan Name</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
                                         <img 
-                                            src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=40&h=40&fit=crop" 
-                                            alt="Tea Set" 
+                                            th:src="${item.product.imageUrl != null ? item.product.imageUrl : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" 
+                                            alt="Product" 
                                             class="w-10 h-10 rounded-lg object-cover"
                                         />
-                                        <span class="text-[#5c4a3d]">Artisan Tea Set</span>
+                                        <span class="text-[#5c4a3d]" th:text="${item.product.title}">Product Title</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">BD 120.000</span>
+                                    <span class="font-semibold text-[#5c4a3d]" th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 3) + ' BD'}">BD 0.000</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 18, 2025</span>
+                                    <span class="text-[#8b7355]" th:text="${#temporals.format(item.order.date, 'MMM dd, yyyy')}">Mar 18, 2025</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge bg-red-100 text-red-700">
-                                        <i class="fas fa-times-circle"></i>
-                                        Declined
+                                    <span th:if="${item.refundStatus == 'PENDING'}" class="status-badge bg-gray-100 text-gray-700">
+                                        <i class="fas fa-clock"></i> Awaiting Response
+                                    </span>
+                                    <span th:if="${item.refundStatus == 'APPROVED'}" class="status-badge bg-green-100 text-green-700">
+                                        <i class="fas fa-check-circle"></i> Approved
+                                    </span>
+                                    <span th:if="${item.refundStatus == 'DECLINED'}" class="status-badge bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle"></i> Declined
+                                    </span>
+                                    <span th:if="${item.refundStatus == 'ESCALATED'}" class="status-badge bg-purple-100 text-purple-700">
+                                        <i class="fas fa-arrow-up"></i> Escalated
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge bg-amber-100 text-amber-700">
-                                        <i class="fas fa-clock"></i>
-                                        Pending
+                                    <span th:if="${item.adminRefundStatus == 'PENDING'}" class="status-badge bg-amber-100 text-amber-700">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                    <span th:if="${item.adminRefundStatus == 'APPROVED'}" class="status-badge bg-green-100 text-green-700">
+                                        <i class="fas fa-check-double"></i> Approved
+                                    </span>
+                                    <span th:if="${item.adminRefundStatus == 'REJECTED'}" class="status-badge bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle"></i> Rejected
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <button onclick="toggleReviewPanel('ref-0089')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                    <button th:onclick="'toggleReviewPanel(' + ${item.orderItemId} + ')'" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
                                         Review
                                     </button>
                                 </td>
                             </tr>
 
-                            <!-- Review Panel for Row 1 -->
-                            <tr id="review-ref-0089" class="review-panel">
-                                <td colspan="10" class="px-6 py-0">
-                                    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6 my-4">
-                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            <!-- Left Column -->
-                                            <div class="space-y-4">
-                                                <h4 class="font-semibold text-[#5c4a3d] text-lg flex items-center gap-2">
-                                                    <i class="fas fa-file-alt text-amber-600"></i>
-                                                    Refund Details
-                                                </h4>
-
-                                                <!-- Customer's Reason -->
-                                                <div>
-                                                    <p class="text-sm font-medium text-[#8b7355] mb-2">Customer's Reason:</p>
-                                                    <blockquote class="bg-white border-l-4 border-amber-400 p-4 italic text-[#5c4a3d] text-sm shadow-sm">
-                                                        "The tea set arrived with a large crack on the side of the teapot. The packaging was also damaged during shipping. I would like a full refund for this item."
-                                                    </blockquote>
-                                                </div>
-
-                                                <!-- Photo Evidence -->
-                                                <div>
-                                                    <p class="text-sm font-medium text-[#8b7355] mb-2 flex items-center gap-2">
-                                                        <i class="fas fa-paperclip"></i>
-                                                        Photo Evidence (3)
-                                                    </p>
-                                                    <div class="flex gap-3">
-                                                        <div class="relative group cursor-pointer" onclick="openLightbox(0)">
-                                                            <img 
-                                                                src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=160&h=160&fit=crop" 
-                                                                alt="Damage photo 1" 
-                                                                class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
-                                                            />
-                                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <i class="fas fa-expand text-white text-lg"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="relative group cursor-pointer" onclick="openLightbox(1)">
-                                                            <img 
-                                                                src="https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=160&h=160&fit=crop" 
-                                                                alt="Damage photo 2" 
-                                                                class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
-                                                            />
-                                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <i class="fas fa-expand text-white text-lg"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="relative group cursor-pointer" onclick="openLightbox(2)">
-                                                            <img 
-                                                                src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=160&h=160&fit=crop" 
-                                                                alt="Packaging photo" 
-                                                                class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
-                                                            />
-                                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <i class="fas fa-expand text-white text-lg"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Refund Amount -->
-                                                <div class="flex justify-between items-center bg-white rounded-lg p-3 shadow-sm">
-                                                    <span class="text-sm font-medium text-[#8b7355]">Requested Refund Amount:</span>
-                                                    <span class="text-xl font-bold text-amber-600">BD 120.000</span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Right Column -->
-                                            <div class="space-y-4">
-                                                <h4 class="font-semibold text-[#5c4a3d] text-lg flex items-center gap-2">
-                                                    <i class="fas fa-palette text-[#c17c5f]"></i>
-                                                    Artisan's Response
-                                                </h4>
-
-                                                <!-- Artisan's Decision -->
-                                                <div class="bg-white rounded-lg p-4 shadow-sm">
-                                                    <div class="flex items-center justify-between mb-3">
-                                                        <span class="text-sm font-medium text-[#8b7355]">Decision:</span>
-                                                        <span class="status-badge bg-red-100 text-red-700">
-                                                            <i class="fas fa-times-circle"></i>
-                                                            Declined
-                                                        </span>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mb-3">
-                                                        <span class="text-sm font-medium text-[#8b7355]">Date:</span>
-                                                        <span class="text-sm text-[#5c4a3d]">March 18, 2025 at 3:30 PM</span>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-medium text-[#8b7355] mb-2">Comment:</p>
-                                                        <p class="text-sm text-[#5c4a3d] leading-relaxed">
-                                                            "The item was carefully packaged before shipping. The damage likely occurred during transit. I recommend the customer file a claim with the shipping carrier. However, I'm willing to accept a partial refund if the admin decides so."
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Timeline -->
-                                                <div>
-                                                    <h5 class="font-semibold text-[#5c4a3d] mb-3 text-sm">Refund Timeline</h5>
-                                                    <div class="space-y-0">
-                                                        <div class="timeline-step completed">
-                                                            <div class="timeline-icon">
-                                                                <i class="fas fa-check"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs font-semibold text-[#5c4a3d]">Refund Requested</p>
-                                                                <p class="text-xs text-[#8b7355]">Mar 18, 9:15 AM</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="timeline-step completed">
-                                                            <div class="timeline-icon">
-                                                                <i class="fas fa-reply"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs font-semibold text-[#5c4a3d]">Artisan Responded</p>
-                                                                <p class="text-xs text-[#8b7355]">Mar 18, 3:30 PM</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="timeline-step current">
-                                                            <div class="timeline-icon">
-                                                                <i class="fas fa-shield-alt"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs font-semibold text-[#5c4a3d]">Admin Review Required</p>
-                                                                <p class="text-xs text-[#8b7355]">Currently Pending</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Admin Action Section -->
-                                        <div class="mt-6 pt-6 border-t border-amber-200">
-                                            <h4 class="font-semibold text-[#5c4a3d] mb-4 flex items-center gap-2">
-                                                <i class="fas fa-gavel text-amber-600"></i>
-                                                Admin Decision
+                            <!-- Review Panel for each item -->
+                            <tr th:each="item : ${refundItems}" th:id="'review-' + ${item.orderItemId}" class="review-panel hidden">
+                                <td colspan="10" class="px-6 py-4 bg-[#faf8f5] border-y border-[#e5e0d8]">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4">
+                                        <!-- Left Column - Details -->
+                                        <div class="space-y-4">
+                                            <h4 class="font-bold text-[#5c4a3d] text-base flex items-center gap-2">
+                                                <i class="fas fa-file-alt text-amber-600"></i>
+                                                Refund Details
                                             </h4>
-
-                                            <div class="mb-4">
-                                                <label class="block text-sm font-medium text-[#8b7355] mb-2">
-                                                    Admin Note <span class="text-red-500">*</span>
-                                                </label>
-                                                <textarea 
-                                                    id="adminNote-0089"
-                                                    rows="3" 
-                                                    placeholder="Explain your decision reasoning (required before approving or rejecting)..." 
-                                                    class="w-full border border-amber-300 rounded-lg px-4 py-3 focus:border-amber-500 focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a] resize-none bg-white"
-                                                    oninput="enableActionButtons('0089')"
-                                                ></textarea>
+                                            <div>
+                                                <p class="text-xs font-semibold text-[#8b7355] mb-2 uppercase tracking-wider">Customer's Reason</p>
+                                                <blockquote class="bg-white border-l-4 border-amber-400 p-4 italic text-[#5c4a3d] text-sm shadow-sm rounded-r-lg" th:text="${item.refundReason}">
+                                                    Customer reason details...
+                                                </blockquote>
                                             </div>
 
-                                            <div class="flex items-center gap-4">
-                                                <button 
-                                                    id="approveBtn-0089"
-                                                    onclick="handleRefundDecision('approve', '0089')" 
-                                                    disabled
-                                                    class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                                >
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Approve Refund
-                                                </button>
-                                                <button 
-                                                    id="rejectBtn-0089"
-                                                    onclick="handleRefundDecision('reject', '0089')" 
-                                                    disabled
-                                                    class="flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                                >
-                                                    <i class="fas fa-times-circle"></i>
-                                                    Reject Refund
-                                                </button>
-                                            </div>
-
-                                            <p class="text-xs text-[#8b7355] mt-4 flex items-center gap-2">
-                                                <i class="fas fa-info-circle"></i>
-                                                Both the customer and artisan will be notified of your decision via email and in-app notification.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 2 - Escalated -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#REF-2024-0090</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-mono text-[#8b7355]">#ORD-2024-1551</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Lisa Anderson" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Lisa Anderson</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Maya Singh" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Maya Singh</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1681091638141-a87495ae612f?w=40&h=40&fit=crop" 
-                                            alt="Silver Cuff" 
-                                            class="w-10 h-10 rounded-lg object-cover"
-                                        />
-                                        <span class="text-[#5c4a3d]">Hammered Silver Cuff</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">BD 48.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 17, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-purple-100 text-purple-700">
-                                        <i class="fas fa-arrow-up"></i>
-                                        Escalated
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-amber-100 text-amber-700">
-                                        <i class="fas fa-clock"></i>
-                                        Pending
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="toggleReviewPanel('ref-0090')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                        Review
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Review Panel for Row 2 -->
-                            <tr id="review-ref-0090" class="review-panel">
-                                <td colspan="10" class="px-6 py-0">
-                                    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-6 my-4">
-                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            <!-- Left Column -->
-                                            <div class="space-y-4">
-                                                <h4 class="font-semibold text-[#5c4a3d] text-lg flex items-center gap-2">
-                                                    <i class="fas fa-file-alt text-purple-600"></i>
-                                                    Refund Details
-                                                </h4>
-
-                                                <!-- Customer's Reason -->
-                                                <div>
-                                                    <p class="text-sm font-medium text-[#8b7355] mb-2">Customer's Reason:</p>
-                                                    <blockquote class="bg-white border-l-4 border-purple-400 p-4 italic text-[#5c4a3d] text-sm shadow-sm">
-                                                        "The silver cuff has discoloration issues that weren't visible in the product photos. After wearing it for one day, my skin turned green. This seems like a quality issue with the materials used."
-                                                    </blockquote>
-                                                </div>
-
-                                                <!-- Photo Evidence -->
-                                                <div>
-                                                    <p class="text-sm font-medium text-[#8b7355] mb-2 flex items-center gap-2">
-                                                        <i class="fas fa-paperclip"></i>
-                                                        Photo Evidence (2)
-                                                    </p>
-                                                    <div class="flex gap-3">
-                                                        <div class="relative group cursor-pointer" onclick="openLightbox(3)">
-                                                            <img 
-                                                                src="https://images.unsplash.com/photo-1681091638141-a87495ae612f?w=160&h=160&fit=crop" 
-                                                                alt="Discoloration photo" 
-                                                                class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
-                                                            />
-                                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <i class="fas fa-expand text-white text-lg"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="relative group cursor-pointer" onclick="openLightbox(4)">
-                                                            <img 
-                                                                src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=160&h=160&fit=crop" 
-                                                                alt="Skin reaction photo" 
-                                                                class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
-                                                            />
-                                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <i class="fas fa-expand text-white text-lg"></i>
-                                                            </div>
+                                            <div th:if="${item.refundImages != null and !item.refundImages.isEmpty()}">
+                                                <p class="text-xs font-semibold text-[#8b7355] mb-2 uppercase tracking-wider flex items-center gap-2">
+                                                    <i class="fas fa-paperclip"></i>
+                                                    Photo Evidence
+                                                </p>
+                                                <div class="flex gap-3">
+                                                    <div class="relative group cursor-pointer" onclick="openLightboxDirectFromImage(this)">
+                                                        <img 
+                                                            th:src="${item.refundImages}" 
+                                                            alt="Evidence photo" 
+                                                            class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
+                                                        />
+                                                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <i class="fas fa-expand text-white text-lg"></i>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <!-- Refund Amount -->
-                                                <div class="flex justify-between items-center bg-white rounded-lg p-3 shadow-sm">
-                                                    <span class="text-sm font-medium text-[#8b7355]">Requested Refund Amount:</span>
-                                                    <span class="text-xl font-bold text-purple-600">BD 48.000</span>
                                                 </div>
                                             </div>
+                                            <div th:if="${item.refundImages == null or item.refundImages.isEmpty()}">
+                                                <p class="text-xs text-[#8b7355] italic">No photo evidence attached.</p>
+                                            </div>
 
-                                            <!-- Right Column -->
-                                            <div class="space-y-4">
-                                                <h4 class="font-semibold text-[#5c4a3d] text-lg flex items-center gap-2">
-                                                    <i class="fas fa-palette text-[#c17c5f]"></i>
-                                                    Artisan's Response
-                                                </h4>
-
-                                                <!-- Artisan's Decision -->
-                                                <div class="bg-white rounded-lg p-4 shadow-sm">
-                                                    <div class="flex items-center justify-between mb-3">
-                                                        <span class="text-sm font-medium text-[#8b7355]">Decision:</span>
-                                                        <span class="status-badge bg-purple-100 text-purple-700">
-                                                            <i class="fas fa-arrow-up"></i>
-                                                            Escalated to Admin
-                                                        </span>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mb-3">
-                                                        <span class="text-sm font-medium text-[#8b7355]">Date:</span>
-                                                        <span class="text-sm text-[#5c4a3d]">March 17, 2025 at 6:45 PM</span>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-medium text-[#8b7355] mb-2">Comment:</p>
-                                                        <p class="text-sm text-[#5c4a3d] leading-relaxed">
-                                                            "This is concerning. I use only sterling silver (.925) for all my pieces. The discoloration could be due to individual skin chemistry or exposure to certain chemicals. I'd like the admin to mediate this situation. If it's truly a material defect, I'll accept the return and refund."
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Timeline -->
-                                                <div>
-                                                    <h5 class="font-semibold text-[#5c4a3d] mb-3 text-sm">Refund Timeline</h5>
-                                                    <div class="space-y-0">
-                                                        <div class="timeline-step completed">
-                                                            <div class="timeline-icon">
-                                                                <i class="fas fa-check"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs font-semibold text-[#5c4a3d]">Refund Requested</p>
-                                                                <p class="text-xs text-[#8b7355]">Mar 17, 2:20 PM</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="timeline-step completed">
-                                                            <div class="timeline-icon">
-                                                                <i class="fas fa-reply"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs font-semibold text-[#5c4a3d]">Artisan Escalated</p>
-                                                                <p class="text-xs text-[#8b7355]">Mar 17, 6:45 PM</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="timeline-step current">
-                                                            <div class="timeline-icon">
-                                                                <i class="fas fa-shield-alt"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs font-semibold text-[#5c4a3d]">Admin Review Required</p>
-                                                                <p class="text-xs text-[#8b7355]">Currently Pending</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <div class="flex justify-between items-center bg-white rounded-lg p-4 shadow-sm border border-[#e5e0d8]">
+                                                <span class="text-sm font-semibold text-[#8b7355]">Requested Refund Amount:</span>
+                                                <span class="text-lg font-bold text-amber-600" th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 3) + ' BD'}">BD 0.000</span>
                                             </div>
                                         </div>
 
-                                        <!-- Admin Action Section -->
-                                        <div class="mt-6 pt-6 border-t border-purple-200">
-                                            <h4 class="font-semibold text-[#5c4a3d] mb-4 flex items-center gap-2">
-                                                <i class="fas fa-gavel text-purple-600"></i>
-                                                Admin Decision
+                                        <!-- Right Column - Response & Decisions -->
+                                        <div class="space-y-4">
+                                            <h4 class="font-bold text-[#5c4a3d] text-base flex items-center gap-2">
+                                                <i class="fas fa-palette text-[#c17c5f]"></i>
+                                                Artisan's Response
                                             </h4>
-
-                                            <div class="mb-4">
-                                                <label class="block text-sm font-medium text-[#8b7355] mb-2">
-                                                    Admin Note <span class="text-red-500">*</span>
-                                                </label>
-                                                <textarea 
-                                                    id="adminNote-0090"
-                                                    rows="3" 
-                                                    placeholder="Explain your decision reasoning (required before approving or rejecting)..." 
-                                                    class="w-full border border-purple-300 rounded-lg px-4 py-3 focus:border-purple-500 focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a] resize-none bg-white"
-                                                    oninput="enableActionButtons('0090')"
-                                                ></textarea>
+                                            <div class="bg-white rounded-lg p-4 shadow-sm border border-[#e5e0d8] space-y-3">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-semibold text-[#8b7355]">Artisan Decision:</span>
+                                                    <span th:if="${item.refundStatus == 'PENDING'}" class="status-badge bg-gray-100 text-gray-700">Awaiting Response</span>
+                                                    <span th:if="${item.refundStatus == 'APPROVED'}" class="status-badge bg-green-100 text-green-700">Accepted</span>
+                                                    <span th:if="${item.refundStatus == 'DECLINED'}" class="status-badge bg-red-100 text-red-700">Declined</span>
+                                                    <span th:if="${item.refundStatus == 'ESCALATED'}" class="status-badge bg-purple-100 text-purple-700">Escalated</span>
+                                                </div>
+                                                <div th:if="${item.refundStatus == 'DECLINED' and item.artisanRefusalReason != null}" class="bg-red-50 p-3 rounded-lg border-l-4 border-red-300">
+                                                    <p class="text-xs font-semibold text-red-700 mb-1">Refusal Reason:</p>
+                                                    <p class="text-sm text-red-800 italic" th:text="${item.artisanRefusalReason}">Reason details...</p>
+                                                </div>
                                             </div>
 
-                                            <div class="flex items-center gap-4">
-                                                <button 
-                                                    id="approveBtn-0090"
-                                                    onclick="handleRefundDecision('approve', '0090')" 
-                                                    disabled
-                                                    class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                                >
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Approve Refund
-                                                </button>
-                                                <button 
-                                                    id="rejectBtn-0090"
-                                                    onclick="handleRefundDecision('reject', '0090')" 
-                                                    disabled
-                                                    class="flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                                >
-                                                    <i class="fas fa-times-circle"></i>
-                                                    Reject Refund
-                                                </button>
+                                            <!-- Admin Action Section (Only show if Admin Status is PENDING) -->
+                                            <div class="mt-6 pt-6 border-t border-[#e5e0d8]" th:if="${item.adminRefundStatus == 'PENDING'}">
+                                                <h4 class="font-bold text-[#5c4a3d] text-base mb-3 flex items-center gap-2">
+                                                    <i class="fas fa-gavel text-amber-600"></i>
+                                                    Admin Decision
+                                                </h4>
+
+                                                <div class="mb-4">
+                                                    <label class="block text-xs font-semibold text-[#8b7355] mb-2 uppercase tracking-wider">
+                                                        Admin Note <span class="text-red-500">*</span>
+                                                    </label>
+                                                    <textarea 
+                                                        th:id="'adminNote-' + ${item.orderItemId}"
+                                                        rows="3" 
+                                                        placeholder="Explain your decision reasoning (required before approving or rejecting)..." 
+                                                        class="w-full border border-[#e5e0d8] rounded-xl px-4 py-3 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a] resize-none bg-white text-sm"
+                                                        th:oninput="'enableActionButtonsDirect(' + ${item.orderItemId} + ')'"
+                                                    ></textarea>
+                                                </div>
+
+                                                <div class="flex items-center gap-4">
+                                                    <button 
+                                                        th:id="'approveBtn-' + ${item.orderItemId}"
+                                                        th:onclick="'handleAdminDecisionDirect(\'approve\', ' + ${item.orderItemId} + ')'" 
+                                                        disabled
+                                                        class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                    >
+                                                        <i class="fas fa-check-circle"></i>
+                                                        Approve Refund
+                                                    </button>
+                                                    <button 
+                                                        th:id="'rejectBtn-' + ${item.orderItemId}"
+                                                        th:onclick="'handleAdminDecisionDirect(\'reject\', ' + ${item.orderItemId} + ')'" 
+                                                        disabled
+                                                        class="flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                    >
+                                                        <i class="fas fa-times-circle"></i>
+                                                        Reject Refund
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            <p class="text-xs text-[#8b7355] mt-4 flex items-center gap-2">
-                                                <i class="fas fa-info-circle"></i>
-                                                Both the customer and artisan will be notified of your decision via email and in-app notification.
-                                            </p>
+                                            <!-- If Admin has already decided -->
+                                            <div class="mt-6 pt-6 border-t border-[#e5e0d8]" th:if="${item.adminRefundStatus != 'PENDING'}">
+                                                <h4 class="font-bold text-[#5c4a3d] text-base mb-2 flex items-center gap-2">
+                                                    <i class="fas fa-gavel text-gray-500"></i>
+                                                    Admin Decision Details
+                                                </h4>
+                                                <div class="bg-white rounded-lg p-4 border border-[#e5e0d8] space-y-2">
+                                                    <p class="text-sm text-gray-700">
+                                                        Status: <span class="font-bold text-[#c17c5f]" th:text="${item.adminRefundStatus}">APPROVED</span>
+                                                    </p>
+                                                    <div th:if="${item.adminNote != null}" class="bg-gray-50 p-3 rounded-lg border-l-4 border-gray-400 mt-1">
+                                                        <p class="text-xs font-semibold text-gray-600 mb-1">Decision Note:</p>
+                                                        <p class="text-sm text-gray-700 italic" th:text="${item.adminNote}">Note text...</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
 
-                            <!-- Row 3 - Approved -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#REF-2024-0087</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-mono text-[#8b7355]">#ORD-2024-1553</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Jennifer Lee" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Jennifer Lee</span>
+                            <!-- Empty State -->
+                            <tr th:if="${refundItems == null or refundItems.isEmpty()}">
+                                <td colspan="10" class="px-6 py-12 text-center text-[#8b7355] italic">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <i class="fas fa-undo-alt text-4xl text-[#c17c5f] opacity-50"></i>
+                                        <span>No refund requests found.</span>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Sarah Mitchell" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Sarah Mitchell</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=40&h=40&fit=crop" 
-                                            alt="Oil Painting" 
-                                            class="w-10 h-10 rounded-lg object-cover"
-                                        />
-                                        <span class="text-[#5c4a3d]">Abstract Oil Painting</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">BD 350.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 10, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-green-100 text-green-700">
-                                        <i class="fas fa-check-circle"></i>
-                                        Accepted
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-green-100 text-green-700">
-                                        <i class="fas fa-check-double"></i>
-                                        Approved
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="alert('Viewing resolved refund details...')" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Row 4 - Rejected -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#REF-2024-0085</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-mono text-[#8b7355]">#ORD-2024-1554</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Thomas White" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Thomas White</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Elena Rodriguez" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=40&h=40&fit=crop" 
-                                            alt="Ceramic Bowl" 
-                                            class="w-10 h-10 rounded-lg object-cover"
-                                        />
-                                        <span class="text-[#5c4a3d]">Ceramic Bowl Set</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">BD 95.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 08, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-red-100 text-red-700">
-                                        <i class="fas fa-times-circle"></i>
-                                        Declined
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-red-100 text-red-700">
-                                        <i class="fas fa-times-circle"></i>
-                                        Rejected
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="alert('Viewing resolved refund details...')" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Row 5 - Pending -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#REF-2024-0091</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-mono text-[#8b7355]">#ORD-2024-1556</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Robert Taylor" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Robert Taylor</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Anna Kowalski" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Anna Kowalski</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=40&h=40&fit=crop" 
-                                            alt="Wool Blanket" 
-                                            class="w-10 h-10 rounded-lg object-cover"
-                                        />
-                                        <span class="text-[#5c4a3d]">Woven Wool Blanket</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">BD 195.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 19, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-gray-100 text-gray-700">
-                                        <i class="fas fa-clock"></i>
-                                        Awaiting
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-amber-100 text-amber-700">
-                                        <i class="fas fa-clock"></i>
-                                        Pending
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="toggleReviewPanel('ref-0091')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                        Review
-                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -1149,17 +690,13 @@
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-4 border-t border-[#e5e0d8]">
                     <p class="text-sm text-[#8b7355]">
-                        Showing <span class="font-semibold text-[#5c4a3d]">1</span> to <span class="font-semibold text-[#5c4a3d]">5</span> of <span class="font-semibold text-[#5c4a3d]">60</span> refund requests
+                        Showing <span class="font-semibold text-[#5c4a3d]" th:text="${refundItems.size() > 0 ? 1 : 0}">1</span> to <span class="font-semibold text-[#5c4a3d]" th:text="${refundItems.size()}">5</span> of <span class="font-semibold text-[#5c4a3d]" th:text="${refundItems.size()}">60</span> refund requests
                     </p>
                     <div class="flex items-center gap-2">
                         <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors disabled:opacity-50" disabled>
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <button class="px-4 py-2 bg-[#c17c5f] text-white rounded-lg font-medium">1</button>
-                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">2</button>
-                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">3</button>
-                        <span class="text-[#8b7355]">...</span>
-                        <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">12</button>
                         <button class="px-4 py-2 border border-[#e5e0d8] rounded-lg text-[#8b7355] hover:bg-[#f5ebe0] transition-colors">
                             <i class="fas fa-chevron-right"></i>
                         </button>
@@ -1182,35 +719,67 @@
                 btn.classList.add('text-[#8b7355]');
             });
 
-            event.target.classList.add('active', 'bg-[#c17c5f]', 'text-white');
-            event.target.classList.remove('text-[#8b7355]');
+            // Get target button
+            const targetBtn = event.currentTarget;
+            targetBtn.classList.add('active', 'bg-[#c17c5f]', 'text-white');
+            targetBtn.classList.remove('text-[#8b7355]');
 
-            // Here you would filter the table based on the selected tab
-            console.log('Switched to tab:', tab);
+            const rows = document.querySelectorAll('tbody tr.table-row-hover');
+            rows.forEach(row => {
+                const orderItemId = row.getAttribute('data-id');
+                const reviewPanel = document.getElementById('review-' + orderItemId);
+                
+                // Close any open review panels
+                if (reviewPanel) {
+                    reviewPanel.classList.add('hidden');
+                    reviewPanel.classList.remove('open');
+                }
+
+                const adminStatus = row.getAttribute('data-admin-status');
+                const artisanStatus = row.getAttribute('data-artisan-status');
+
+                let show = false;
+                if (tab === 'all') {
+                    show = true;
+                } else if (tab === 'pending') {
+                    show = (adminStatus === 'PENDING');
+                } else if (tab === 'escalated') {
+                    show = (artisanStatus === 'ESCALATED');
+                } else if (tab === 'approved') {
+                    show = (adminStatus === 'APPROVED');
+                } else if (tab === 'rejected') {
+                    show = (adminStatus === 'REJECTED');
+                }
+
+                if (show) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
         }
 
         // Toggle review panel
         function toggleReviewPanel(refundId) {
             const panel = document.getElementById('review-' + refundId);
-            const isOpen = panel.classList.contains('open');
+            const isOpen = !panel.classList.contains('hidden');
 
             // Close all other panels first
             document.querySelectorAll('.review-panel').forEach(p => {
                 if (p.id !== 'review-' + refundId) {
-                    p.classList.remove('open');
+                    p.classList.add('hidden');
                 }
             });
 
             // Toggle current panel
             if (isOpen) {
-                panel.classList.remove('open');
+                panel.classList.add('hidden');
             } else {
-                panel.classList.add('open');
+                panel.classList.remove('hidden');
             }
         }
 
-        // Enable action buttons when note is filled
-        function enableActionButtons(refundId) {
+        function enableActionButtonsDirect(refundId) {
             const note = document.getElementById('adminNote-' + refundId).value.trim();
             const approveBtn = document.getElementById('approveBtn-' + refundId);
             const rejectBtn = document.getElementById('rejectBtn-' + refundId);
@@ -1224,72 +793,54 @@
             }
         }
 
-        // Handle refund decision
-        function handleRefundDecision(decision, refundId) {
+        async function handleAdminDecisionDirect(decision, refundId) {
             const note = document.getElementById('adminNote-' + refundId).value.trim();
-
             if (!note) {
                 showNotification('Please add an admin note before making a decision.', 'error');
                 return;
             }
 
-            if (decision === 'approve') {
-                showNotification('Refund approved successfully. Both parties have been notified.', 'success');
-            } else if (decision === 'reject') {
-                showNotification('Refund rejected. Both parties have been notified.', 'info');
-            }
+            try {
+                const response = await fetch(`/api/orders/items/${refundId}/admin-refund/decision`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        decision: decision.toUpperCase(),
+                        adminNote: note
+                    })
+                });
 
-            // Close the panel after decision
-            setTimeout(() => {
-                toggleReviewPanel(refundId);
-            }, 1000);
+                if (response.ok) {
+                    showNotification(`Refund ${decision}ed successfully. Both parties have been notified.`, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    const errMsg = await response.text();
+                    showNotification('Error: ' + errMsg, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting admin decision:', error);
+                showNotification('An error occurred while submitting decision.', 'error');
+            }
         }
 
-        // Evidence photos for lightbox
-        const evidencePhotos = [
-            'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1578749556920-d1e28f1fa5c9?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1681091638141-a87495ae612f?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&h=600&fit=crop'
-        ];
-
-        // Open lightbox with image
-        function openLightbox(index) {
+        function openLightboxDirectFromImage(imgEl) {
+            const src = imgEl.querySelector('img').src;
             const lightbox = document.createElement('div');
             lightbox.id = 'lightbox';
             lightbox.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center cursor-pointer';
-            lightbox.onclick = closeLightbox;
+            lightbox.onclick = () => lightbox.remove();
 
             const img = document.createElement('img');
-            img.src = evidencePhotos[index];
-            img.alt = 'Evidence photo';
+            img.src = src;
             img.className = 'max-w-full max-h-full w-auto h-auto object-contain p-4';
             img.onclick = (e) => e.stopPropagation();
 
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'absolute top-4 right-4 text-white hover:text-gray-300 transition-colors';
-            closeBtn.innerHTML = '<i class="fas fa-times text-3xl"></i>';
-            closeBtn.onclick = (e) => {
-                e.stopPropagation();
-                closeLightbox();
-            };
-
-            lightbox.appendChild(closeBtn);
             lightbox.appendChild(img);
             document.body.appendChild(lightbox);
-        }
-
-        // Close lightbox
-        function closeLightbox() {
-            const lightbox = document.getElementById('lightbox');
-            if (lightbox) {
-                lightbox.style.opacity = '0';
-                lightbox.style.transition = 'opacity 0.2s ease';
-                setTimeout(() => {
-                    lightbox.remove();
-                }, 200);
-            }
         }
 
         // Show notification toast

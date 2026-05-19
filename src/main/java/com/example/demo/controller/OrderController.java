@@ -69,6 +69,9 @@ public class OrderController {
                     itemMap.put("refundStatus", item.getRefundStatus());
                     itemMap.put("refundReason", item.getRefundReason());
                     itemMap.put("refundImages", item.getRefundImages());
+                    itemMap.put("artisanRefusalReason", item.getArtisanRefusalReason());
+                    itemMap.put("adminRefundStatus", item.getAdminRefundStatus());
+                    itemMap.put("adminNote", item.getAdminNote());
                     items.add(itemMap);
                 }
             }
@@ -162,12 +165,22 @@ public class OrderController {
 
         OrderItem item = itemOpt.get();
         String status = decision.toUpperCase();
+        String msg = "";
+
         if ("ACCEPT".equals(status)) {
             item.setRefundStatus("APPROVED");
+            msg = "Your refund request for " + item.getProduct().getTitle() + " has been accepted by the artisan and is awaiting administrator approval.";
         } else if ("DECLINE".equals(status)) {
             item.setRefundStatus("DECLINED");
+            String refusalReason = payload.get("refusalReason");
+            if (refusalReason == null || refusalReason.trim().isEmpty()) {
+                refusalReason = "No reason provided.";
+            }
+            item.setArtisanRefusalReason(refusalReason);
+            msg = "Your refund request for " + item.getProduct().getTitle() + " has been declined by the artisan (Reason: " + refusalReason + "). The administrator will make the final decision.";
         } else if ("ESCALATE".equals(status)) {
             item.setRefundStatus("ESCALATED");
+            msg = "Your refund request for " + item.getProduct().getTitle() + " has been escalated to the administrator.";
         } else {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid decision"));
         }
@@ -176,7 +189,6 @@ public class OrderController {
 
         // Notify customer
         String title = "Refund Update";
-        String msg = "Your refund request for " + item.getProduct().getTitle() + " has been " + item.getRefundStatus().toLowerCase() + ".";
         notificationService.sendNotification(
             item.getOrder().getCustomer(),
             title,
@@ -186,5 +198,65 @@ public class OrderController {
         );
 
         return ResponseEntity.ok(Map.of("success", true, "message", "Refund status updated."));
+    }
+
+    @PutMapping("/items/{orderItemId}/admin-refund/decision")
+    @Transactional
+    public ResponseEntity<?> handleAdminRefundDecision(
+            @PathVariable Long orderItemId,
+            @RequestBody Map<String, String> payload) {
+        
+        String decision = payload.get("decision"); // approve, reject
+        String note = payload.get("note");
+        
+        if (decision == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Decision is required"));
+        }
+        
+        Optional<OrderItem> itemOpt = orderItemRepository.findById(orderItemId);
+        if (itemOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Order item not found"));
+        }
+        
+        OrderItem item = itemOpt.get();
+        String adminStatus = decision.toUpperCase();
+        if ("APPROVE".equals(adminStatus)) {
+            item.setAdminRefundStatus("APPROVED");
+            item.setRefundStatus("APPROVED");
+        } else if ("REJECT".equals(adminStatus)) {
+            item.setAdminRefundStatus("REJECTED");
+            item.setRefundStatus("DECLINED");
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid decision"));
+        }
+        
+        item.setAdminNote(note);
+        orderItemRepository.save(item);
+        
+        String displayStatus = "APPROVE".equals(adminStatus) ? "approved" : "rejected";
+        
+        // Notify customer
+        String customerMsg = "Your refund request for " + item.getProduct().getTitle() + " has been " + displayStatus + " by the administrator. Note: " + (note != null ? note : "None");
+        notificationService.sendNotification(
+            item.getOrder().getCustomer(),
+            "Refund " + ("APPROVE".equals(adminStatus) ? "Approved" : "Rejected"),
+            customerMsg,
+            "REFUND_FINAL_DECISION",
+            "/orders"
+        );
+        
+        // Notify artisan
+        if (item.getProduct() != null && item.getProduct().getArtisan() != null) {
+            String artisanMsg = "The refund request for " + item.getProduct().getTitle() + " (Order #" + item.getOrder().getOrderId() + ") has been " + displayStatus + " by the administrator. Note: " + (note != null ? note : "None");
+            notificationService.sendNotification(
+                item.getProduct().getArtisan(),
+                "Refund " + ("APPROVE".equals(adminStatus) ? "Approved" : "Rejected"),
+                artisanMsg,
+                "REFUND_FINAL_DECISION",
+                "/artisanOrderDetail?orderId=" + item.getOrder().getOrderId() + "&id=" + item.getProduct().getArtisan().getUserId()
+            );
+        }
+        
+        return ResponseEntity.ok(Map.of("success", true, "message", "Admin refund status updated."));
     }
 }
