@@ -300,7 +300,7 @@ function openOrderModal(row) {
                 <p class="text-yellow-600 text-sm mt-1">The artisan will ship your order soon.</p>
             </div>` : ''}
 
-            ${hasRefundableItem ? `
+            ${hasRefundableItem && order.status.toLowerCase() === 'delivered' ? `
             <button id="refund-btn-trigger" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white font-semibold py-3 rounded-xl transition-all shadow-md mt-4 flex items-center justify-center gap-2">
                 <i class="fas fa-undo"></i> Request a Refund
             </button>

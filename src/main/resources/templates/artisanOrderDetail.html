@@ -410,7 +410,7 @@
                     </div>
 
                     <!-- Order Timeline Card -->
-                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden" th:if="${order != null}">
                         <div class="p-6 border-b border-[#e5e0d8]">
                             <h2 class="text-xl font-semibold text-[#5c4a3d]">Order Timeline</h2>
                         </div>
@@ -423,7 +423,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Order Placed</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 15, 2025 at 10:30 AM</p>
+                                        <p class="text-sm text-[#8b7355] mt-1" th:text="${order.date}">March 15, 2025</p>
                                         <p class="text-sm text-[#8b7355]">Customer placed the order successfully</p>
                                     </div>
                                 </div>
@@ -435,31 +435,31 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Payment Confirmed</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 15, 2025 at 10:32 AM</p>
-                                        <p class="text-sm text-[#8b7355]">Payment received via PayPal</p>
+                                        <p class="text-sm text-[#8b7355] mt-1" th:text="${order.date}">March 15, 2025</p>
+                                        <p class="text-sm text-[#8b7355]">Payment received successfully</p>
                                     </div>
                                 </div>
 
-                                <!-- Processing - Current -->
-                                <div class="timeline-step current">
+                                <!-- Processing - Current/Completed -->
+                                <div class="timeline-step" th:classappend="${order.status.toLowerCase() == 'shipped' || order.status.toLowerCase() == 'delivered' ? 'completed' : 'current'}">
                                     <div class="timeline-icon">
                                         <i class="fas fa-box-open"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Processing</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">March 16, 2025 at 9:00 AM</p>
+                                        <p class="text-sm text-[#8b7355] mt-1" th:text="${order.status.toLowerCase() == 'pending' ? 'Pending' : 'Completed'}">Completed</p>
                                         <p class="text-sm text-[#8b7355]">Preparing items for shipment</p>
                                     </div>
                                 </div>
 
-                                <!-- Shipped - Pending -->
-                                <div class="timeline-step pending" id="step-shipped">
+                                <!-- Shipped - Pending/Current/Completed -->
+                                <div class="timeline-step" id="step-shipped" th:classappend="${order.status.toLowerCase() == 'delivered' ? 'completed' : (order.status.toLowerCase() == 'shipped' ? 'current' : 'pending')}">
                                     <div class="timeline-icon">
                                         <i class="fas fa-shipping-fast"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Shipped</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">Pending</p>
+                                        <p class="text-sm text-[#8b7355] mt-1" th:text="${order.status.toLowerCase() == 'shipped' || order.status.toLowerCase() == 'delivered' ? 'Completed' : 'Pending'}">Pending</p>
                                         <p class="text-sm text-[#8b7355]">Awaiting dispatch</p>
                                         <div id="shipped-inputs" class="hidden mt-3 space-y-2">
                                             <div class="flex items-center gap-2">
@@ -477,14 +477,14 @@
                                     </div>
                                 </div>
 
-                                <!-- Delivered - Pending -->
-                                <div class="timeline-step pending" id="step-delivered">
+                                <!-- Delivered - Pending/Current/Completed -->
+                                <div class="timeline-step" id="step-delivered" th:classappend="${order.status.toLowerCase() == 'delivered' ? 'completed' : 'pending'}">
                                     <div class="timeline-icon">
                                         <i class="fas fa-home"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-[#5c4a3d]">Delivered</h4>
-                                        <p class="text-sm text-[#8b7355] mt-1">Pending</p>
+                                        <p class="text-sm text-[#8b7355] mt-1" th:text="${order.status.toLowerCase() == 'delivered' ? 'Completed' : 'Pending'}">Pending</p>
                                         <p class="text-sm text-[#8b7355]">Awaiting delivery confirmation</p>
                                         <div id="delivered-inputs" class="hidden mt-3 space-y-2">
                                             <div class="flex items-center gap-2">
@@ -557,11 +557,11 @@
                         <div class="p-6">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-[#8b7355] mb-2">Current Status</label>
-                                <select id="orderStatus" class="w-full border border-[#e5e0d8] rounded-lg px-4 py-2.5 text-[#5c4a3d] focus:outline-none focus:border-[#c17c5f]">
-                                    <option value="pending" selected>Pending</option>
-                                    <option value="processing">Processing</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
+                                <select id="orderStatus" class="w-full border border-[#e5e0d8] rounded-lg px-4 py-2.5 text-[#5c4a3d] focus:outline-none focus:border-[#c17c5f]" th:if="${order != null}">
+                                    <option value="pending" th:selected="${order.status.toLowerCase() == 'pending'}">Pending</option>
+                                    <option value="processing" th:selected="${order.status.toLowerCase() == 'processing'}">Processing</option>
+                                    <option value="shipped" th:selected="${order.status.toLowerCase() == 'shipped'}">Shipped</option>
+                                    <option value="delivered" th:selected="${order.status.toLowerCase() == 'delivered'}">Delivered</option>
                                 </select>
                             </div>
                             <button id="updateStatusBtn" onclick="updateOrderStatus()" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white font-medium py-2.5 rounded-lg transition-colors">
@@ -724,9 +724,13 @@
     <script>
         /* Sidebar active state handled by dynamic script below */
 
-        // Validate phone number on page load
+        // Validate phone number and initialize timeline inputs on page load
         document.addEventListener('DOMContentLoaded', function() {
             validatePhoneNumber();
+            const orderStatusSelect = document.getElementById('orderStatus');
+            if (orderStatusSelect) {
+                updateTimelineInputs(orderStatusSelect.value);
+            }
         });
 
         // Validate Bahraini phone number format
@@ -747,30 +751,66 @@
         // Update order status
         function updateOrderStatus() {
             const btn = document.getElementById('updateStatusBtn');
-            const status = document.getElementById('orderStatus').value;
+            const statusSelect = document.getElementById('orderStatus');
+            if (!btn || !statusSelect) return;
+            const status = statusSelect.value;
+
+            // Get orderId from query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            if (!orderId) {
+                showNotification('Order ID not found in URL.', 'error');
+                return;
+            }
 
             // Disable button to prevent double-click
             btn.disabled = true;
             btn.classList.add('btn-disabled');
             btn.textContent = 'Updating...';
 
-            // Simulate API call
-            setTimeout(() => {
+            fetch(`/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => {
                 btn.disabled = false;
                 btn.classList.remove('btn-disabled');
                 btn.textContent = 'Update Status';
 
-                showNotification(`Order status updated to ${status.charAt(0).toUpperCase() + status.slice(1)}`, 'success');
-
-                // Show relevant input fields based on status
-                updateTimelineInputs(status);
-            }, 1000);
+                if (res.ok) {
+                    showNotification(`Order status updated to ${status.charAt(0).toUpperCase() + status.slice(1)}`, 'success');
+                    // Show relevant input fields based on status
+                    updateTimelineInputs(status);
+                    
+                    // Reload after a short delay to sync timeline/UI with the server
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showNotification('Failed to update order status', 'error');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.textContent = 'Update Status';
+                console.error(err);
+                showNotification('Network error occurred', 'error');
+            });
         }
 
         // Update timeline inputs based on status
         function updateTimelineInputs(status) {
             const shippedInputs = document.getElementById('shipped-inputs');
             const deliveredInputs = document.getElementById('delivered-inputs');
+            if (!shippedInputs || !deliveredInputs) return;
+
+            // Hide them by default
+            shippedInputs.classList.add('hidden');
+            deliveredInputs.classList.add('hidden');
 
             if (status === 'shipped') {
                 shippedInputs.classList.remove('hidden');
