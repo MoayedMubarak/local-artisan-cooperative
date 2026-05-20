@@ -309,12 +309,15 @@ function startCountdowns() {
 
 function tickCountdowns() {
     document.querySelectorAll('.countdown').forEach(el => {
+        const card = el.closest('.auction-card');
+        if (card && card.classList.contains('refreshing')) return;
+
         let hours   = parseInt(el.dataset.hours,   10);
         let minutes = parseInt(el.dataset.minutes, 10);
         let seconds = parseInt(el.dataset.seconds, 10);
 
-        if (hours === 0 && minutes === 0 && seconds === 0) {
-            markAuctionEnded(el);
+        if (hours <= 0 && minutes <= 0 && seconds <= 0) {
+            if (card) refreshAuctionCard(card);
             return;
         }
 
@@ -362,6 +365,38 @@ function markAuctionEnded(countdownEl) {
         btn.className   = 'w-full py-2.5 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed';
         btn.disabled    = true;
     }
+}
+
+function refreshAuctionCard(card) {
+    const auctionId = card.getAttribute('data-auction-id');
+    if (!auctionId) return;
+
+    card.classList.add('refreshing');
+    
+    fetch(window.location.pathname + '?_t=' + new Date().getTime())
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newCard = doc.querySelector(`.auction-card[data-auction-id="${auctionId}"]`);
+            if (newCard) {
+                card.innerHTML = newCard.innerHTML;
+                card.setAttribute('data-auction-status', newCard.getAttribute('data-auction-status'));
+                card.className = newCard.className;
+            } else {
+                // If it wasn't found in the response, fallback to manual marking
+                markAuctionEnded(card.querySelector('.countdown') || card);
+            }
+        })
+        .catch(err => {
+            console.error("Failed to refresh card", err);
+            // Fallback
+            markAuctionEnded(card.querySelector('.countdown') || card);
+        })
+        .finally(() => {
+            card.classList.remove('refreshing');
+            if (typeof applyFilters === 'function') applyFilters();
+        });
 }
 
 // ============================================================

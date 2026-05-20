@@ -453,23 +453,30 @@
                             <span th:if="${displayStatus == 'LIVE'}" 
                                   class="inline-flex items-center px-3 py-1 bg-[#f5ebe0] text-[#c17c5f] text-sm font-semibold rounded-full">
                                 <i class="far fa-clock mr-1.5"></i>
-                                <span class="countdown" th:if="${auction.endTime != null}"
+                                <span class="countdown" data-type="live" th:if="${auction.endTime != null}"
                                       th:with="dur=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.endTime)},
                                                hrs=${dur.isNegative() ? 0 : dur.toHours()},
                                                mins=${dur.isNegative() ? 0 : dur.toMinutesPart()},
                                                secs=${dur.isNegative() ? 0 : dur.toSecondsPart()}"
                                       th:attr="data-hours=${hrs}, data-minutes=${mins}, data-seconds=${secs}"
-                                      th:text="${hrs} + 'h ' + ${mins} + 'm'">
-                                    2h 34m
+                                      th:text="${hrs} + 'h ' + ${mins} + 'm ' + ${secs} + 's'">
+                                    2h 34m 10s
                                 </span>
                             </span>
 
                             <!-- Starts in for Upcoming -->
                             <span th:if="${displayStatus == 'UPCOMING'}" 
-                                  class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full">
+                                  class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded-full time-status-badge">
                                 <i class="far fa-calendar mr-1.5"></i>
-                                <span th:if="${auction.startTime != null}"
-                                      th:text="'Starts in ' + ${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + 'd'">Starts in 1d</span>
+                                <span class="countdown" data-type="upcoming" th:if="${auction.startTime != null}"
+                                      th:with="dur=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime)},
+                                               hrs=${dur.isNegative() ? 0 : dur.toHours()},
+                                               mins=${dur.isNegative() ? 0 : dur.toMinutesPart()},
+                                               secs=${dur.isNegative() ? 0 : dur.toSecondsPart()}"
+                                      th:attr="data-hours=${hrs}, data-minutes=${mins}, data-seconds=${secs}"
+                                      th:text="'Starts in ' + ${hrs} + 'h ' + ${mins} + 'm ' + ${secs} + 's'">
+                                    Starts in 1d 2h 3m 4s
+                                </span>
                                 <span th:if="${auction.startTime == null}">Upcoming</span>
                             </span>
 

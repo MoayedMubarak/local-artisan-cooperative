@@ -137,7 +137,11 @@ public class ProductApiController {
                 String startTimeStr = (String) payload.get("startTime");
                 if (startTimeStr != null && !startTimeStr.isBlank()) {
                     try {
-                        start = java.time.LocalDateTime.parse(startTimeStr);
+                        if (startTimeStr.endsWith("Z")) {
+                            start = java.time.Instant.parse(startTimeStr).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
+                        } else {
+                            start = java.time.LocalDateTime.parse(startTimeStr);
+                        }
                     } catch (Exception ex) {}
                 }
                 auction.setStartTime(start);
@@ -146,7 +150,11 @@ public class ProductApiController {
                 String endTimeStr = (String) payload.get("endTime");
                 if (endTimeStr != null && !endTimeStr.isBlank()) {
                     try {
-                        end = java.time.LocalDateTime.parse(endTimeStr);
+                        if (endTimeStr.endsWith("Z")) {
+                            end = java.time.Instant.parse(endTimeStr).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
+                        } else {
+                            end = java.time.LocalDateTime.parse(endTimeStr);
+                        }
                     } catch (Exception ex) {}
                 }
                 auction.setEndTime(end);

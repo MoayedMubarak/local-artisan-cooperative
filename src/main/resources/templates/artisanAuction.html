@@ -643,18 +643,21 @@
             const price = parseInt(document.getElementById('auction-starting-bid').value); // integer price
             const imageUrl = document.getElementById('auction-image-url').value.trim();
             const description = document.getElementById('auction-description').value.trim();
-            const startTime = document.getElementById('auction-starttime').value;
-            const endTime = document.getElementById('auction-endtime').value;
+            const startTimeInput = document.getElementById('auction-starttime').value;
+            const endTimeInput = document.getElementById('auction-endtime').value;
 
             if (isNaN(price) || price <= 0) {
                 alert('Please enter a valid starting price.');
                 return;
             }
 
-            if (!startTime || !endTime) {
+            if (!startTimeInput || !endTimeInput) {
                 alert('Please specify both start and end times for the auction.');
                 return;
             }
+            
+            const startTime = new Date(startTimeInput).toISOString();
+            const endTime = new Date(endTimeInput).toISOString();
 
             const payload = {
                 artisanEmail: email,
