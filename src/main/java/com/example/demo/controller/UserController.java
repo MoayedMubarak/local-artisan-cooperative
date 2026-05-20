@@ -98,21 +98,57 @@ public class UserController {
         return ResponseEntity.status(404).body(Map.of("success", false, "message", "Artisan not found"));
     }
 
-    @PostMapping("/update-shop-banner")
-    public ResponseEntity<?> updateShopBanner(@RequestBody Map<String, String> payload) {
+    @PostMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
-        String bannerUrl = payload.get("bannerUrl");
-
-        Optional<Artisan> artisanOpt = artisanRepository.findByEmail(email);
-        if (artisanOpt.isPresent()) {
-            Artisan artisan = artisanOpt.get();
-            if (!"active".equalsIgnoreCase(artisan.getStatus())) {
-                return ResponseEntity.status(403).body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+        String name = payload.get("name");
+        String phone = payload.get("phone");
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (!"active".equalsIgnoreCase(user.getStatus())) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "Account is not active."));
             }
-            artisan.setShopBanner(bannerUrl);
-            artisanRepository.save(artisan);
-            return ResponseEntity.ok(Map.of("success", true, "user", artisan));
+            if (name != null) user.setName(name);
+            if (phone != null) user.setPhone(phone);
+            // Email change handling: ensure uniqueness
+            if (email != null && !email.equals(user.getEmail())) {
+                if (userRepository.findByEmail(email).isPresent()) {
+                    return ResponseEntity.status(400).body(Map.of("success", false, "message", "Email already in use."));
+                }
+                user.setEmail(email);
+            }
+            userRepository.save(user);
+            // Return updated user (including role-specific data)
+            if (user instanceof Customer) {
+                return customerRepository.findByEmail(user.getEmail())
+                        .map(c -> ResponseEntity.ok(Map.of("success", true, "user", c)))
+                        .orElse(ResponseEntity.ok(Map.of("success", true, "user", user)));
+            }
+            if (user instanceof Artisan || "ARTISAN".equalsIgnoreCase(user.getRole())) {
+                return artisanRepository.findByEmail(user.getEmail())
+                        .map(a -> ResponseEntity.ok(Map.of("success", true, "user", a)))
+                        .orElse(ResponseEntity.ok(Map.of("success", true, "user", user)));
+            }
+            return ResponseEntity.ok(Map.of("success", true, "user", user));
         }
-        return ResponseEntity.status(404).body(Map.of("success", false, "message", "Artisan not found"));
+        return ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found"));
     }
+
+@PostMapping("/update-shop-banner")
+public ResponseEntity<?> updateShopBanner(@RequestBody Map<String, String> payload) {
+    String email = payload.get("email");
+    String bannerUrl = payload.get("bannerUrl");
+    Optional<Artisan> artisanOpt = artisanRepository.findByEmail(email);
+    if (artisanOpt.isPresent()) {
+        Artisan artisan = artisanOpt.get();
+        if (!"active".equalsIgnoreCase(artisan.getStatus())) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "Your artisan account is not active. Access denied."));
+        }
+        artisan.setShopBanner(bannerUrl);
+        artisanRepository.save(artisan);
+        return ResponseEntity.ok(Map.of("success", true, "user", artisan));
+    }
+    return ResponseEntity.status(404).body(Map.of("success", false, "message", "Artisan not found"));
+}
 }

@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "customers")
 public class Customer extends User {
     private String address;
-    private String phone;
+// duplicate phone removed
 
     @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer totalOrders = 0;

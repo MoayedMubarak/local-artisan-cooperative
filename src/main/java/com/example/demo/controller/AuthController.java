@@ -157,4 +157,42 @@ public class AuthController {
         }
         return ResponseEntity.ok(Map.of("success", true)); // Still return success to allow frontend logout to proceed
     }
+
+    @PostMapping("/change-password")
+    @Transactional
+    public ResponseEntity<?> changePassword(@RequestBody java.util.Map<String, Object> payload) {
+        String email = (String) payload.get("email");
+        String oldPassword = (String) payload.get("oldPassword");
+        String newPassword = (String) payload.get("newPassword");
+        if (email == null || oldPassword == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Missing required fields"));
+        }
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "User not found"));
+        }
+        User user = userOpt.get();
+        String stored = user.getPassword();
+        boolean match = false;
+        if (stored != null && (stored.startsWith("$2a$") || stored.startsWith("$2b$") || stored.startsWith("$2y$"))) {
+            try {
+                match = BCrypt.checkpw(oldPassword, stored);
+            } catch (Exception e) {
+                match = false;
+            }
+        } else {
+            match = oldPassword.equals(stored);
+        }
+        if (!match) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Current password is incorrect"));
+        }
+        if (newPassword.length() < 6) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "New password must be at least 6 characters"));
+        }
+        user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Password updated"));
+    }
 }
+    
+

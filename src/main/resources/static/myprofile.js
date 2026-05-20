@@ -243,20 +243,42 @@ window.setRole = function (role) {
 // ============================================================
 
 window.savePersonalInfo = function () {
-    const section = document.querySelector('section:first-of-type');
-    const inputs  = section?.querySelectorAll('input');
-    let   valid   = true;
+    // Collect form data
+    const name = document.querySelector('input[type="text"]').value.trim();
+    const phone = document.querySelector('input[type="tel"]').value.trim();
+    const email = sessionStorage.getItem('userEmail') || '';
+    // Prepare payload
+    const payload = { name, email, phone };
 
-    inputs?.forEach(input => {
-        if (!input.value.trim()) { valid = false; }
-    });
+    // Send request to backend
+    console.log('Saving personal info payload:', payload);
+    fetch('/api/user/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(r => {
+            if (!r.ok) {
+                return r.text().then(txt => Promise.reject(new Error(txt)));
+            }
+            return r.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showToast('Personal information saved successfully!', 'success');
+                if (data.user) {
+                    sessionStorage.setItem('userProfile', JSON.stringify(data.user));
+                    renderProfileData(data.user);
+                }
+            } else {
+                showToast(data.message || 'Failed to save personal information.', 'error');
+            }
+        })
 
-    if (!valid) {
-        showToast('Please fill in all required fields.', 'error');
-        return;
-    }
-
-    showToast('Personal information saved successfully!', 'success');
+        .catch(err => {
+            console.error('Save personal info error:', err);
+            showToast('Error saving personal information.', 'error');
+        });
 };
 
 // ============================================================
@@ -264,30 +286,47 @@ window.savePersonalInfo = function () {
 // ============================================================
 
 window.updatePassword = function () {
-    const security = document.querySelectorAll('section')[1];
-    const pwds     = security?.querySelectorAll('input[type="password"]');
-    if (!pwds || pwds.length < 3) return;
+    // Collect password fields
+    const currentPwd = document.querySelector('section:nth-of-type(2) input[type="password"]:nth-of-type(1)').value;
+    const newPwd = document.querySelector('section:nth-of-type(2) input[type="password"]:nth-of-type(2)').value;
+    const confirmPwd = document.querySelector('section:nth-of-type(2) input[type="password"]:nth-of-type(3)').value;
 
-    const [current, newPwd, confirm] = pwds;
-
-    if (!current.value) {
+    if (!currentPwd) {
         showToast('Please enter your current password.', 'error');
-        current.focus();
         return;
     }
-    if (newPwd.value.length < 8) {
+    if (newPwd.length < 8) {
         showToast('New password must be at least 8 characters.', 'error');
-        newPwd.focus();
         return;
     }
-    if (newPwd.value !== confirm.value) {
+    if (newPwd !== confirmPwd) {
         showToast('New passwords do not match.', 'error');
-        confirm.focus();
         return;
     }
 
-    showToast('Password updated successfully!', 'success');
-    [current, newPwd, confirm].forEach(i => i.value = '');
+    const payload = {
+        email: sessionStorage.getItem('userEmail'),
+        oldPassword: currentPwd,
+        newPassword: newPwd
+    };
+
+    fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Password updated successfully!', 'success');
+                // Clear fields
+                document.querySelectorAll('section:nth-of-type(2) input[type="password"]').forEach(i => i.value = '');
+            } else {
+                showToast(data.message || 'Failed to update password.', 'error');
+            }
+        })
+        .catch(() => showToast('Error updating password.', 'error'));
+
 };
 
 // ============================================================

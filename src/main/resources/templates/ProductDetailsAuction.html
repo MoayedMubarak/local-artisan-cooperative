@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,10 @@
             background-color: #faf9f6;
         }
 
-        h1, h2, h3, h4 {
+        h1,
+        h2,
+        h3,
+        h4 {
             font-family: 'Playfair Display', serif;
         }
 
@@ -60,7 +64,8 @@
             opacity: 0.7;
         }
 
-        .thumbnail:hover, .thumbnail.active {
+        .thumbnail:hover,
+        .thumbnail.active {
             opacity: 1;
             transform: scale(1.05);
             border-color: #c17c5f;
@@ -79,10 +84,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
                 transform: scale(1);
             }
+
             50% {
                 opacity: 0.9;
                 transform: scale(1.02);
@@ -153,10 +161,9 @@
             border-radius: 50%;
             background-color: #c17c5f;
         }
-
-
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col">
     <!-- Navigation Bar -->
     <nav class="bg-[#faf9f6] border-b border-[#e5e0d8] py-4 px-6 sticky top-0 z-50">
@@ -166,7 +173,8 @@
                 <a href="/" class="flex items-center gap-3 group">
                     <img src="/images/Logo.png" alt="ArtsyVibe Logo" class="h-10 w-auto object-contain shrink-0"
                         style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
-                    <span class="text-xl sm:text-2xl font-semibold whitespace-nowrap truncate max-w-[10rem] sm:max-w-none"
+                    <span
+                        class="text-xl sm:text-2xl font-semibold whitespace-nowrap truncate max-w-[10rem] sm:max-w-none"
                         style="font-family: 'Playfair Display', serif;">
                         ArtsyVibe
                     </span>
@@ -175,11 +183,11 @@
 
             <!-- Center links -->
             <div class="hidden md:flex flex-1 min-w-0 items-center justify-center gap-6 lg:gap-8 px-2">
-                <a href="/" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium whitespace-nowrap shrink-0">Home</a>
+                <a href="/"
+                    class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium whitespace-nowrap shrink-0">Home</a>
                 <a href="/products"
                     class="text-[#8b7355] hover:text-[#c17c5f] transition-colors font-medium whitespace-nowrap shrink-0">Products</a>
-                <a href="/auctions"
-                    class="text-[#c17c5f] font-semibold whitespace-nowrap shrink-0">Auctions</a>
+                <a href="/auctions" class="text-[#c17c5f] font-semibold whitespace-nowrap shrink-0">Auctions</a>
             </div>
 
             <!-- Actions -->
@@ -208,7 +216,8 @@
                     </a>
                 </div>
 
-                <a id="cart-link" href="/cart" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative shrink-0">
+                <a id="cart-link" href="/cart"
+                    class="text-[#8b7355] hover:text-[#c17c5f] transition-colors relative shrink-0">
                     <i class="fas fa-shopping-cart text-xl"></i>
                     <span id="cart-badge"
                         class="absolute -top-2 -right-2 bg-[#c17c5f] text-white text-xs rounded-full w-5 h-5 items-center justify-center"
@@ -230,9 +239,12 @@
                     <li><span>/</span></li>
                     <li><a href="/auctions" class="hover:text-[#c17c5f] transition-colors">Auctions</a></li>
                     <li><span>/</span></li>
-                    <li><a href="/auctions" class="hover:text-[#c17c5f] transition-colors" th:text="${auction.product.productCategory != null ? auction.product.productCategory.name : auction.product.category}">Jewelry</a></li>
+                    <li><a href="/auctions" class="hover:text-[#c17c5f] transition-colors"
+                            th:text="${auction.product.productCategory != null ? auction.product.productCategory.name : auction.product.category}">Jewelry</a>
+                    </li>
                     <li><span>/</span></li>
-                    <li class="text-[#5c4a3d] font-medium" th:text="${auction.product.title}">Silver Moonstone Necklace</li>
+                    <li class="text-[#5c4a3d] font-medium" th:text="${auction.product.title}">Silver Moonstone Necklace
+                    </li>
                 </ol>
             </nav>
 
@@ -243,46 +255,42 @@
                     <div>
                         <!-- Main Image with Auction Badge -->
                         <div class="mb-4 relative">
-                            <img id="mainImage" th:src="${auction.product.imageUrl}" th:alt="${auction.product.title}" class="w-full h-96 object-cover rounded-xl">
-                            <div class="absolute top-4 left-4 auction-badge-large bg-[#c17c5f] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                                <i class="fas fa-gavel mr-2"></i><span th:text="${displayStatus == 'LIVE' ? 'Live Auction' : (displayStatus == 'UPCOMING' ? 'Upcoming' : 'Ended')}">Live Auction</span>
+                            <img id="mainImage" th:src="${auction.product.imageUrl}" th:alt="${auction.product.title}"
+                                class="w-full h-96 object-cover rounded-xl">
+                            <div
+                                class="absolute top-4 left-4 auction-badge-large bg-[#c17c5f] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                                <i class="fas fa-gavel mr-2"></i><span
+                                    th:text="${displayStatus == 'LIVE' ? 'Live Auction' : (displayStatus == 'UPCOMING' ? 'Upcoming' : 'Ended')}">Live
+                                    Auction</span>
                             </div>
                         </div>
 
                         <!-- Thumbnails (Using same image for now as placeholder for dynamic thumbnails) -->
                         <div class="flex gap-3">
-                            <img th:src="${auction.product.imageUrl}" alt="Main Thumbnail" class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8] active" onclick="changeImage(this)">
+                            <img th:src="${auction.product.imageUrl}" alt="Main Thumbnail"
+                                class="thumbnail w-20 h-20 object-cover rounded-lg border-2 border-[#e5e0d8] active"
+                                onclick="changeImage(this)">
                         </div>
                     </div>
 
                     <!-- Right: Product Info & Bid Panel -->
                     <div>
                         <!-- Category Badge -->
-                        <span class="inline-block bg-[#f5ebe0] text-[#c17c5f] px-3 py-1 rounded-full text-sm font-medium mb-4" 
-                              th:text="${auction.product.productCategory != null ? auction.product.productCategory.name : auction.product.category}">
+                        <span
+                            class="inline-block bg-[#f5ebe0] text-[#c17c5f] px-3 py-1 rounded-full text-sm font-medium mb-4"
+                            th:text="${auction.product.productCategory != null ? auction.product.productCategory.name : auction.product.category}">
                             Jewelry
                         </span>
 
                         <!-- Product Name -->
-                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2" th:text="${auction.product.title}">Silver Moonstone Necklace</h1>
+                        <h1 class="text-3xl md:text-4xl font-bold text-[#5c4a3d] mb-2"
+                            th:text="${auction.product.title}">Silver Moonstone Necklace</h1>
 
                         <!-- Artisan Name -->
-                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block" th:text="'by ' + ${auction.product.artisanName}">
+                        <a href="#" class="text-[#8b7355] hover:text-[#c17c5f] transition-colors mb-4 block"
+                            th:text="'by ' + ${auction.product.artisanName}">
                             by Marcus Chen
                         </a>
-
-                        <!-- Star Rating (Placeholder dynamic) -->
-                        <div class="flex items-center mb-6">
-                            <div class="flex mr-3">
-                                <i class="fas fa-star star-filled"></i>
-                                <i class="fas fa-star star-filled"></i>
-                                <i class="fas fa-star star-filled"></i>
-                                <i class="fas fa-star star-filled"></i>
-                                <i class="fas fa-star star-filled"></i>
-                            </div>
-                            <span class="text-[#5c4a3d] font-medium">5.0</span>
-                            <span class="text-[#8b7355] ml-2">(18 reviews)</span>
-                        </div>
 
                         <!-- Description -->
                         <div class="mb-6">
@@ -293,7 +301,8 @@
                         </div>
 
                         <!-- Place a Bid Panel -->
-                        <div class="bg-gradient-to-br from-[#f5ebe0] to-[#ede3d5] rounded-xl p-6 border-2 border-[#c17c5f]">
+                        <div
+                            class="bg-gradient-to-br from-[#f5ebe0] to-[#ede3d5] rounded-xl p-6 border-2 border-[#c17c5f]">
                             <div class="flex items-center mb-4">
                                 <i class="fas fa-gavel text-2xl text-[#c17c5f] mr-3"></i>
                                 <h3 class="text-xl font-bold text-[#5c4a3d]">Place a Bid</h3>
@@ -303,19 +312,23 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
                                     <p class="text-sm text-[#8b7355] mb-1">Current Bid</p>
-                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] break-words break-all max-w-full" id="current-bid-display" th:text="${#numbers.formatDecimal(auction.currentHighestBid, 0, 0)} + ' BD'">120.00 BD</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-[#c17c5f] break-words break-all max-w-full"
+                                        id="current-bid-display"
+                                        th:text="${#numbers.formatDecimal(auction.currentHighestBid, 0, 0)} + ' BD'">
+                                        120.00 BD</p>
                                 </div>
                                 <div class="bg-white rounded-lg p-4 min-w-0 overflow-hidden">
                                     <p class="text-sm text-[#8b7355] mb-1 whitespace-nowrap">Highest Bidder</p>
-                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name" th:text="${auction.highestBidderName != null ? auction.highestBidderName : 'No bids yet'}">Jennifer M.</p>
+                                    <p class="text-lg font-semibold text-[#5c4a3d] truncate" id="highest-bidder-name"
+                                        th:text="${auction.highestBidderName != null ? auction.highestBidderName : 'No bids yet'}">
+                                        Jennifer M.</p>
                                 </div>
                             </div>
 
                             <!-- Countdown Timer -->
                             <div class="bg-white rounded-lg p-4 mb-6" th:if="${displayStatus == 'LIVE'}">
                                 <p class="text-sm text-[#8b7355] mb-3">Auction Ends In</p>
-                                <div class="flex gap-3" id="countdown" 
-                                     th:attr="data-end-time=${auction.endTime}">
+                                <div class="flex gap-3" id="countdown" th:attr="data-end-time=${auction.endTime}">
                                     <div class="countdown-digit text-white rounded-lg p-3 text-center flex-1">
                                         <span class="text-2xl font-bold" id="hours">--</span>
                                         <span class="text-xs block">Hours</span>
@@ -329,20 +342,28 @@
                                         <span class="text-xs block">Seconds</span>
                                     </div>
                                 </div>
-                                <p class="text-xs text-[#8b7355] mt-2 text-center" th:text="'Ends: ' + ${#temporals.format(auction.endTime, 'MMMM dd, yyyy HH:mm')}">Ends: March 25, 2024 at 8:00 PM EST</p>
+                                <p class="text-xs text-[#8b7355] mt-2 text-center"
+                                    th:text="'Ends: ' + ${#temporals.format(auction.endTime, 'MMMM dd, yyyy HH:mm')}">
+                                    Ends: March 25, 2024 at 8:00 PM EST</p>
                             </div>
 
                             <!-- Upcoming Info -->
                             <div class="bg-white rounded-lg p-4 mb-6" th:if="${displayStatus == 'UPCOMING'}">
                                 <p class="text-sm text-[#8b7355] mb-1">Starts In</p>
-                                <p class="text-lg font-bold text-blue-600" th:text="${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + ' days'"></p>
-                                <p class="text-xs text-[#8b7355] mt-2 text-center" th:text="'Starts: ' + ${#temporals.format(auction.startTime, 'MMMM dd, yyyy HH:mm')}">Starts soon</p>
+                                <p class="text-lg font-bold text-blue-600"
+                                    th:text="${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), auction.startTime).toDays()} + ' days'">
+                                </p>
+                                <p class="text-xs text-[#8b7355] mt-2 text-center"
+                                    th:text="'Starts: ' + ${#temporals.format(auction.startTime, 'MMMM dd, yyyy HH:mm')}">
+                                    Starts soon</p>
                             </div>
 
                             <!-- Ended Info -->
                             <div class="bg-white rounded-lg p-4 mb-6" th:if="${displayStatus == 'ENDED'}">
                                 <p class="text-lg font-bold text-gray-500 text-center">AUCTION ENDED</p>
-                                <p class="text-xs text-[#8b7355] mt-2 text-center" th:text="'Ended: ' + ${#temporals.format(auction.endTime, 'MMMM dd, yyyy HH:mm')}">Ended</p>
+                                <p class="text-xs text-[#8b7355] mt-2 text-center"
+                                    th:text="'Ended: ' + ${#temporals.format(auction.endTime, 'MMMM dd, yyyy HH:mm')}">
+                                    Ended</p>
                             </div>
 
                             <!-- Bid Form -->
@@ -351,46 +372,49 @@
                                 <div>
                                     <label class="block text-sm font-medium text-[#5c4a3d] mb-2">Your Bid (BD)</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></span>
-                                        <input 
-                                            type="number" 
-                                            th:min="${@auctionService.computeMinNextBid(auction)}"
-                                            step="1"
-                                            placeholder="Min bid (whole BD)" 
+                                        <span
+                                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></span>
+                                        <input type="number" th:min="${@auctionService.computeMinNextBid(auction)}"
+                                            step="1" placeholder="Min bid (whole BD)"
                                             class="w-full pl-4 pr-12 py-3 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] font-semibold"
-                                            id="bidAmount"
-                                        />
-                                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] font-medium pointer-events-none">BD</span>
+                                            id="bidAmount" />
+                                        <span
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] font-medium pointer-events-none">BD</span>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-[#5c4a3d] mb-2">Your Name</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Enter your name" 
+                                    <input type="text" placeholder="Enter your name"
                                         class="w-full px-4 py-3 rounded-lg border border-[#e5e0d8] focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d]"
-                                        id="bidderName"
-                                    />
+                                        id="bidderName" />
                                 </div>
 
-                                <button type="submit" id="bid-submit-btn" class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg flex items-center justify-center">
+                                <button type="submit" id="bid-submit-btn"
+                                    class="w-full bg-[#c17c5f] hover:bg-[#a5664d] text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg flex items-center justify-center">
                                     <i class="fas fa-gavel mr-2"></i>Place Bid
                                 </button>
 
                                 <p class="text-xs text-[#8b7355] text-center">
-                                    <i class="fas fa-info-circle mr-1"></i>Bids must be whole BD amounts and at least 1 BD above the current bid. No fils allowed.
+                                    <i class="fas fa-info-circle mr-1"></i>Bids must be whole BD amounts and at least 1
+                                    BD above the current bid. No fils allowed.
                                 </p>
 
-                                <button type="button" id="back-to-auctions" class="w-full mt-2 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center justify-center" onclick="window.location.href='/auctions'">
+                                <button type="button" id="back-to-auctions"
+                                    class="w-full mt-2 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                                    onclick="window.location.href='/auctions'">
                                     <i class="fas fa-arrow-left mr-2"></i>Back to Auctions
                                 </button>
                             </form>
                             <div th:if="${displayStatus != 'LIVE'}" class="space-y-4">
-                                <button type="button" class="w-full bg-gray-200 text-gray-500 px-6 py-3 rounded-lg font-semibold cursor-not-allowed" disabled>
+                                <button type="button"
+                                    class="w-full bg-gray-200 text-gray-500 px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
+                                    disabled>
                                     Bidding Closed
                                 </button>
-                                <button type="button" id="back-to-auctions-2" class="w-full mt-2 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center justify-center" onclick="window.location.href='/auctions'">
+                                <button type="button" id="back-to-auctions-2"
+                                    class="w-full mt-2 border-2 border-[#c17c5f] text-[#c17c5f] hover:bg-[#c17c5f] hover:text-white px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                                    onclick="window.location.href='/auctions'">
                                     <i class="fas fa-arrow-left mr-2"></i>Back to Auctions
                                 </button>
                             </div>
@@ -417,4 +441,5 @@
 
     </script>
 </body>
+
 </html>
