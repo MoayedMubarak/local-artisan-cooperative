@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,32 +58,32 @@
             transition: background-color 0.2s ease, color 0.2s ease;
             color: #d4c5b5;
         }
-        
+
         .sidebar-link:hover {
             background-color: rgba(255, 255, 255, 0.18);
             color: #ffffff;
         }
-        
+
         .sidebar-link:hover i,
         .sidebar-link:hover span {
             color: #ffffff;
         }
-        
+
         .sidebar-link.active {
             background-color: rgba(255, 255, 255, 0.25);
             border-left: 3px solid #ffffff;
             color: #ffffff;
         }
-        
+
         .sidebar-link.active i,
         .sidebar-link.active span {
             color: #ffffff;
         }
-        
+
         .user-menu {
             position: relative;
         }
-        
+
         .user-menu-dropdown {
             position: absolute;
             right: 0;
@@ -96,11 +96,11 @@
             display: none;
             z-index: 50;
         }
-        
+
         .user-menu-dropdown.show {
             display: block;
         }
-        
+
         .user-menu-item {
             display: block;
             padding: 0.85rem 1rem;
@@ -110,20 +110,20 @@
             border-radius: 0.75rem;
             transition: background-color 0.2s ease, color 0.2s ease;
         }
-        
+
         .user-menu-item:hover {
             background-color: #f5ebe0;
         }
-        
+
         .user-menu-item.logout:hover {
             color: #b91c1c;
             background-color: #fee2e2;
         }
-        
+
         .chevron-icon {
             transition: transform 0.3s ease;
         }
-        
+
         .chevron-icon.rotated {
             transform: rotate(180deg);
         }
@@ -207,7 +207,7 @@
                     <img src="/images/Logo.png" alt="ArtsyVibe Logo"
                         class="h-10 w-auto object-contain"
                         style="filter: drop-shadow(0 0 0.5px rgba(193, 124, 95, 1));">
-                    
+
                     <!-- Brand Name -->
                     <span class="text-2xl font-semibold" 
                         style="font-family: 'Playfair Display', serif;">
@@ -215,7 +215,7 @@
                     </span>
                 </a>
             </div>
-            
+
             <!-- Right Side - Notifications and User -->
             <div class="flex items-center space-x-4">
                  <!-- Notification Bell -->
@@ -223,7 +223,7 @@
                     <i class="fas fa-bell text-xl"></i>
                     <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-[#faf9f6] text-white text-xs flex items-center justify-center font-semibold">5</span>
                 </button></a>
-                
+
                 <!-- User Profile -->
                 <div class="user-menu flex items-center space-x-3 pl-4 border-l border-[#e5e0d8]">
                     <button id="userMenuButton" type="button" class="flex items-center gap-3 text-left focus:outline-none">
@@ -266,7 +266,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Navigation Menu -->
             <nav class="p-4 mt-4">
                 <ul class="space-y-1">
@@ -326,7 +326,7 @@
                     </li>
                 </ul>
             </nav>
-            
+
             <!-- Systems Log Section -->
             <div class="p-4 mt-2 border-t border-[#7a6655]">
                 <ul class="space-y-1">
@@ -354,19 +354,19 @@
                     <button class="tab-button active px-5 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap flex items-center gap-2" onclick="switchTab('live')">
                         <span class="pulse-dot"></span>
                         Live Now
-                        <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+                        <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full" id="count-live">0</span>
                     </button>
                     <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap" onclick="switchTab('upcoming')">
                         Upcoming
-                        <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">5</span>
+                        <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full" id="count-upcoming">0</span>
                     </button>
                     <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap" onclick="switchTab('ended')">
                         Ended
-                        <span class="bg-gray-500 text-white text-xs px-2 py-0.5 rounded-full">28</span>
+                        <span class="bg-gray-500 text-white text-xs px-2 py-0.5 rounded-full" id="count-ended">0</span>
                     </button>
                     <button class="tab-button px-5 py-2.5 rounded-lg text-sm font-medium text-[#8b7355] whitespace-nowrap" onclick="switchTab('cancelled')">
                         Cancelled
-                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">2</span>
+                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full" id="count-cancelled">0</span>
                     </button>
                 </div>
             </div>
@@ -377,9 +377,7 @@
                     <!-- Search Input -->
                     <div class="flex-1 min-w-64">
                         <div class="relative">
-                            <input 
-                                type="text" 
-                                placeholder="Search auctions..." 
+                            <input id="searchInput" type="text" placeholder="Search auctions..." 
                                 class="w-full pl-10 pr-4 py-2.5 border border-[#e5e0d8] rounded-lg focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] placeholder-[#b8a99a]"
                             />
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b7355]"></i>
@@ -388,26 +386,18 @@
 
                     <!-- Category Filter -->
                     <div class="relative">
-                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                        <select id="categoryFilter" class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
                             <option value="">All Categories</option>
-                            <option value="ceramics">Ceramics</option>
-                            <option value="jewelry">Jewelry</option>
-                            <option value="paintings">Paintings</option>
-                            <option value="textiles">Textiles</option>
-                            <option value="woodwork">Woodwork</option>
+                            <option th:each="cat : ${categoriesList}" th:value="${cat}" th:text="${cat}"></option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
                     </div>
 
                     <!-- Artisan Filter -->
                     <div class="relative">
-                        <select class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
+                        <select id="artisanFilter" class="appearance-none border border-[#e5e0d8] rounded-lg px-4 py-2.5 pr-10 focus:border-[#c17c5f] focus:outline-none text-[#5c4a3d] bg-white cursor-pointer">
                             <option value="">All Artisans</option>
-                            <option value="elena">Elena Rodriguez</option>
-                            <option value="marcus">Marcus Chen</option>
-                            <option value="sarah">Sarah Mitchell</option>
-                            <option value="anna">Anna Kowalski</option>
-                            <option value="james">James Thompson</option>
+                            <option th:each="artisan : ${artisansList}" th:value="${artisan}" th:text="${artisan}"></option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b7355] pointer-events-none"></i>
                     </div>
@@ -445,291 +435,75 @@
                                 <th class="text-left text-sm font-semibold text-[#5c4a3d] px-6 py-4">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#e5e0d8]">
-                            <!-- Row 1 - Live Auction -->
-                            <tr class="table-row-hover">
+                        <tbody class="divide-y divide-[#e5e0d8]" id="auctionsTableBody">
+                            <tr th:each="auction : ${auctionsList}" class="table-row-hover auction-row" 
+                                th:data-status="${auction.status != null ? auction.status.toLowerCase() : 'ended'}"
+                                th:data-category="${auction.product != null ? auction.product.category : ''}"
+                                th:data-artisan="${auction.product != null ? auction.product.artisanName : ''}">
                                 <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0042</span>
+                                    <span class="font-mono font-semibold text-[#5c4a3d]" th:text="'#AUC-' + ${auction.id}"></span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <img 
-                                            src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=60&h=60&fit=crop" 
-                                            alt="Silver Moonstone Necklace" 
+                                            th:if="${auction.product != null}"
+                                            th:src="${auction.product.imageUrl}" 
+                                            alt="Product" 
                                             class="w-14 h-14 rounded-lg object-cover"
+                                            onerror="this.src='/images/placeholder.png'"
                                         />
-                                        <div>
-                                            <p class="font-semibold text-[#5c4a3d]">Silver Moonstone Necklace</p>
-                                            <p class="text-xs text-[#8b7355]">SKU: JWL-NCK-089</p>
+                                        <div th:if="${auction.product != null}">
+                                            <p class="font-semibold text-[#5c4a3d]" th:text="${auction.product.title}"></p>
+                                            <p class="text-xs text-[#8b7355]" th:text="'Category: ' + ${auction.product.category}"></p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Marcus Chen" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Marcus Chen</span>
+                                        <span class="font-medium text-[#5c4a3d]" th:text="${auction.product != null ? auction.product.artisanName : '-'}"></span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">BD 100.000</span>
+                                    <span class="text-[#8b7355]" th:text="'BD ' + ${auction.startingBid}"></span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="font-bold text-green-600">BD 185.000</span>
+                                    <span class="font-bold" th:classappend="${auction.currentHighestBid > auction.startingBid ? 'text-green-600' : 'text-[#5c4a3d]'}" th:text="${auction.currentHighestBid > 0 ? 'BD ' + auction.currentHighestBid : '-'}"></span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">12 bids</span>
+                                    <span class="font-semibold text-[#5c4a3d]" th:text="${auctionBidsMap[auction.id] != null ? auctionBidsMap[auction.id] + ' bids' : '0 bids'}"></span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 18, 2025</span>
+                                    <span class="text-[#8b7355]" th:text="${auction.startTime != null ? #temporals.format(auction.startTime, 'MMM dd, yyyy') : '-'}"></span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 20, 2025</span>
+                                    <span class="text-[#8b7355]" th:text="${auction.endTime != null ? #temporals.format(auction.endTime, 'MMM dd, yyyy') : '-'}"></span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="status-badge bg-green-100 text-green-700">
-                                        <span class="pulse-dot"></span>
-                                        Live
+                                    <span th:if="${auction.status != null and auction.status.toUpperCase() == 'LIVE'}" class="status-badge bg-green-100 text-green-700">
+                                        <span class="pulse-dot"></span>Live
                                     </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="openMonitorModal(1)" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
-                                        <i class="fas fa-eye"></i>
-                                        Monitor
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Row 2 - Live Auction -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0043</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=60&h=60&fit=crop" 
-                                            alt="Abstract Oil Painting" 
-                                            class="w-14 h-14 rounded-lg object-cover"
-                                        />
-                                        <div>
-                                            <p class="font-semibold text-[#5c4a3d]">Abstract Oil Painting</p>
-                                            <p class="text-xs text-[#8b7355]">SKU: ART-OIL-042</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Sarah Mitchell" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Sarah Mitchell</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">BD 250.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-bold text-green-600">BD 420.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">23 bids</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 17, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 21, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-green-100 text-green-700">
-                                        <span class="pulse-dot"></span>
-                                        Live
+                                    <span th:if="${auction.status != null and auction.status.toUpperCase() == 'UPCOMING'}" class="status-badge bg-blue-100 text-blue-700">
+                                        <i class="fas fa-clock"></i>Upcoming
                                     </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="openMonitorModal(2)" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
-                                        <i class="fas fa-eye"></i>
-                                        Monitor
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Row 3 - Upcoming Auction -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0044</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=60&h=60&fit=crop" 
-                                            alt="Handmade Ceramic Vase" 
-                                            class="w-14 h-14 rounded-lg object-cover"
-                                        />
-                                        <div>
-                                            <p class="font-semibold text-[#5c4a3d]">Handmade Ceramic Vase</p>
-                                            <p class="text-xs text-[#8b7355]">SKU: CER-VASE-001</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Elena Rodriguez" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Elena Rodriguez</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">BD 80.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">-</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">0 bids</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 22, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 25, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-blue-100 text-blue-700">
-                                        <i class="fas fa-clock"></i>
-                                        Upcoming
+                                    <span th:if="${auction.status != null and auction.status.toUpperCase() == 'ENDED'}" class="status-badge bg-gray-100 text-gray-700">
+                                        <i class="fas fa-check-circle"></i>Ended
+                                    </span>
+                                    <span th:if="${auction.status != null and auction.status.toUpperCase() == 'CANCELLED'}" class="status-badge bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle"></i>Cancelled
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <button class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                        <button th:if="${auction.status != null and auction.status.toUpperCase() == 'LIVE'}" th:onclick="'openMonitorModal(' + ${auction.id} + ')'" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
+                                            <i class="fas fa-eye"></i> Monitor
+                                        </button>
+                                        <button th:if="${auction.status != null and auction.status.toUpperCase() == 'UPCOMING'}" class="border-2 border-red-500 text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                            Cancel
+                                        </button>
+                                        <button th:if="${auction.status != null and (auction.status.toUpperCase() == 'ENDED' or auction.status.toUpperCase() == 'CANCELLED')}" th:onclick="'openEndedModal(' + ${auction.id} + ')'" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
                                             View
                                         </button>
-                                        <button onclick="confirmCancel()" class="border-2 border-red-500 text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                            Cancel Auction
-                                        </button>
                                     </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 4 - Ended Auction -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0038</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=60&h=60&fit=crop" 
-                                            alt="Woven Wool Blanket" 
-                                            class="w-14 h-14 rounded-lg object-cover"
-                                        />
-                                        <div>
-                                            <p class="font-semibold text-[#5c4a3d]">Woven Wool Blanket</p>
-                                            <p class="text-xs text-[#8b7355]">SKU: TEX-BLK-015</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Anna Kowalski" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Anna Kowalski</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">BD 150.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-bold text-[#5c4a3d]">BD 245.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">18 bids</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 10, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 15, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-gray-100 text-gray-700">
-                                        <i class="fas fa-check-circle"></i>
-                                        Ended
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button onclick="openEndedModal(1)" class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Row 5 - Cancelled Auction -->
-                            <tr class="table-row-hover">
-                                <td class="px-6 py-4">
-                                    <span class="font-mono font-semibold text-[#5c4a3d]">#AUC-2024-0035</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1681091638141-a87495ae612f?w=60&h=60&fit=crop" 
-                                            alt="Hammered Silver Cuff" 
-                                            class="w-14 h-14 rounded-lg object-cover"
-                                        />
-                                        <div>
-                                            <p class="font-semibold text-[#5c4a3d]">Hammered Silver Cuff</p>
-                                            <p class="text-xs text-[#8b7355]">SKU: JWL-CUF-023</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-                                            alt="Maya Singh" 
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <span class="font-medium text-[#5c4a3d]">Maya Singh</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">BD 50.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">BD 75.000</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-[#5c4a3d]">5 bids</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 05, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-[#8b7355]">Mar 08, 2025</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="status-badge bg-red-100 text-red-700">
-                                        <i class="fas fa-times-circle"></i>
-                                        Cancelled
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button class="bg-[#5c4a3d] hover:bg-[#7a6655] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
-                                        View
-                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -1075,8 +849,55 @@
         // User profile logout dropdown
         /* User menu handled by adminDashboard.js */
 
+        let currentStatus = 'live';
+
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter') ? document.getElementById('categoryFilter').value.toLowerCase() : '';
+            const artisan = document.getElementById('artisanFilter') ? document.getElementById('artisanFilter').value.toLowerCase() : '';
+            const search = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
+
+            let counts = { live: 0, upcoming: 0, ended: 0, cancelled: 0 };
+
+            document.querySelectorAll('.auction-row').forEach(row => {
+                const status = row.getAttribute('data-status') || '';
+                const rowCategory = (row.getAttribute('data-category') || '').toLowerCase();
+                const rowArtisan = (row.getAttribute('data-artisan') || '').toLowerCase();
+                const rowText = row.innerText.toLowerCase();
+
+                counts[status] = (counts[status] || 0) + 1;
+
+                let match = true;
+                if (status !== currentStatus) match = false;
+                if (category && rowCategory !== category) match = false;
+                if (artisan && rowArtisan !== artisan) match = false;
+                if (search && !rowText.includes(search)) match = false;
+
+                if (match) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if(document.getElementById('count-live')) document.getElementById('count-live').innerText = counts.live || 0;
+            if(document.getElementById('count-upcoming')) document.getElementById('count-upcoming').innerText = counts.upcoming || 0;
+            if(document.getElementById('count-ended')) document.getElementById('count-ended').innerText = counts.ended || 0;
+            if(document.getElementById('count-cancelled')) document.getElementById('count-cancelled').innerText = counts.cancelled || 0;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const catFilter = document.getElementById('categoryFilter');
+            const artFilter = document.getElementById('artisanFilter');
+            const searchInput = document.getElementById('searchInput');
+            if(catFilter) catFilter.addEventListener('change', applyFilters);
+            if(artFilter) artFilter.addEventListener('change', applyFilters);
+            if(searchInput) searchInput.addEventListener('input', applyFilters);
+            applyFilters();
+        });
+
         // Tab switching
         function switchTab(tab) {
+            currentStatus = tab;
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active', 'bg-[#c17c5f]', 'text-white');
                 btn.classList.add('text-[#8b7355]');
@@ -1084,6 +905,8 @@
 
             event.target.closest('.tab-button').classList.add('active', 'bg-[#c17c5f]', 'text-white');
             event.target.closest('.tab-button').classList.remove('text-[#8b7355]');
+
+            applyFilters();
         }
 
         // Open monitor modal

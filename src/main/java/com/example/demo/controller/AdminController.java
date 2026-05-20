@@ -10,6 +10,8 @@ import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.BidRepository;
+import com.example.demo.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +46,12 @@ public class AdminController {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private BidRepository bidRepository;
+
+    @Autowired
+    private AuctionService auctionService;
+
+    @Autowired
     private com.example.demo.repository.WishlistItemRepository wishlistItemRepository;
 
     @Autowired
@@ -55,59 +63,59 @@ public class AdminController {
         long totalArtisans = artisanRepository.count();
         List<com.example.demo.model.Product> allProducts = productRepository.findAll();
         LocalDate now = LocalDate.now();
-        
+
         long activeProducts = allProducts.stream()
             .filter(p -> p.getAddingDate() != null && 
                          p.getAddingDate().getMonthValue() == now.getMonthValue() && 
                          p.getAddingDate().getYear() == now.getYear())
             .count();
-            
+
         long productsLastMonth = allProducts.stream()
             .filter(p -> p.getAddingDate() != null && 
                          p.getAddingDate().getMonthValue() == now.minusMonths(1).getMonthValue() && 
                          p.getAddingDate().getYear() == now.minusMonths(1).getYear())
             .count();
-            
+
         double productGrowth = 0;
         if (productsLastMonth > 0) {
             productGrowth = ((double) (activeProducts - productsLastMonth) / productsLastMonth) * 100;
         } else if (activeProducts > 0) {
             productGrowth = 100.0;
         }
-        
+
         List<com.example.demo.model.Auction> allAuctions = auctionRepository.findAll();
         long openAuctions = allAuctions.stream()
             .filter(a -> a.getStartTime() != null && 
                          a.getStartTime().getMonthValue() == now.getMonthValue() && 
                          a.getStartTime().getYear() == now.getYear())
             .count();
-            
+
         long auctionsLastMonth = allAuctions.stream()
             .filter(a -> a.getStartTime() != null && 
                          a.getStartTime().getMonthValue() == now.minusMonths(1).getMonthValue() && 
                          a.getStartTime().getYear() == now.minusMonths(1).getYear())
             .count();
-            
+
         double auctionGrowth = 0;
         if (auctionsLastMonth > 0) {
             auctionGrowth = ((double) (openAuctions - auctionsLastMonth) / auctionsLastMonth) * 100;
         } else if (openAuctions > 0) {
             auctionGrowth = 100.0;
         }
-        
+
         List<com.example.demo.model.Review> allReviews = reviewRepository.findAll();
         long totalReviewsThisMonth = allReviews.stream()
             .filter(r -> r.getDate() != null && 
                          r.getDate().getMonthValue() == now.getMonthValue() && 
                          r.getDate().getYear() == now.getYear())
             .count();
-            
+
         long reviewsLastMonth = allReviews.stream()
             .filter(r -> r.getDate() != null && 
                          r.getDate().getMonthValue() == now.minusMonths(1).getMonthValue() && 
                          r.getDate().getYear() == now.minusMonths(1).getYear())
             .count();
-            
+
         double reviewGrowth = 0;
         if (reviewsLastMonth > 0) {
             reviewGrowth = ((double) (totalReviewsThisMonth - reviewsLastMonth) / reviewsLastMonth) * 100;
@@ -120,16 +128,16 @@ public class AdminController {
         model.addAttribute("activeProducts", activeProducts);
         model.addAttribute("openAuctions", openAuctions);
         model.addAttribute("totalReviews", totalReviewsThisMonth);
-        
+
         // Mock percentages for now (as User has no createdAt)
         model.addAttribute("userGrowth", 8.2);
         model.addAttribute("artisanGrowth", 12.5);
         model.addAttribute("productGrowth", productGrowth);
         model.addAttribute("auctionGrowth", auctionGrowth);
         model.addAttribute("reviewGrowth", reviewGrowth);
-        
+
         List<Order> allOrders = orderRepository.findAll();
-        
+
         // Orders per week (last 6 weeks)
         int[] ordersPerWeek = new int[6];
         for (Order order : allOrders) {
@@ -143,7 +151,7 @@ public class AdminController {
             }
         }
         model.addAttribute("ordersPerWeek", ordersPerWeek);
-        
+
         // Revenue per month (last 6 months)
         double[] revenuePerMonth = new double[6];
         String[] monthLabels = new String[6];
@@ -152,7 +160,7 @@ public class AdminController {
             monthLabels[i] = monthDate.getMonth().name().substring(0, 3);
             final int currentMonth = monthDate.getMonthValue();
             final int currentYear = monthDate.getYear();
-            
+
             double monthlyRevenue = allOrders.stream()
                 .filter(o -> o.getDate() != null && o.getDate().getMonthValue() == currentMonth && o.getDate().getYear() == currentYear)
                 .mapToDouble(Order::getTotalAmount)
@@ -180,7 +188,31 @@ public class AdminController {
 
 
     @GetMapping("/adminAuction")
-    public String adminAuction() {
+    public String adminAuction(Model model) {
+        auctionService.syncStoredStatuses();
+        List<com.example.demo.model.Auction> allAuctions = auctionRepository.findAll();
+
+        Map<Long, Long> auctionBidsMap = new java.util.HashMap<>();
+        java.util.Set<String> categories = new java.util.TreeSet<>();
+        java.util.Set<String> artisans = new java.util.TreeSet<>();
+
+        for (com.example.demo.model.Auction a : allAuctions) {
+            auctionBidsMap.put(a.getId(), bidRepository.countByAuctionId(a.getId()));
+            if (a.getProduct() != null) {
+                if (a.getProduct().getCategory() != null && !a.getProduct().getCategory().trim().isEmpty()) {
+                    categories.add(a.getProduct().getCategory().trim());
+                }
+                if (a.getProduct().getArtisanName() != null && !a.getProduct().getArtisanName().trim().isEmpty()) {
+                    artisans.add(a.getProduct().getArtisanName().trim());
+                }
+            }
+        }
+
+        model.addAttribute("auctionsList", allAuctions);
+        model.addAttribute("auctionBidsMap", auctionBidsMap);
+        model.addAttribute("categoriesList", categories);
+        model.addAttribute("artisansList", artisans);
+
         return "adminAuction";
     }
 
