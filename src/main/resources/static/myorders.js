@@ -245,21 +245,51 @@ function openOrderModal(row) {
                     <p class="font-semibold text-sm text-[#5c4a3d]">${escapeHtml(item.title)}</p>
                     <p class="text-xs text-[#8b7355]">Qty: ${item.quantity} | ${Number(item.price).toFixed(2)} BD</p>
                     ${item.refundRequested ? `
-                        <span class="inline-flex items-center px-2 py-0.5 mt-1 rounded text-xs font-semibold ${
-                            item.adminRefundStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                            item.adminRefundStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                            item.refundStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                            item.refundStatus === 'DECLINED' ? 'bg-amber-100 text-amber-800' :
-                            item.refundStatus === 'ESCALATED' ? 'bg-blue-100 text-blue-800' :
-                            'bg-amber-100 text-amber-800'
-                        }">Refund: ${
-                            item.adminRefundStatus === 'APPROVED' ? 'Approved by Admin' :
-                            item.adminRefundStatus === 'REJECTED' ? 'Rejected by Admin' :
-                            item.refundStatus === 'DECLINED' ? 'Artisan reject and waiting the admin respond' :
-                            item.refundStatus === 'ESCALATED' ? 'Escalated to Admin' :
-                            item.refundStatus === 'APPROVED' ? 'Approved' :
-                            escapeHtml(item.refundStatus)
-                        }</span>
+                        <div class="mt-2 flex flex-col gap-1.5 p-3 rounded-lg bg-[#faf9f6] border border-[#e5e0d8]">
+                            <div class="flex items-center justify-between">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide uppercase ${
+                                    item.adminRefundStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                                    item.adminRefundStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                                    item.refundStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                                    item.refundStatus === 'DECLINED' ? 'bg-amber-100 text-amber-800' :
+                                    item.refundStatus === 'ESCALATED' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-700'
+                                }">Refund: ${
+                                    item.adminRefundStatus === 'APPROVED' ? 'Approved by Admin' :
+                                    item.adminRefundStatus === 'REJECTED' ? 'Rejected by Admin' :
+                                    item.refundStatus === 'DECLINED' ? 'Artisan Reject (Waiting Admin)' :
+                                    item.refundStatus === 'ESCALATED' ? 'Escalated to Admin' :
+                                    item.refundStatus === 'APPROVED' ? 'Approved' :
+                                    'Pending Review'
+                                }</span>
+                                <span class="text-xs text-[#8b7355]">
+                                    <span class="font-bold text-[#c17c5f]">${Number(order.items.length === 1 ? order.totalAmount : item.price * item.quantity).toFixed(2)} BD</span>
+                                    ${order.items.length === 1 && order.totalAmount > (item.price * item.quantity) ? '<span class="text-[9px] text-green-600 ml-1"><i class="fas fa-truck mr-0.5"></i>Inc. Delivery</span>' : ''}
+                                </span>
+                            </div>
+                            
+                            ${(item.adminRefundStatus === 'REJECTED' || item.adminRefundStatus === 'APPROVED') && item.adminNote ? `
+                                <div class="${item.adminRefundStatus === 'APPROVED' ? 'bg-green-50 text-green-800 border-green-100' : 'bg-red-50 text-red-800 border-red-100'} p-2 rounded text-xs border">
+                                    <strong class="font-bold">Admin Note:</strong> ${escapeHtml(item.adminNote)}
+                                </div>
+                            ` : ''}
+                            
+                            ${item.refundStatus === 'DECLINED' && item.adminRefundStatus !== 'APPROVED' && item.adminRefundStatus !== 'REJECTED' && item.artisanRefusalReason ? `
+                                <div class="bg-amber-50 p-2 rounded text-xs text-amber-800 border border-amber-100">
+                                    <strong class="font-bold">Artisan Reason:</strong> ${escapeHtml(item.artisanRefusalReason)}
+                                </div>
+                            ` : ''}
+
+                            ${(item.refundStatus === 'APPROVED' || item.adminRefundStatus === 'APPROVED') ? `
+                                <div class="bg-green-50 p-2 rounded text-xs text-green-800 border border-green-200 mt-0.5 shadow-sm flex gap-2 items-start">
+                                    <i class="fas fa-box-open mt-0.5 text-green-600"></i>
+                                    <p>
+                                        <strong class="font-bold block text-[11px] uppercase tracking-wide text-green-700 mb-0.5">Return Process Started</strong>
+                                        Please prepare the requested item for the delivery person to take it.
+                                    </p>
+                                </div>
+                            ` : ''}
+                        </div>
                     ` : ''}
                 </div>
             </div>
