@@ -32,6 +32,9 @@ public class OrderController {
     @Autowired
     private com.example.demo.service.NotificationService notificationService;
 
+    @Autowired
+    private com.example.demo.repository.UserRepository userRepository;
+
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<?> getMyOrders(@RequestHeader(value = "X-User-Email", required = false) String email) {
@@ -200,6 +203,22 @@ public class OrderController {
             "REFUND_UPDATE",
             "/orders"
         );
+
+        // Notify Admins if declined or escalated
+        if ("DECLINE".equals(status) || "ESCALATE".equals(status)) {
+            String adminMsg = "Artisan " + item.getProduct().getArtisan().getName() + " has " + status.toLowerCase() + "d the refund request for order #" + item.getOrder().getOrderId() + ". " + ("DECLINE".equals(status) ? "Reason: " + payload.get("refusalReason") : "");
+            userRepository.findAll().stream()
+                .filter(u -> "ADMIN".equalsIgnoreCase(u.getRole()))
+                .forEach(admin -> {
+                    notificationService.sendNotification(
+                        admin,
+                        "Refund Requires Review",
+                        adminMsg,
+                        "REFUND_ADMIN_REVIEW",
+                        "/adminRefund"
+                    );
+                });
+        }
 
         return ResponseEntity.ok(Map.of("success", true, "message", "Refund status updated."));
     }

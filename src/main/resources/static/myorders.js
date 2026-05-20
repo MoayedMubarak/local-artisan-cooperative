@@ -246,11 +246,20 @@ function openOrderModal(row) {
                     <p class="text-xs text-[#8b7355]">Qty: ${item.quantity} | ${Number(item.price).toFixed(2)} BD</p>
                     ${item.refundRequested ? `
                         <span class="inline-flex items-center px-2 py-0.5 mt-1 rounded text-xs font-semibold ${
+                            item.adminRefundStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                            item.adminRefundStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
                             item.refundStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                            item.refundStatus === 'DECLINED' ? 'bg-red-100 text-red-800' :
+                            item.refundStatus === 'DECLINED' ? 'bg-amber-100 text-amber-800' :
                             item.refundStatus === 'ESCALATED' ? 'bg-blue-100 text-blue-800' :
                             'bg-amber-100 text-amber-800'
-                        }">Refund: ${escapeHtml(item.refundStatus)}</span>
+                        }">Refund: ${
+                            item.adminRefundStatus === 'APPROVED' ? 'Approved by Admin' :
+                            item.adminRefundStatus === 'REJECTED' ? 'Rejected by Admin' :
+                            item.refundStatus === 'DECLINED' ? 'Artisan reject and waiting the admin respond' :
+                            item.refundStatus === 'ESCALATED' ? 'Escalated to Admin' :
+                            item.refundStatus === 'APPROVED' ? 'Approved' :
+                            escapeHtml(item.refundStatus)
+                        }</span>
                     ` : ''}
                 </div>
             </div>

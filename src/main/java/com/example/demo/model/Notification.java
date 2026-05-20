@@ -17,6 +17,8 @@ public class Notification {
     private User user;
 
     private String title;
+    
+    @Column(length = 4000)
     private String message;
     private String type; // e.g., AUCTION_START, BID_OUTBID, ORDER_SHIPPED
     private LocalDateTime timestamp;
